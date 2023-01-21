@@ -1,0 +1,31 @@
+{
+	"name": "feedlanddatabase",
+	"version": "0.4.26",
+	"author": "Dave Winer <dave@scripting.com>",
+	"main": "database.js",
+	"license": "MIT",
+	"files": [
+		"database.js",
+		"worknotes.md",
+		"database.md",
+		"source.opml"
+		],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/scripting/feedlandDatabase.git"
+		},
+	"dependencies" : {
+		"request": "*",
+		"md5": "*",
+		"sanitize-html": "*",
+		"marked": "3.0.8",
+		"daveutils": "*",
+		"daverss": "*",
+		"daves3": "*",
+		"nodejs-websocket": "*",
+		"davesql": "*",
+		"davegithub": "*",
+		"reallysimple": "*",
+		"opml": "*"
+		} 
+	}
