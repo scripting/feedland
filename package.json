@@ -1,0 +1,32 @@
+{
+	"name": "feedland",
+	"version": "0.4.11",
+	"author": "Dave Winer <dave@scripting.com>",
+	"license": "GPLV2",
+	"main": "feedland.js",
+	"files": [
+		"blog.js",
+		"readme.md"
+		],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/scripting/feedLandServer.git"
+		},
+	"dependencies" : {
+		"request": "*",
+		"md5": "*",
+		"sanitize-html": "*",
+		"marked": "3.0.8",
+		"daveutils": "*",
+		"davetwitter": "*",
+		"daveappserver": "*",
+		"daverss": "*",
+		"daves3": "*",
+		"nodejs-websocket": "*",
+		"davesql": "*",
+		"reallysimple": "*",
+		"davegithub": "*",
+		"feedlanddatabase": "*",
+		"opml": "*"
+		} 
+	}
