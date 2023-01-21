@@ -1,9 +1,5 @@
 # feedLand
 
-The server software behind the FeedLand UI.
-
-### What is this?
-
 This is the source code for the NPM package <a href="https://www.npmjs.com/package/feedland?activeTab=readme">feedland</a>. 
 
 ### How to use?
