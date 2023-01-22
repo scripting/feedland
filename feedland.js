@@ -1,4 +1,4 @@
-const myVersion = "0.4.11", myProductName = "feedland"; 
+const myVersion = "0.4.12", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -48,9 +48,11 @@ var config = {
 	
 	flBackupOnStartup: false, //1/9/23 by DW
 	
-	flNewsProducts: false, //1/20/23 by DW -- these features default to off
+	flNewsProducts: false, //1/20/23 by DW
 	flUserFeeds: false, 
-	flLikesFeeds: false 
+	flLikesFeeds: false, 
+	
+	urlStarterFeeds: "http://scripting.com/publicfolder/feedland/subscriptionLists/starterfeeds.opml" //1/22/23 by DW
 	};
 
 var whenLastDayRollover = new Date ();
@@ -185,7 +187,6 @@ function asyncAddMacroToPagetable (pagetable, theRequest, callback) { //12/2/22 
 		}
 	}
 function addMacroToPagetable (pagetable) {
-	
 	function getConfigJson () {
 		var theConfig = new Object ();
 		function addvalue (name) {
@@ -216,6 +217,7 @@ function addMacroToPagetable (pagetable) {
 		addvalue ("productName");
 		addvalue ("productNameForDisplay");
 		addvalue ("urlServerHomePageSource");
+		addvalue ("urlStarterFeeds"); //1/22/23 by DW
 		return (utils.jsonStringify (theConfig));
 		}
 	pagetable.urlForFeeds = config.urlForFeeds;

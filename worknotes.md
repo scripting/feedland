@@ -1,3 +1,9 @@
+#### 1/22/23; 10:40:58 AM by DW
+
+New config.json setting -- urlStarterFeeds.
+
+Moved emailtemplate.html to the feedlandInstall repo.
+
 #### 1/21/23; 11:24:35 AM by DW
 
 The idea of doing a new build every time there's a new element of config.json isn't going to work well in the future, because of the way we're including every item specially in the pagetable that the home page is rendered through. It would mean we couldn't add code that depends on a value from config.json unless every installation had already upgraded to the new version of the server software. That has been somewhat manageable with two instances, the public one and my test version, but it would be completely out of hand when there are N instances. 
