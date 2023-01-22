@@ -1,3 +1,7 @@
+#### 1/22/23 by DW -- 0.5.3
+
+If config.flLikesFeeds is false don't build likes feeds.
+
 #### 10/24/22 by DW
 
 getAllUsers now returns ctSubs for each user.

@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.4.26";  
+var myProductName = "feedlandDatabase", myVersion = "0.5.3";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -2313,81 +2313,88 @@ function getLikes (itemId, callback) {
 	}
 
 function buildLikesFeed (screenname, callback) { //10/19/22 by DW
-	function buildOne (flForAll, callback) {
-		const whenstart = new Date ();
-		const whereClause = (flForAll) ? "" : " where likes.listName=" + davesql.encode (screenname) + " ";
-		const sqltext = "select likes.listName, likes.itemId, likes.whenCreated, items.title, items.link, items.description, items.pubDate, items.guid, items.enclosureUrl, items.enclosureType, items.enclosureLength from likes inner join items on likes.itemId = items.id " + whereClause + " order by likes.whenCreated desc limit " + config.maxRssItems + ";"
-		davesql.runSqltext (sqltext, function (err, likedRecs) {
-			if (err) {
-				callback (err);
-				}
-			else {
-				let title = (flForAll) ? "FeedLand likes for all users" : "FeedLand likes for " + screenname;
-				let description = (flForAll) ? "Recent liked items from the people of FeedLand" : "Recent FeedLand likes for " + screenname;
-				let headElements = {
-					title,
-					link: "http://feedland.org/?likes",
-					description,
-					language: "en-us",
-					generator: myProductName + " v" + myVersion,
-					flRssCloudEnabled: true, 
-					rssCloudDomain: "rpc.rsscloud.io",
-					rssCloudPort: 5337,
-					rssCloudPath: "/pleaseNotify",
-					rssCloudRegisterProcedure: "",
-					rssCloudProtocol: "http-post",
-					maxFeedItems: 25
-					};
-				let historyArray = new Array ();
-				likedRecs.forEach (function (likedRec) {
-					var rssItem = {
-						title: checkNull (likedRec.title),
-						link: checkNull (likedRec.link),
-						text: checkNull (likedRec.description),
-						when: checkNull (likedRec.whenCreated),
-						twitterScreenName: checkNull (likedRec.listName),
-						guid: {
-							flPermalink: false,
-							value: likedRec.itemId
-							}
+	if (config.flLikesFeeds) { //1/22/23 by DW
+		function buildOne (flForAll, callback) {
+			const whenstart = new Date ();
+			const whereClause = (flForAll) ? "" : " where likes.listName=" + davesql.encode (screenname) + " ";
+			const sqltext = "select likes.listName, likes.itemId, likes.whenCreated, items.title, items.link, items.description, items.pubDate, items.guid, items.enclosureUrl, items.enclosureType, items.enclosureLength from likes inner join items on likes.itemId = items.id " + whereClause + " order by likes.whenCreated desc limit " + config.maxRssItems + ";"
+			davesql.runSqltext (sqltext, function (err, likedRecs) {
+				if (err) {
+					callback (err);
+					}
+				else {
+					let title = (flForAll) ? "FeedLand likes for all users" : "FeedLand likes for " + screenname;
+					let description = (flForAll) ? "Recent liked items from the people of FeedLand" : "Recent FeedLand likes for " + screenname;
+					let headElements = {
+						title,
+						link: "http://feedland.org/?likes",
+						description,
+						language: "en-us",
+						generator: myProductName + " v" + myVersion,
+						flRssCloudEnabled: true, 
+						rssCloudDomain: "rpc.rsscloud.io",
+						rssCloudPort: 5337,
+						rssCloudPath: "/pleaseNotify",
+						rssCloudRegisterProcedure: "",
+						rssCloudProtocol: "http-post",
+						maxFeedItems: 25
 						};
-					if (notNull (likedRec.enclosureUrl) && notNull (likedRec.enclosureType)) {
-						if (!utils.beginsWith (likedRec.enclosureType.toLowerCase (), "image")) {
-							rssItem.enclosure = {
-								url: checkNull (likedRec.enclosureUrl),
-								type: checkNull (likedRec.enclosureType),
-								length: checkNull (likedRec.enclosureLength)
+					let historyArray = new Array ();
+					likedRecs.forEach (function (likedRec) {
+						var rssItem = {
+							title: checkNull (likedRec.title),
+							link: checkNull (likedRec.link),
+							text: checkNull (likedRec.description),
+							when: checkNull (likedRec.whenCreated),
+							twitterScreenName: checkNull (likedRec.listName),
+							guid: {
+								flPermalink: false,
+								value: likedRec.itemId
+								}
+							};
+						if (notNull (likedRec.enclosureUrl) && notNull (likedRec.enclosureType)) {
+							if (!utils.beginsWith (likedRec.enclosureType.toLowerCase (), "image")) {
+								rssItem.enclosure = {
+									url: checkNull (likedRec.enclosureUrl),
+									type: checkNull (likedRec.enclosureType),
+									length: checkNull (likedRec.enclosureLength)
+									}
 								}
 							}
-						}
-					historyArray.push (rssItem);
-					});
-				let xmltext = rss.buildRssFeed (headElements, historyArray); 
-				let s3path = config.s3LikesPath + ((flForAll) ? "all.xml" : screenname + ".xml");
-				let urlFeed = "http:/" + s3path;
-				s3.newObject (s3path, xmltext, "text/xml", "public-read", function (err, data) {
-					if (err) {
-						console.log ("buildLikesFeed: err.message == " + err.message);
-						callback (err);
-						}
-					else {
-						console.log ("buildLikesFeed: " + utils.secondsSince (whenstart) + " secs.");
-						checkOneFeed (urlFeed, function () { //10/17/22 by DW
-							rss.cloudPing (undefined, urlFeed);
-							});
-						callback (undefined, urlFeed);
-						}
-					});
-				}
+						historyArray.push (rssItem);
+						});
+					let xmltext = rss.buildRssFeed (headElements, historyArray); 
+					let s3path = config.s3LikesPath + ((flForAll) ? "all.xml" : screenname + ".xml");
+					let urlFeed = "http:/" + s3path;
+					s3.newObject (s3path, xmltext, "text/xml", "public-read", function (err, data) {
+						if (err) {
+							console.log ("buildLikesFeed: err.message == " + err.message);
+							callback (err);
+							}
+						else {
+							console.log ("buildLikesFeed: " + utils.secondsSince (whenstart) + " secs.");
+							checkOneFeed (urlFeed, function () { //10/17/22 by DW
+								rss.cloudPing (undefined, urlFeed);
+								});
+							callback (undefined, urlFeed);
+							}
+						});
+					}
+				});
+			}
+		buildOne (true, function (err, data) {
+			buildOne (false, function (err, data) {
+				if (callback !== undefined) {
+					callback (err, data);
+					}
+				});
 			});
 		}
-	buildOne (true, function (err, data) {
-		buildOne (false, function (err, data) {
-			if (callback !== undefined) {
-				callback (err, data);
-				}
-			});
-		});
+	else {
+		if (callback !== undefined) { //1/22/23 by DW
+			callback (undefined, undefined);
+			}
+		}
 	}
 
 function pleaseNotify (urlServer, port, path, urlFeed, domain, callback) { //rssCloud support

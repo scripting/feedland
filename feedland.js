@@ -1,4 +1,4 @@
-const myVersion = "0.4.12", myProductName = "feedland"; 
+const myVersion = "0.4.15", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -329,7 +329,6 @@ function regenerateEmailSecret (screenname, callback) {
 			}
 		});
 	}
-
 
 function getUserRecFromEmail (emailAddress, emailSecret, callback) { //12/13/22 by DW
 	const sqltext = "select * from users where emailAddress = " + davesql.encode (emailAddress) + " and emailSecret = " + davesql.encode (emailSecret) + ";";
