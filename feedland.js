@@ -1,19 +1,20 @@
-const myVersion = "0.4.25", myProductName = "feedland"; 
+const myVersion = "0.4.30", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
 const fs = require ("fs");
 const request = require ("request");
 const utils = require ("daveutils");
-const daveappserver = require ("daveappserver"); //9/13/22 by DW
 const davetwitter = require ("davetwitter"); 
+const daveappserver = require ("daveappserver");
 const davesql = require ("davesql");
-const reallysimple = require ("reallysimple");
 const opml = require ("opml");
-const database = require ("feedlanddatabase");
+const database = require ("feedlanddatabase"); 
+const reallysimple = require ("reallysimple");
 const blog = require ("./blog.js");
 const process = require ("process"); //9/14/22 by DW
 const qs = require ("querystring"); //10/9/22 by DW
+
 
 var config = {
 	urlForFeeds: "http://data.feedland.org/feeds/", //11/5/22 by DW
@@ -732,8 +733,11 @@ function handleHttpRequest (theRequest) {
 							});
 						}
 					return (true); 
-				case "/isemailindatabase": //1/12/23; 11:54:04 AM by DW
+				case "/isemailindatabase": //1/12/23 by DW
 					isEmailInDatabase (params.email, returnData);
+					return (true); 
+				case "/isfeedinriver": //2/1/23 by DW
+					database.isFeedInRiver (params.url, params.cachekey, httpReturn);
 					return (true); 
 				case config.rssCloud.feedUpdatedCallback: //12/12/22 by DW
 					returnPlainText (params.challenge);

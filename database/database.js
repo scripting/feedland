@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.5.3";  
+var myProductName = "feedlandDatabase", myVersion = "0.5.6";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -61,6 +61,7 @@ exports.renewNextSubscriptionIfReady = renewNextSubscriptionIfReady; //10/9/22 b
 exports.renewFeedNow = renewFeedNow; //10/9/22 by DW
 
 exports.getCurrentRiverBuildLog = getCurrentRiverBuildLog; //10/10/22 by DW
+exports.isFeedInRiver = isFeedInRiver; //2/1/23 by DW
 
 
 const fs = require ("fs");
@@ -146,7 +147,7 @@ var stats = {
 
 var riverCache = new Object (); //8/22/22 by DW
 const flUseRiverCache = true; //9/14/22 by DW -- https://github.com/scripting/feedlandSupport/issues/54
-const ctSecsLifeRiverCache = 5 * 60; //cached rivers age-out after 5 minutes
+const ctSecsLifeRiverCache = 15 * 60; //cached rivers age-out after 60 minutes -- changed from 15 minutes -- 2/2/23 by DW
 
 var riverBuildLog = new Array (); //10/10/22 by DW
 var flRiverBuildLogChanged = false;
@@ -1301,6 +1302,20 @@ function clearOldCachedRivers () { //9/15/22 by DW
 			}
 		}
 	}
+function isFeedInRiver (feedUrl, cachekey, callback) { //2/1/23 by DW
+	var flInRiver = false;
+	if (riverCache [cachekey] !== undefined) {
+		var feedUrlList = riverCache [urlOpml].feedUrlList;
+		if (feedUrlList !== undefined) {
+			feedUrlList.forEach (function (url) {
+				if (url == feedUrl) {
+					flInRiver = true;
+					}
+				});
+			}
+		}
+	callback (undefined, flInRiver);
+	}
 
 function startBuildLog () { //10/10/22 by DW
 	if (config.flRiverBuildLogEnabled) {
@@ -1339,7 +1354,7 @@ function saveCurrentBuildLog () {
 		}
 	}
 
-function getRiver (feedUrl, screenname, callback) {
+function getRiver (feedUrl, screenname, callback, metadata=undefined) {
 	const whenstart = new Date ();
 	function getFeedClause () {
 		var feedClause;
@@ -1428,6 +1443,7 @@ function getRiver (feedUrl, screenname, callback) {
 			addToRiverBuildLog (whenstart, sqltext);
 			if (callback !== undefined) {
 				let jstruct = sortRiver (convertItemList (result));
+				jstruct.metadata = metadata; //2/1/23 by DW
 				let jsontext = utils.jsonStringify (jstruct);
 				callback (undefined, jsontext);
 				}
@@ -1441,8 +1457,10 @@ function getRiverFromList (jsontext, callback) {
 		}
 	catch (err) {
 		callback (err);
+		return; //2/1/23 by DW
 		}
-	getRiver (feedUrlList, undefined, callback);
+	const metadata = {cachekey: ""}; //2/1/23 by DW
+	getRiver (feedUrlList, undefined, callback, metadata);
 	}
 function getRiverFromOpml (urlOpml, callback) { //8/21/22 by DW
 	const whenstart = new Date ();
@@ -1456,6 +1474,7 @@ function getRiverFromOpml (urlOpml, callback) { //8/21/22 by DW
 				callback (err);
 				}
 			else {
+				const metadata = {cachekey: urlOpml}; //2/1/23 by DW
 				var feedUrlList = new Array ();
 				opml.visitAll (theOutline, function (node) {
 					if (notComment (node)) {
@@ -1467,13 +1486,14 @@ function getRiverFromOpml (urlOpml, callback) { //8/21/22 by DW
 						}
 					return (true); //keep visiting
 					});
+				metadata.feedUrlList = feedUrlList; 
 				getRiver (feedUrlList, undefined, function (err, river) {
 					if (!err) {
 						addToRiverCache (urlOpml, feedUrlList, river); //9/15/22 by DW
 						}
 					console.log ("getRiverFromOpml: urlOpml == " + urlOpml + ", " + utils.secondsSince (whenstart) + " secs.");
 					callback (err, river);
-					});
+					}, metadata);
 				}
 			});
 		}
@@ -1510,13 +1530,14 @@ function getRiverFromCategory (screenname, catname, callback) {
 					callback ({message});
 					}
 				else {
+					const metadata = {cachekey, feedUrlList}; //2/1/23 by DW
 					getRiver (feedUrlList, undefined, function (err, river) {
 						if (!err) {
 							addToRiverCache (cachekey, feedUrlList, river); //9/15/22 by DW
 							}
 						console.log ("getRiverFromCategory: cachekey == " + cachekey + ", " + utils.secondsSince (whenstart) + " secs.");
 						callback (err, river);
-						});
+						}, metadata);
 					}
 				}
 			});
@@ -1528,12 +1549,13 @@ function getRiverFromEverything (callback) { //10/14/22 by DW
 		callback (undefined, riverCache [cachekey].river);
 		}
 	else {
+		const metadata = {cachekey: "everything"}; //2/1/23 by DW
 		getRiver (undefined, undefined, function (err, river) {
 			if (!err) {
 				addToRiverCache (cachekey, undefined, river); 
 				}
 			callback (err, river);
-			});
+			}, metadata);
 		}
 	}
 function getRiverFromHotlist (callback) { //10/15/22 by DW
@@ -1556,12 +1578,13 @@ function getRiverFromHotlist (callback) { //10/15/22 by DW
 					callback ({message});
 					}
 				else {
+					const metadata = {cachekey, feedUrlList}; //2/1/23 by DW
 					getRiver (feedUrlList, undefined, function (err, river) {
 						if (!err) {
 							addToRiverCache (cachekey, feedUrlList, river); 
 							}
 						callback (err, river);
-						});
+						}, metadata);
 					}
 				}
 			});
@@ -1599,12 +1622,13 @@ function getRiverFromUserFeeds (callback) { //12/3/22 by DW
 					callback ({message});
 					}
 				else {
+					const metadata = {cachekey, feedUrlList}; //2/1/23 by DW
 					getRiver (feedUrlList, undefined, function (err, river) {
 						if (!err) {
 							addToRiverCache (cachekey, feedUrlList, river); 
 							}
 						callback (err, river);
-						});
+						}, metadata);
 					}
 				}
 			});
