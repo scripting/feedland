@@ -1,4 +1,4 @@
-const myVersion = "0.5.1", myProductName = "feedland"; 
+const myVersion = "0.5.8", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -331,6 +331,7 @@ function regenerateEmailSecret (screenname, callback) {
 		});
 	}
 
+
 function getUserRecFromEmail (emailAddress, emailSecret, callback) { //12/13/22 by DW
 	const sqltext = "select * from users where emailAddress = " + davesql.encode (emailAddress) + " and emailSecret = " + davesql.encode (emailSecret) + ";";
 	davesql.runSqltext (sqltext, function (err, result) {
@@ -343,6 +344,22 @@ function getUserRecFromEmail (emailAddress, emailSecret, callback) { //12/13/22 
 				}
 			else {
 				callback (undefined, result [0]);
+				}
+			}
+		});
+	}
+function isUserInDatabase (emailaddress, callback) { //2/15/23 by DW -- xxx
+	const sqltext = "select * from users where emailAddress = " + davesql.encode (emailaddress) + ";";
+	davesql.runSqltext (sqltext, function (err, result) {
+		if (err) {
+			callback (false);
+			}
+		else {
+			if (result.length == 0) {
+				callback (false);
+				}
+			else {
+				callback (true, result [0]);
 				}
 			}
 		});
@@ -758,7 +775,8 @@ var options = {
 	asyncAddMacroToPagetable, //12/2/22 by DW
 	addEmailToUserInDatabase, //12/7/22 by DW
 	getScreenname, //12/23/22 by DW
-	getScreenNameFromEmail //1/10/23 by DW
+	getScreenNameFromEmail, //1/10/23 by DW
+	isUserInDatabase //2/15/23 by DW
 	}
 function start () {
 	daveappserver.start (options, function (appConfig) {

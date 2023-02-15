@@ -2,7 +2,7 @@
 	"name": "feedland",
 	"description": "The top level of the FeedLand server, the source code for the NPM feedland package.",
 	"author": "Dave Winer <dave@scripting.com>",
-	"version": "0.5.1",
+	"version": "0.5.8",
 	"license": "GPLV2",
 	"main": "feedland.js",
 	"files": [
