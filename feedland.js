@@ -1,4 +1,4 @@
-const myVersion = "0.5.8", myProductName = "feedland"; 
+const myVersion = "0.5.9", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -53,7 +53,7 @@ var config = {
 	flUserFeeds: false, 
 	flLikesFeeds: false, 
 	
-	urlStarterFeeds: "http://scripting.com/publicfolder/feedland/subscriptionLists/starterfeeds.opml" //1/22/23 by DW
+	urlStarterFeeds: "//s3.amazonaws.com/scripting.com/publicfolder/feedland/subscriptionLists/starterfeeds.opml" //2/15/23 by DW
 	};
 
 var whenLastDayRollover = new Date ();
