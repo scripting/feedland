@@ -1,3 +1,7 @@
+#### 3/13/23; 10:29:46 AM by DW
+
+Preparing to switch feedland.org over to email identity.
+
 #### 1/22/23; 10:40:58 AM by DW
 
 New config.json setting -- urlStarterFeeds.

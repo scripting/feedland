@@ -36,7 +36,7 @@ function getBlogUrl (screenname) {
 	return (urlfeed);
 	}
 function getBlogLinkValue (screenname) { //11/9/22 by DW
-	return ("http://feedland.org/?river=" + config.urlForFeeds + + screenname + ".xml");
+	return ("http://feedland.org/?river=" + config.urlForFeeds + screenname + ".xml");
 	}
 function buildRss (screenname, callback) {
 	const feedUrl = getBlogUrl (screenname), whenstart = new Date ();
