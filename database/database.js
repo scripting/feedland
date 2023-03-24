@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.5.6";  
+var myProductName = "feedlandDatabase", myVersion = "0.5.7";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -2370,7 +2370,6 @@ function buildLikesFeed (screenname, callback) { //10/19/22 by DW
 							link: checkNull (likedRec.link),
 							text: checkNull (likedRec.description),
 							when: checkNull (likedRec.whenCreated),
-							twitterScreenName: checkNull (likedRec.listName),
 							guid: {
 								flPermalink: false,
 								value: likedRec.itemId
@@ -2385,6 +2384,14 @@ function buildLikesFeed (screenname, callback) { //10/19/22 by DW
 									}
 								}
 							}
+						
+						if (notNull (likedRec.listName)) { //3/21/23 by DW
+							rssItem.account = {
+								service: config.myDomain,
+								name: likedRec.listName
+								};
+							}
+						
 						historyArray.push (rssItem);
 						});
 					let xmltext = rss.buildRssFeed (headElements, historyArray); 

@@ -1,3 +1,7 @@
+#### 3/21/23 by DW
+
+In likes feeds, the listname is not a twitter identifier.
+
 #### 1/22/23 by DW -- 0.5.3
 
 If config.flLikesFeeds is false don't build likes feeds.

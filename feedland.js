@@ -1,4 +1,4 @@
-const myVersion = "0.5.11", myProductName = "feedland"; 
+const myVersion = "0.5.16", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -45,7 +45,7 @@ var config = {
 		feedUpdatedCallback: "/feedupdated"
 		},
 	flRenewSubscriptions: true, //10/29/22 by DW
-	urlFeedlandApp: "http://feedland.org/", //11/10/22 by DW
+	urlFeedlandApp: "https://feedland.org/", //11/10/22 by DW
 	
 	flBackupOnStartup: false, //1/9/23 by DW
 	
@@ -231,7 +231,7 @@ function addMacroToPagetable (pagetable) {
 	pagetable.configJson = getConfigJson (); //1/21/23 by DW
 	
 	//12/2/22 by DW -- set up the normal case for the Facebook/Twitter metadata
-		pagetable.metaUrl = "http://feedland.org/";
+		pagetable.metaUrl = "https://feedland.org/";
 		pagetable.metaTitle = "FeedLand";
 		pagetable.metaDescription = "The first full feed management system. Share lists of feeds with other users, both in and outside of FeedLand. Writing feeds, reading news.";
 		pagetable.metaTwitterOwnerName = "@davewiner";
