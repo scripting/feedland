@@ -1,3 +1,17 @@
+#### 4/2/23; 5:35:21 PM by DW
+
+Changes in blog.js to support saving of title, link and enclosureUrl from the editor. 
+
+#### 3/29/23; 9:40:08 AM by DW
+
+New setting, config.flNightlyBackup. Default false. 
+
+If true we backup the database at midnight local time. 
+
+I needed this because it seems my database has gotten to large to do this in memory. It appears the feedland.js app crashes every night at midnight. 
+
+This should have always been a config setting, imho.
+
 #### 3/13/23; 10:29:46 AM by DW
 
 Preparing to switch feedland.org over to email identity.

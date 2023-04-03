@@ -1,4 +1,4 @@
-const myVersion = "0.5.16", myProductName = "feedland"; 
+const myVersion = "0.5.22", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -48,6 +48,7 @@ var config = {
 	urlFeedlandApp: "https://feedland.org/", //11/10/22 by DW
 	
 	flBackupOnStartup: false, //1/9/23 by DW
+	flNightlyBackup: false, //3/29/23 by DW
 	
 	flNewsProducts: false, //1/20/23 by DW
 	flUserFeeds: false, 
@@ -420,7 +421,9 @@ function getScreenname (params, callback) { //12/23/22 by DW
 	}
 
 function everyNight () { //8/22/22 by DW
-	database.backupDatabase (); 
+	if (config.flNightlyBackup) { //3/29/23 by DW
+		database.backupDatabase (); 
+		}
 	}
 function everyMinute () {
 	}

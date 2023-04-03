@@ -1,5 +1,6 @@
 const fs = require ("fs"); 
 const marked = require ("marked"); 
+const request = require ("request"); 
 const utils = require ("daveutils");
 const rss = require ("daverss");
 const s3 = require ("daves3");
@@ -118,12 +119,22 @@ function buildRss (screenname, callback) {
 								description = fixMediumEditorQuirks (description);
 								}
 							
+							var enclosure = undefined; //4/3/23 by DW
+							if (notNull (item.enclosureUrl) && notNull (item.enclosureLength) && notNull (item.enclosureType)) { //4/3/23 by DW
+								enclosure = {
+									url: item.enclosureUrl,
+									length: item.enclosureLength,
+									type: item.enclosureType
+									}
+								}
+							
 							historyArray.push ({
 								title: checkNull (item.title),
 								text: description,
 								link: item.guid, //11/11/22 by DW
 								markdowntext: checkNull (item.markdowntext), //5/5/22 by DW
 								when: item.pubDate,
+								enclosure, //4/3/23 by DW
 								guid: {
 									flPermalink: utils.beginsWith (item.guid, config.urlFeedlandApp),
 									value: item.guid
@@ -214,6 +225,65 @@ function addFeedIfNecessary (screenname, callback) { //5/8/22 by DW
 			}
 		});
 	}
+
+
+function getEnclosureInfo (enclosureUrl, callback) { //4/3/23 by DW
+	var options = {
+		method: "HEAD",
+		uri: enclosureUrl
+		};
+	request (options, function (err, response, body) {
+		if (err) {
+			callback (err);
+			}
+		else {
+			if (response.statusCode != 200) {
+				const message = "Can't get enclosure info because there was an error.";
+				callback ({message});
+				}
+			else {
+				const jstruct = {
+					length: response.headers ["content-length"],
+					type: response.headers ["content-type"]
+					}
+				callback (undefined, jstruct);
+				}
+			}
+		});
+	}
+
+function checkEnclosure (itemRec, callback) { //4/3/23 by DW
+	function isNull (val) {
+		if (val === undefined) {
+			return (true);
+			}
+		if (val == null) {
+			return (true);
+			}
+		return (false);
+		}
+	if (isNull (itemRec.enclosureUrl)) { 
+		callback ();
+		}
+	else {
+		if (isNull (itemRec.enclosureType) || isNull (itemRec.enclosureLength)) {
+			getEnclosureInfo (itemRec.enclosureUrl, function (err, data) {
+				if (err) {
+					callback (err);
+					}
+				else {
+					itemRec.enclosureType = data.type;
+					itemRec.enclosureLength = data.length;
+					callback (undefined);
+					}
+				});
+			}
+		else {
+			callback ();
+			}
+		}
+	}
+
 function newPost (jsontext, screenname, callback) {
 	var feedUrl = getBlogUrl (screenname), itemRecFromClient, whenstart = new Date ();
 	var itemRec = {
@@ -242,37 +312,39 @@ function newPost (jsontext, screenname, callback) {
 		itemRec [x] = itemRecFromClient [x];
 		}
 	
-	database.saveItem (itemRec, function (err, result) {
-		if (err) {
-			callback (err);
-			}
-		else {
-			itemRec.id = result.insertId; //7/12/22 by DW
-			itemRec.guid = config.urlFeedlandApp + "?item=" + itemRec.id; //11/10/22 by DW
-			database.saveItem (itemRec, function () { //save again so guid makes it into the database -- 7/12/22 by DW
-				addFeedIfNecessary (screenname, function (err, feedRec) {
-					database.subscribeToFeed (screenname, feedUrl, function (err, feedRec) { //11/5/22 by DW
-						buildRss (screenname, function (err, feedRec) {
-							if (err) { //11/9/22 by DW
-								console.log ("newPost: err.message == " + err.message);
-								callback (err);
-								}
-							else {
-								feedRec.whenUpdated = whenstart;  
-								var jstruct = {
-									item: database.convertDatabaseItem (itemRec),
-									theFeed: database.convertDatabaseFeed (feedRec)
+	checkEnclosure (itemRec, function (err) { //4/3/23 by DW
+		database.saveItem (itemRec, function (err, result) {
+			if (err) {
+				callback (err);
+				}
+			else {
+				itemRec.id = result.insertId; //7/12/22 by DW
+				itemRec.guid = config.urlFeedlandApp + "?item=" + itemRec.id; //11/10/22 by DW
+				database.saveItem (itemRec, function () { //save again so guid makes it into the database -- 7/12/22 by DW
+					addFeedIfNecessary (screenname, function (err, feedRec) {
+						database.subscribeToFeed (screenname, feedUrl, function (err, feedRec) { //11/5/22 by DW
+							buildRss (screenname, function (err, feedRec) {
+								if (err) { //11/9/22 by DW
+									console.log ("newPost: err.message == " + err.message);
+									callback (err);
 									}
-								database.updateSocketSubscribers ("newItem", jstruct);
-								database.saveFeed (feedRec, function () {  
-									callback (undefined, database.convertDatabaseItem (itemRec));
-									});
-								}
+								else {
+									feedRec.whenUpdated = whenstart;  
+									var jstruct = {
+										item: database.convertDatabaseItem (itemRec),
+										theFeed: database.convertDatabaseFeed (feedRec)
+										}
+									database.updateSocketSubscribers ("newItem", jstruct);
+									database.saveFeed (feedRec, function () {  
+										callback (undefined, database.convertDatabaseItem (itemRec));
+										});
+									}
+								});
 							});
 						});
 					});
-				});
-			}
+				}
+			});
 		});
 	}
 function updatePost (jsontext, screenname, callback) {
@@ -289,24 +361,25 @@ function updatePost (jsontext, screenname, callback) {
 		}
 	database.isItemInDatabase (feedUrl, itemRecFromClient.guid, function (flThere, itemRec) {
 		if (flThere) {
-			if (itemRecFromClient.markdowntext !== undefined) { //5/5/22 by DW
-				itemRec.markdowntext = itemRecFromClient.markdowntext;
+			for (var x in itemRecFromClient) { //4/2/23 by DW
+				itemRec [x] = itemRecFromClient [x];
 				}
-			itemRec.description = itemRecFromClient.description;
-			database.saveItem (itemRec, function (err, feedRec) {
-				if (err) {
-					callback (err);
-					}
-				else {
-					buildRss (screenname, function (err, feedRec) {
-						var jstruct = {
-							item: database.convertDatabaseItem (itemRec),
-							theFeed: database.convertDatabaseFeed (feedRec)
-							}
-						database.updateSocketSubscribers ("updatedItem", jstruct);
-						callback (undefined, database.convertDatabaseItem (itemRec));
-						});
-					}
+			checkEnclosure (itemRec, function (err) { //4/3/23 by DW
+				database.saveItem (itemRec, function (err, feedRec) {
+					if (err) {
+						callback (err);
+						}
+					else {
+						buildRss (screenname, function (err, feedRec) {
+							var jstruct = {
+								item: database.convertDatabaseItem (itemRec),
+								theFeed: database.convertDatabaseFeed (feedRec)
+								}
+							database.updateSocketSubscribers ("updatedItem", jstruct);
+							callback (undefined, database.convertDatabaseItem (itemRec));
+							});
+						}
+					});
 				});
 			}
 		else {
