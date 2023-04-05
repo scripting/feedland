@@ -131,7 +131,7 @@ function buildRss (screenname, callback) {
 							historyArray.push ({
 								title: checkNull (item.title),
 								text: description,
-								link: item.guid, //11/11/22 by DW
+								link: (item.link === undefined) ? item.guid : item.link, //4/5/23 by DW
 								markdowntext: checkNull (item.markdowntext), //5/5/22 by DW
 								when: item.pubDate,
 								enclosure, //4/3/23 by DW

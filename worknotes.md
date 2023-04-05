@@ -1,3 +1,7 @@
+#### 4/5/23; 11:07:47 AM by DW
+
+In blog.js, if an item already has a link, don't invent one for it. This makes linkblogging work. Previously there was no way to set the link in the user interface.
+
 #### 4/2/23; 5:35:21 PM by DW
 
 Changes in blog.js to support saving of title, link and enclosureUrl from the editor. 
