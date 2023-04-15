@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.5.7";  
+var myProductName = "feedlandDatabase", myVersion = "0.5.8";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -117,7 +117,6 @@ var config = {
 	riverBuildLogFolder: "data/riverBuildLogs/",
 	
 	blockedUsers: [
-		"AndySylvester99.xml"
 		],
 	
 	getUserOpmlSubscriptions: function (username, catname, callback) { //6/27/22 by DW
