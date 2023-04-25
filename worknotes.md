@@ -1,3 +1,11 @@
+#### 4/25/23; 2:06:28 PM by DW -- v0.5.27
+
+Use the new database.getRiverFromScreenname routine.
+
+See this thread for an explanation of why this was needed. 
+
+https://github.com/scripting/feedlandInstall/issues/31
+
 #### 4/5/23; 11:07:47 AM by DW
 
 In blog.js, if an item already has a link, don't invent one for it. This makes linkblogging work. Previously there was no way to set the link in the user interface.

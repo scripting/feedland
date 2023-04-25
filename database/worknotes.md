@@ -1,3 +1,15 @@
+#### 4/25/23 by DW
+
+New routine -- getRiverFromScreenname.
+
+See this thread for the reason this was needed.
+
+https://github.com/scripting/feedlandInstall/issues/31
+
+Turned off GitHub nightly backup by default.
+
+config.githubBackup.enabled
+
 #### 3/21/23 by DW
 
 In likes feeds, the listname is not a twitter identifier.

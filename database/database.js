@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.5.8";  
+var myProductName = "feedlandDatabase", myVersion = "0.5.9";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -29,6 +29,8 @@ exports.subscribeToFeed = subscribeToFeed; //5/27/22 by DW
 exports.getRecentSubscriptions = getRecentSubscriptions; //7/23/22 by DW
 exports.getRiverFromList = getRiverFromList; //8/3/22 by DW
 exports.getRiverFromOpml = getRiverFromOpml; //8/21/22 by DW
+exports.getRiverFromScreenname = getRiverFromScreenname; //4/25/23 by DW
+
 exports.backupDatabase = backupDatabase; //8/22/22 by DW
 exports.getFeedItems = getFeedItems; //8/31/22 by DW
 exports.setCategoriesForSubscription = setCategoriesForSubscription; //9/4/22 by DW
@@ -101,7 +103,7 @@ var config = {
 	s3LikesPath: "/data.feedland.org/likes/", //10/27/22 by DW
 	
 	githubBackup: { //9/30/22 by DW
-		enabled: true,
+		enabled: false, //4/25/23 by DW
 		username: "scripting",
 		repo: "test1",
 		basepath: "server/",
@@ -1526,6 +1528,51 @@ function getRiverFromCategory (screenname, catname, callback) {
 					});
 				if (feedUrlList.length == 0) {
 					let message = "Can't get the river because there are no feeds in the \"" + catname + "\" category";
+					callback ({message});
+					}
+				else {
+					const metadata = {cachekey, feedUrlList}; //2/1/23 by DW
+					getRiver (feedUrlList, undefined, function (err, river) {
+						if (!err) {
+							addToRiverCache (cachekey, feedUrlList, river); //9/15/22 by DW
+							}
+						console.log ("getRiverFromCategory: cachekey == " + cachekey + ", " + utils.secondsSince (whenstart) + " secs.");
+						callback (err, river);
+						}, metadata);
+					}
+				}
+			});
+		}
+	}
+function getRiverFromScreenname (screenname, callback) { //4/25/23 by DW
+	const cachekey = "screenname:" + screenname, whenstart = new Date ();
+	function getTheFeeds (screenname, callback) {
+		const sqltext =  "select * from subscriptions where listname=" + davesql.encode (screenname) + ";";
+		davesql.runSqltext (sqltext, function (err, result) {
+			if (err) {
+				callback (err);
+				}
+			else {
+				callback (undefined, result);
+				}
+			});
+		}
+	if (riverCache [cachekey] !== undefined) { //serve from cache
+		console.log ("getRiverFromScreenname (serving from cache): cachekey == " + cachekey);
+		callback (undefined, riverCache [cachekey].river);
+		}
+	else {
+		getTheFeeds (screenname, function (err, theSubscriptions) {
+			if (err) {
+				callback (err);
+				}
+			else {
+				var feedUrlList = new Array ();
+				theSubscriptions.forEach (function (sub) {
+					feedUrlList.push (sub.feedUrl);
+					});
+				if (feedUrlList.length == 0) {
+					let message = "Can't get the river because the user \"" + screenname + "\" isn't subscribed to any feeds.";
 					callback ({message});
 					}
 				else {
