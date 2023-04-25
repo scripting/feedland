@@ -364,6 +364,11 @@ function updatePost (jsontext, screenname, callback) {
 			for (var x in itemRecFromClient) { //4/2/23 by DW
 				itemRec [x] = itemRecFromClient [x];
 				}
+			if (itemRec.title !== undefined) { //4/25/23 by DW
+				if (itemRecFromClient.title === undefined) { //it was deleted by the user
+					delete itemRec.title;
+					}
+				}
 			checkEnclosure (itemRec, function (err) { //4/3/23 by DW
 				database.saveItem (itemRec, function (err, feedRec) {
 					if (err) {

@@ -1,4 +1,4 @@
-const myVersion = "0.5.27", myProductName = "feedland"; 
+const myVersion = "0.5.29", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -657,13 +657,18 @@ function handleHttpRequest (theRequest) {
 					database.getHotlist (httpReturn);
 					return (true); 
 				case "/getriver": //4/25/23 by DW -- get the river just using the screenname
-					if (params.screenname === undefined) { 
-						callWithScreenname (function (screenname) {
-							database.getRiverFromScreenname (screenname, httpReturn);
-							});
+					if (params.url === undefined) {
+						if (params.screenname === undefined) { 
+							callWithScreenname (function (screenname) {
+								database.getRiverFromScreenname (screenname, httpReturn);
+								});
+							}
+						else {
+							database.getRiverFromScreenname (params.screenname, httpReturn);
+							}
 						}
 					else {
-						database.getRiverFromScreenname (params.screenname, httpReturn);
+						database.getRiver (params.url, params.screenname, httpReturn);
 						}
 					return (true); 
 				case "/getriverfromlist": //8/3/22 by DW

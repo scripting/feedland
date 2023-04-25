@@ -1,3 +1,13 @@
+#### 4/25/23; 4:17:27 PM by DW -- v0.5.29
+
+fixed a bug in blog.js -- if you update an item to remove its title, the title wasn't getting removed in the database
+
+it now works properly.
+
+/getriver is also called to get a river if all we have is the URL of a feed. 
+
+now it works properly in that case
+
 #### 4/25/23; 2:06:28 PM by DW -- v0.5.27
 
 Use the new database.getRiverFromScreenname routine.
