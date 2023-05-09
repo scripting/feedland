@@ -1,3 +1,15 @@
+#### 5/7/23 by DW
+
+Major change to setUserPrefs.
+
+Previously we would assign to all columns in a users table record, even if the caller only provided a few values.
+
+This comes up in marktwain because it doesn't do anything with tabs and categories, for example, or news products.
+
+If an element of an object has the value undefined, when we encode the values, it is changed to NULL and that overwrites whatever was in that column.
+
+Now we add to the userRec more carefully, only adding values that are provided in the object provided by the caller.
+
 #### 4/25/23 by DW
 
 New routine -- getRiverFromScreenname.

@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.5.9";  
+var myProductName = "feedlandDatabase", myVersion = "0.5.12";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -64,7 +64,6 @@ exports.renewFeedNow = renewFeedNow; //10/9/22 by DW
 
 exports.getCurrentRiverBuildLog = getCurrentRiverBuildLog; //10/10/22 by DW
 exports.isFeedInRiver = isFeedInRiver; //2/1/23 by DW
-
 
 const fs = require ("fs");
 const md5 = require ("md5");
@@ -2127,12 +2126,14 @@ function isUserInDatabase (screenname, callback) { //9/17/22 by DW
 		});
 	}
 function setUserPrefs (screenname, jsontext, callback) { //9/15/22 by DW
+	const now = new Date ();
 	function normalizeCatString (s) {
 		if (s == ",all,") {
 			s = "All";
 			}
 		return (s);
 		}
+	
 	var prefs;
 	try {
 		prefs = JSON.parse (jsontext);
@@ -2141,29 +2142,34 @@ function setUserPrefs (screenname, jsontext, callback) { //9/15/22 by DW
 		callback (err);
 		return;
 		}
-	const now = new Date ();
-	var userRec = {
-		screenname: maxStringLength (screenname, config.maxListNameLength),
-		
-		whenCreated: now,
-		whenUpdated: now,
-		
-		ctStartups: prefs.ctStartups,
-		whenLastStartup: new Date (prefs.whenLastStartup),
-		
-		categories: normalizeCatString (prefs.usersCategoryList),
-		homePageCategories: normalizeCatString (prefs.homePageCategoryList),
-		
-		newsproductCategoryList: normalizeCatString (prefs.newsproductCategoryList), //9/26/22 by DW
-		newsproductTitle: prefs.newsproductTitle,
-		newsproductDescription: prefs.newsproductDescription,
-		newsproductImage: prefs.newsproductImage,
-		newsproductStyle: prefs.newsproductStyle,
-		newsproductScript: prefs.newsproductScript,
-		
-		myFeedTitle: prefs.myFeedTitle,  //11/6/22 by DW
-		myFeedDescription: prefs.myFeedDescription
-		};
+	
+	function setupUserRec () { //5/7/23 by DW
+		var userRec = {
+			screenname: maxStringLength (screenname, config.maxListNameLength),
+			whenCreated: now,
+			whenUpdated: now,
+			};
+		function addToUserRec (name) {
+			const value = prefs [name];
+			if (value !== undefined) {
+				userRec [name] = value;
+				}
+			}
+		addToUserRec ("ctStartups");
+		addToUserRec ("whenLastStartup");
+		addToUserRec ("homePageCategoryList"); //5/7/23 by DW -- commented, see change note above
+		addToUserRec ("newsproductCategoryList");
+		addToUserRec ("newsproductTitle");
+		addToUserRec ("newsproductDescription");
+		addToUserRec ("newsproductImage");
+		addToUserRec ("newsproductStyle");
+		addToUserRec ("newsproductScript");
+		addToUserRec ("myFeedTitle");
+		addToUserRec ("myFeedDescription");
+		return (userRec);
+		}
+	var userRec = setupUserRec ();
+	
 	isUserInDatabase (screenname, function (flInDatabase, userRecFromDatabase) {
 		if (flInDatabase) {
 			if (userRecFromDatabase.whenCreated != null) {
@@ -2172,7 +2178,7 @@ function setUserPrefs (screenname, jsontext, callback) { //9/15/22 by DW
 			userRec.emailAddress = userRecFromDatabase.emailAddress; //12/8/22 by DW
 			userRec.emailSecret = userRecFromDatabase.emailSecret;
 			}
-		else { //12/12/22 by DW -- xxx
+		else { //12/12/22 by DW 
 			if (!config.flEnableNewUsers) {
 				const message = "Could not set the user's prefs because new users are not being accepted here at this time.";
 				callback ({message});
@@ -2190,6 +2196,11 @@ function setUserPrefs (screenname, jsontext, callback) { //9/15/22 by DW
 						config.buildUsersFeed (screenname); 
 						}
 					}
+				
+				if (userRec.emailSecret !== undefined) { //5/7/23 by DW
+					delete userRec.emailSecret;
+					}
+				
 				callback (undefined, userRec);
 				}
 			});

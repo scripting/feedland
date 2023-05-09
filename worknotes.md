@@ -1,4 +1,10 @@
-#### 4/25/23; 4:17:27 PM by DW -- v0.5.29
+#### 5/8/23 by DW
+
+New entrypoint -- /getserverconfig
+
+For apps that are not served by daveappserver.
+
+#### 4/25/23; 4:17:27 PM by DW -- v0.5.30
 
 fixed a bug in blog.js -- if you update an item to remove its title, the title wasn't getting removed in the database
 

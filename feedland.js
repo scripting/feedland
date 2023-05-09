@@ -1,4 +1,4 @@
-const myVersion = "0.5.29", myProductName = "feedland"; 
+const myVersion = "0.5.33", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -440,6 +440,14 @@ function getRssCloudOptions () {
 	options.websocketPort = (appconfig.flWebsocketEnabled) ? appconfig.websocketPort : undefined;
 	return (options);
 	}
+function getServerConfig (screenname) { //5/8/23 by DW -- xxx
+	const serverConfig = {
+		urlForFeeds: config.urlForFeeds,
+		localRssPath: config.localRssPath,
+		maxFeedItems: config.maxFeedItems
+		}
+	return (serverConfig);
+	}
 function everySecond () {
 	var now = new Date ();
 	if (config.flRenewSubscriptions) { //10/29/22 by DW
@@ -764,6 +772,9 @@ function handleHttpRequest (theRequest) {
 				case "/isfeedinriver": //2/1/23 by DW
 					database.isFeedInRiver (params.url, params.cachekey, httpReturn);
 					return (true); 
+				case "/getserverconfig": //5/8/23 by DW
+					returnData (getServerConfig ());
+					return (true);
 				case config.rssCloud.feedUpdatedCallback: //12/12/22 by DW
 					returnPlainText (params.challenge);
 					return (true); 
