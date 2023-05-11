@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.5.12";  
+var myProductName = "feedlandDatabase", myVersion = "0.5.15";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -2149,6 +2149,14 @@ function setUserPrefs (screenname, jsontext, callback) { //9/15/22 by DW
 			whenCreated: now,
 			whenUpdated: now,
 			};
+		function addDateToUserRec (name) { //5/11/23 by DW
+			const value = new Date (prefs [name]);
+			if (!isNaN (value)) {
+				if (value !== undefined) {
+					userRec [name] = value;
+					}
+				}
+			}
 		function addToUserRec (name) {
 			const value = prefs [name];
 			if (value !== undefined) {
@@ -2156,8 +2164,7 @@ function setUserPrefs (screenname, jsontext, callback) { //9/15/22 by DW
 				}
 			}
 		addToUserRec ("ctStartups");
-		addToUserRec ("whenLastStartup");
-		addToUserRec ("homePageCategoryList"); //5/7/23 by DW -- commented, see change note above
+		addDateToUserRec ("whenLastStartup");
 		addToUserRec ("newsproductCategoryList");
 		addToUserRec ("newsproductTitle");
 		addToUserRec ("newsproductDescription");
