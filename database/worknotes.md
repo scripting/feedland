@@ -1,3 +1,7 @@
+#### 5/11/23 by DW
+
+Fixed all kinds of problems in setUserPrefs. See comment at the head of the routine. 
+
 #### 5/7/23 by DW
 
 Major change to setUserPrefs.

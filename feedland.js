@@ -1,4 +1,4 @@
-const myVersion = "0.5.35", myProductName = "feedland"; 
+const myVersion = "0.5.40", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -433,10 +433,15 @@ function getRssCloudOptions () {
 		options [x] = config.rssCloud [x];
 		}
 	
-	options.port = 80; //12/12/22; 1:18:17 PM by DW
-	options.domain = "feedland.org";
-	
 	let appconfig = daveappserver.getConfig ();
+	
+	var splits = appconfig.myDomain.split (":"); //5/17/23 by DW
+	options.domain = splits [0];
+	options.port = (splits.length == 2) ? Number (splits [1]) : 80;
+	if (options.port == NaN) {
+		options.port = 80;
+		}
+	
 	options.websocketPort = (appconfig.flWebsocketEnabled) ? appconfig.websocketPort : undefined;
 	return (options);
 	}

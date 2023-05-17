@@ -1,3 +1,9 @@
+#### 5/17/23; 4:47:30 PM by DW -- v0.5.40
+
+Fixed a bug where FeedLand would always request rssCloud notifications at feedland.org, even if the software is running on a different server. 
+
+In getRssCloudOptions, we get the domain and port from the appserver-level config.myDomain value. 
+
 #### 5/8/23 by DW
 
 New entrypoint -- /getserverconfig

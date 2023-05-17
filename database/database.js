@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.5.15";  
+var myProductName = "feedlandDatabase", myVersion = "0.5.18";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -2157,15 +2157,31 @@ function setUserPrefs (screenname, jsontext, callback) { //9/15/22 by DW
 					}
 				}
 			}
+		function addCategoriesToUserRec (name) { //5/11/23 by DW
+			const value = prefs [name];
+			if (value !== undefined) {
+				userRec [name] = normalizeCatString (value);
+				}
+			}
 		function addToUserRec (name) {
 			const value = prefs [name];
 			if (value !== undefined) {
 				userRec [name] = value;
 				}
 			}
+		
+		if (prefs.usersCategoryList !== undefined) { //5/11/23 by DW
+			prefs.categories = prefs.usersCategoryList;
+			}
+		if (prefs.homePageCategoryList !== undefined) { //5/11/23 by DW
+			prefs.homePageCategories = prefs.homePageCategoryList;
+			}
+		
 		addToUserRec ("ctStartups");
 		addDateToUserRec ("whenLastStartup");
-		addToUserRec ("newsproductCategoryList");
+		addCategoriesToUserRec ("categories"); //5/11/23 by DW
+		addCategoriesToUserRec ("homePageCategories"); //5/11/23 by DW
+		addCategoriesToUserRec ("newsproductCategoryList"); //5/11/23 by DW
 		addToUserRec ("newsproductTitle");
 		addToUserRec ("newsproductDescription");
 		addToUserRec ("newsproductImage");
