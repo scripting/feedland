@@ -1,3 +1,11 @@
+5/25/23; 10:50:43 AM by DW -- v0.6.0
+
+added a new column to the user table for user prefs -- apps.
+
+new apps must have a way of storing stuff on the server, start moving away from prefs.json file.
+
+alter table users add apps json;
+
 #### 5/11/23 by DW
 
 Fixed all kinds of problems in setUserPrefs. See comment at the head of the routine. 

@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.5.18";  
+var myProductName = "feedlandDatabase", myVersion = "0.6.7";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -64,6 +64,7 @@ exports.renewFeedNow = renewFeedNow; //10/9/22 by DW
 
 exports.getCurrentRiverBuildLog = getCurrentRiverBuildLog; //10/10/22 by DW
 exports.isFeedInRiver = isFeedInRiver; //2/1/23 by DW
+
 
 const fs = require ("fs");
 const md5 = require ("md5");
@@ -584,7 +585,7 @@ function deleteItem (id, callback) { //4/22/22 by DW
 		});
 	}
 function saveFeed (feedRec, callback) {
-	const sqltext = "replace into feeds " + davesql.encodeValues (feedRec);
+	const sqltext = "replace into feeds " + davesql.encodeValues (removeNullValuesFromObject (feedRec));
 	davesql.runSqltext (sqltext, function (err, result) {
 		if (err) {
 			if (callback !== undefined) {
@@ -2163,6 +2164,11 @@ function setUserPrefs (screenname, jsontext, callback) { //9/15/22 by DW
 				userRec [name] = normalizeCatString (value);
 				}
 			}
+		function addAppsToUserRec () { //5/25/23 by DW
+			if (prefs.apps !== undefined) {
+				userRec.apps = prefs.apps;
+				}
+			}
 		function addToUserRec (name) {
 			const value = prefs [name];
 			if (value !== undefined) {
@@ -2189,6 +2195,7 @@ function setUserPrefs (screenname, jsontext, callback) { //9/15/22 by DW
 		addToUserRec ("newsproductScript");
 		addToUserRec ("myFeedTitle");
 		addToUserRec ("myFeedDescription");
+		addAppsToUserRec (); //5/25/23 by DW
 		return (userRec);
 		}
 	var userRec = setupUserRec ();
@@ -2262,6 +2269,14 @@ function getUserPrefs (screenname, callback) { //9/26/22 by DW
 			if (userRec.emailSecret !== undefined) { //12/16/22 by DW
 				delete userRec.emailSecret;
 				}
+			if (userRec.apps !== undefined) { //5/25/23 by DW
+				try {
+					userRec.apps = JSON.parse (userRec.apps);
+					}
+				catch (err) {
+					console.log ("getUserPrefs: err.message == " + err.message);
+					}
+				}
 			callback (undefined, removeNullValuesFromObject (userRec));
 			}
 		else {
@@ -2269,6 +2284,7 @@ function getUserPrefs (screenname, callback) { //9/26/22 by DW
 			}
 		});
 	}
+
 
 function addToLikesTable (screenname, itemId, callback) { //10/16/22 by DW
 	const likesRec = {
