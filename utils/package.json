@@ -1,0 +1,12 @@
+{
+	"name": "feedlandutils",
+	"description": "Utilities I need to administer the FeedLand database.",
+	"author": "Dave Winer <dave@scripting.com>",
+	"license": "MIT",
+	"version": "0.4.0",
+	"dependencies" : {
+		"daveutils": "*",
+		"davesql": "*",
+		"feedlanddatabase": "*"
+		} 
+	}

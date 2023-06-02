@@ -1,4 +1,4 @@
-const myVersion = "0.5.49", myProductName = "feedland"; 
+const myVersion = "0.5.53", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -779,6 +779,9 @@ function handleHttpRequest (theRequest) {
 					return (true); 
 				case "/getserverconfig": //5/8/23 by DW
 					returnData (getServerConfig ());
+					return (true);
+				case "/getfeedlistfromopml": //6/2/23 by DW
+					database.getFeedlistFromOpml (params.url, httpReturn);
 					return (true);
 				case config.rssCloud.feedUpdatedCallback: //12/12/22 by DW
 					returnPlainText (params.challenge);

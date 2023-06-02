@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.6.7";  
+var myProductName = "feedlandDatabase", myVersion = "0.6.10";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -64,6 +64,9 @@ exports.renewFeedNow = renewFeedNow; //10/9/22 by DW
 
 exports.getCurrentRiverBuildLog = getCurrentRiverBuildLog; //10/10/22 by DW
 exports.isFeedInRiver = isFeedInRiver; //2/1/23 by DW
+
+
+exports.getFeedlistFromOpml = getFeedlistFromOpml; //6/1/23 by DW
 
 
 const fs = require ("fs");
@@ -289,6 +292,27 @@ function getOutlineFromOpml (urlOpml, callback) { //8/21/22 by DW
 					callback (undefined, theOutline);
 					}
 				});
+			}
+		});
+	}
+function getUrlArrayFromOpml (urlOpml, callback) { //6/1/23 by DW
+	getOutlineFromOpml (urlOpml, function (err, theOutline) {
+		if (err) {
+			callback (err);
+			}
+		else {
+			var feedUrlList = new Array ();
+			opml.visitAll (theOutline, function (node) {
+				if (notComment (node)) {
+					if (node.type == "rss") {
+						if (node.xmlUrl !== undefined) {
+							feedUrlList.push (node.xmlUrl);
+							}
+						}
+					}
+				return (true); //keep visiting
+				});
+			callback (undefined, feedUrlList, theOutline);
 			}
 		});
 	}
@@ -526,6 +550,7 @@ function getNexItemtId () { //5/3/22 by DW
 	return (theId);
 	}
 function saveItem (itemRec, callback) { 
+	itemRec = removeNullValuesFromObject (itemRec); //5/27/23 by DW
 	
 	if (itemRec.enclosureLength !== undefined) { //1/10/23 by DW
 		if (typeof itemRec.enclosureLength == "string") {
@@ -2080,6 +2105,77 @@ function getHotlist (callback) { //7/26/22 by DW
 			}
 		});
 	}
+
+function getFeedlistFromOpml (urlOpml, callback) { //6/1/23 by DW
+	getUrlArrayFromOpml (urlOpml, function (err, urlArray, theOutline) {
+		if (err) {
+			callback (err);
+			}
+		else {
+			var listtext = "";
+			urlArray.forEach (function (url) {
+				listtext += davesql.encode (url) + ",";
+				});
+			if (listtext.length > 0) {
+				listtext = utils.stringMid (listtext, 1, listtext.length - 1);
+				}
+			const sqltext = "select * from feeds where feedUrl in (" + listtext + ");";
+			davesql.runSqltext (sqltext, function (err, result) {
+				if (err) {
+					callback (err);
+					}
+				else {
+					var theFeedlist = new Array ();
+					result.forEach (function (item) {
+						var newItem = new Object ();
+						for (var x in item) {
+							var val = item [x];
+							if (val != null) {
+								newItem [x] = val;
+								}
+							}
+						theFeedlist.push (newItem);
+						});
+					
+					function getOutlineElementsNotSubscribedTo () {
+						var subscribedToStruct = new Object ();
+						result.forEach (function (item) {
+							subscribedToStruct [item.feedUrl] = item;
+							});
+						
+						var elementsNotSubscribedTo = new Array ();
+						opml.visitAll (theOutline, function (node) {
+							if (notComment (node)) {
+								if (node.type == "rss") {
+									if (node.xmlUrl !== undefined) {
+										if (subscribedToStruct [node.xmlUrl] === undefined) {
+											var item = {
+												title: node.text,
+												feedUrl: node.xmlUrl,
+												htmlUrl: node.htmlUrl,
+												description: node.description
+												};
+											elementsNotSubscribedTo.push (item);
+											}
+										}
+									}
+								}
+							return (true); //keep visiting
+							});
+						return (elementsNotSubscribedTo)
+						}
+					var elementsNotSubscribedTo = getOutlineElementsNotSubscribedTo ();
+					elementsNotSubscribedTo.forEach (function (item) {
+						theFeedlist.push (item);
+						});
+					
+					callback (undefined, theFeedlist);
+					}
+				});
+			}
+		});
+	}
+
 function getHotlistOpml (callback) { //7/26/22 by DW
 	getHotlist (function (err, theHotlistArray) {
 		if (err) {

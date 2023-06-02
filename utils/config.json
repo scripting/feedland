@@ -1,0 +1,12 @@
+{
+	"database": {
+		 "host": "mydatabasehost.com",
+		 "port": 26891,
+		 "user": "admin",
+		 "password": "hahahahahaha",
+		 "charset": "utf8mb4",
+		 "connectionLimit": 100,
+		 "database": "feedland",
+		 "debug": false
+		 }
+	}
