@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.6.10";  
+var myProductName = "feedlandDatabase", myVersion = "0.6.11";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -2169,7 +2169,11 @@ function getFeedlistFromOpml (urlOpml, callback) { //6/1/23 by DW
 						theFeedlist.push (item);
 						});
 					
-					callback (undefined, theFeedlist);
+					const thePackage = { //6/3/23 by DW
+						head: theOutline.opml.head,
+						feedlist: theFeedlist
+						}
+					callback (undefined, thePackage);
 					}
 				});
 			}
