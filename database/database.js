@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.6.11";  
+var myProductName = "feedlandDatabase", myVersion = "0.6.12";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -2112,70 +2112,76 @@ function getFeedlistFromOpml (urlOpml, callback) { //6/1/23 by DW
 			callback (err);
 			}
 		else {
-			var listtext = "";
-			urlArray.forEach (function (url) {
-				listtext += davesql.encode (url) + ",";
-				});
-			if (listtext.length > 0) {
-				listtext = utils.stringMid (listtext, 1, listtext.length - 1);
+			if (urlArray.length == 0) { //6/8/23 by DW
+				const message = "Can't get the feed list because there are no feeds in the OPML file.";
+				callback ({message});
 				}
-			const sqltext = "select * from feeds where feedUrl in (" + listtext + ");";
-			davesql.runSqltext (sqltext, function (err, result) {
-				if (err) {
-					callback (err);
+			else {
+				var listtext = "";
+				urlArray.forEach (function (url) {
+					listtext += davesql.encode (url) + ",";
+					});
+				if (listtext.length > 0) {
+					listtext = utils.stringMid (listtext, 1, listtext.length - 1);
 					}
-				else {
-					var theFeedlist = new Array ();
-					result.forEach (function (item) {
-						var newItem = new Object ();
-						for (var x in item) {
-							var val = item [x];
-							if (val != null) {
-								newItem [x] = val;
-								}
-							}
-						theFeedlist.push (newItem);
-						});
-					
-					function getOutlineElementsNotSubscribedTo () {
-						var subscribedToStruct = new Object ();
+				const sqltext = "select * from feeds where feedUrl in (" + listtext + ");";
+				davesql.runSqltext (sqltext, function (err, result) {
+					if (err) {
+						callback (err);
+						}
+					else {
+						var theFeedlist = new Array ();
 						result.forEach (function (item) {
-							subscribedToStruct [item.feedUrl] = item;
+							var newItem = new Object ();
+							for (var x in item) {
+								var val = item [x];
+								if (val != null) {
+									newItem [x] = val;
+									}
+								}
+							theFeedlist.push (newItem);
 							});
 						
-						var elementsNotSubscribedTo = new Array ();
-						opml.visitAll (theOutline, function (node) {
-							if (notComment (node)) {
-								if (node.type == "rss") {
-									if (node.xmlUrl !== undefined) {
-										if (subscribedToStruct [node.xmlUrl] === undefined) {
-											var item = {
-												title: node.text,
-												feedUrl: node.xmlUrl,
-												htmlUrl: node.htmlUrl,
-												description: node.description
-												};
-											elementsNotSubscribedTo.push (item);
+						function getOutlineElementsNotSubscribedTo () {
+							var subscribedToStruct = new Object ();
+							result.forEach (function (item) {
+								subscribedToStruct [item.feedUrl] = item;
+								});
+							
+							var elementsNotSubscribedTo = new Array ();
+							opml.visitAll (theOutline, function (node) {
+								if (notComment (node)) {
+									if (node.type == "rss") {
+										if (node.xmlUrl !== undefined) {
+											if (subscribedToStruct [node.xmlUrl] === undefined) {
+												var item = {
+													title: node.text,
+													feedUrl: node.xmlUrl,
+													htmlUrl: node.htmlUrl,
+													description: node.description
+													};
+												elementsNotSubscribedTo.push (item);
+												}
 											}
 										}
 									}
-								}
-							return (true); //keep visiting
+								return (true); //keep visiting
+								});
+							return (elementsNotSubscribedTo)
+							}
+						var elementsNotSubscribedTo = getOutlineElementsNotSubscribedTo ();
+						elementsNotSubscribedTo.forEach (function (item) {
+							theFeedlist.push (item);
 							});
-						return (elementsNotSubscribedTo)
+						
+						const thePackage = { //6/3/23 by DW
+							head: theOutline.opml.head,
+							feedlist: theFeedlist
+							}
+						callback (undefined, thePackage);
 						}
-					var elementsNotSubscribedTo = getOutlineElementsNotSubscribedTo ();
-					elementsNotSubscribedTo.forEach (function (item) {
-						theFeedlist.push (item);
-						});
-					
-					const thePackage = { //6/3/23 by DW
-						head: theOutline.opml.head,
-						feedlist: theFeedlist
-						}
-					callback (undefined, thePackage);
-					}
-				});
+					});
+				}
 			}
 		});
 	}

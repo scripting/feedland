@@ -1,3 +1,7 @@
+#### 6/8/23 by DW
+
+In getFeedlistFromOpml, return an error if the OPML file has no feeds.
+
 #### 5/27/23 by DW
 
 When saving an item, remove null values before generating the query. 
