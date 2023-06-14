@@ -1,3 +1,7 @@
+6/14/23; 10:01:47 AM by DW
+
+Added a new POST request to save the users prefs -- "/sendprefs". There was a GET request that did the same and it's still there to prevent breakage with feedlandHome. The new way is supported in the feedlandPlatform code. At some point feedlandHome will be a platform product. 
+
 #### 5/17/23; 4:47:30 PM by DW -- v0.5.40
 
 Fixed a bug where FeedLand would always request rssCloud notifications at feedland.org, even if the software is running on a different server. 

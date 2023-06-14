@@ -1,4 +1,4 @@
-const myVersion = "0.5.55", myProductName = "feedland"; 
+const myVersion = "0.5.57", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -547,6 +547,11 @@ function handleHttpRequest (theRequest) {
 						subscribeToOpml (screenname, theRequest.postBody, utils.getBoolean (params.flDeleteEnabled), httpReturn);
 						});
 					return (true); 
+				case "/sendprefs": //6/14/23 by DW
+					callWithScreenname (function (screenname) {
+						database.setUserPrefs (screenname, theRequest.postBody, httpReturn);
+						});
+					return (true);
 				case config.rssCloud.feedUpdatedCallback: //10/9/22 by DW
 					var jstruct = qs.parse (theRequest.postBody);
 					database.checkOneFeed (jstruct.url, function (err, data) {
