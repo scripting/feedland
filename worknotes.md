@@ -1,4 +1,12 @@
-6/14/23; 10:01:47 AM by DW
+#### 7/5/23; 9:44:42 AM by DW
+
+Revised what is returned from the /getserverconfig call. 
+
+we need to know the user's blog url, don't need to know the path to the blog folder on the static server. not sure why that was there. 
+
+see comment at head of the routine.
+
+#### 6/14/23; 10:01:47 AM by DW
 
 Added a new POST request to save the users prefs -- "/sendprefs". There was a GET request that did the same and it's still there to prevent breakage with feedlandHome. The new way is supported in the feedlandPlatform code. At some point feedlandHome will be a platform product. 
 

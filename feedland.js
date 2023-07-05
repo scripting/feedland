@@ -1,4 +1,4 @@
-const myVersion = "0.5.57", myProductName = "feedland"; 
+const myVersion = "0.5.59", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -445,11 +445,12 @@ function getRssCloudOptions () {
 	options.websocketPort = (appconfig.flWebsocketEnabled) ? appconfig.websocketPort : undefined;
 	return (options);
 	}
-function getServerConfig (screenname) { //5/8/23 by DW -- xxx
-	const serverConfig = {
-		urlForFeeds: config.urlForFeeds,
-		localRssPath: config.localRssPath,
+function getServerConfig (screenname) { //5/8/23 by DW
+	var serverConfig = { //7/5/23 by DW
 		maxFeedItems: config.maxFeedItems
+		}
+	if (screenname !== undefined) { //7/5/23 by DW
+		serverConfig.urlUsersBlog = blog.getBlogUrl (screenname);
 		}
 	return (serverConfig);
 	}
@@ -783,7 +784,7 @@ function handleHttpRequest (theRequest) {
 					database.isFeedInRiver (params.url, params.cachekey, httpReturn);
 					return (true); 
 				case "/getserverconfig": //5/8/23 by DW
-					returnData (getServerConfig ());
+					returnData (getServerConfig (params.screenname)); //added param -- 7/5/23 by DW
 					return (true);
 				case "/getfeedlistfromopml": //6/2/23 by DW
 					database.getFeedlistFromOpml (params.url, httpReturn);
