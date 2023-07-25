@@ -1,3 +1,7 @@
+#### 7/25/23; 10:57:10 AM by DW
+
+Changed the URL for config.urlStarterFeeds to begin with https:// because the read is flowing through a proxy server.
+
 #### 7/5/23; 9:44:42 AM by DW
 
 Revised what is returned from the /getserverconfig call. 
