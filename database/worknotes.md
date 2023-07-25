@@ -1,3 +1,7 @@
+#### 7/14/23 by DW -- v0.6.14
+
+New -- config.maxGetAllUsers -- it's the number of users database.getAllUsers will return.
+
 #### 6/8/23 by DW
 
 In getFeedlistFromOpml, return an error if the OPML file has no feeds.

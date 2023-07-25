@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.6.12";  
+var myProductName = "feedlandDatabase", myVersion = "0.6.14";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -123,6 +123,8 @@ var config = {
 	
 	blockedUsers: [
 		],
+	
+	maxGetAllUsers: 100, //7/14/23 by DW
 	
 	getUserOpmlSubscriptions: function (username, catname, callback) { //6/27/22 by DW
 		},
@@ -2343,7 +2345,7 @@ function setUserPrefs (screenname, jsontext, callback) { //9/15/22 by DW
 		});
 	}
 function getAllUsers (callback) { //9/15/22 by DW
-	const sqltext = "select users.screenname, users.ctStartups, users.whenLastStartup, users.whenCreated, users.whenUpdated, users.categories, users.homePageCategories, users.newsproductCategoryList, users.newsproductTitle, users.newsproductDescription, users.newsproductImage, users.newsproductStyle, count(*) as ctSubs from users inner join subscriptions on subscriptions.listname = users.screenname group by users.screenname;"
+	const sqltext = "select users.screenname, users.ctStartups, users.whenLastStartup, users.whenCreated, users.whenUpdated, users.categories, users.homePageCategories, users.newsproductCategoryList, users.newsproductTitle, users.newsproductDescription, users.newsproductImage, users.newsproductStyle, count(*) as ctSubs from users inner join subscriptions on subscriptions.listname = users.screenname group by users.screenname order by users.whenLastStartup desc limit " + davesql.encode (config.maxGetAllUsers) + ";"
 	davesql.runSqltext (sqltext, function (err, result) {
 		if (err) {
 			callback (err);
