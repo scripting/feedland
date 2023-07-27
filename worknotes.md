@@ -1,3 +1,43 @@
+#### 7/26/23; 2:36:40 PM by DW
+
+Changed the dependencies in package.json to reference specific versions of the packages I authored using the caret, to basically always ask for the newest version available in that major version. 
+
+"daveappserver": "0.6.24",
+
+"davefeedread": "0.5.25",
+
+"davefilesystem": "0.4.5",
+
+"davegithub": "0.5.4",
+
+"davehttp": "0.5.1",
+
+"davemail": "0.5.4",
+
+"daverss": "0.6.2",
+
+"daves3": "0.4.11",
+
+"davesql": "0.4.25",
+
+"davetwitter": "0.6.39",
+
+"daveutils": "0.4.64",
+
+"davezip": "0.4.4",
+
+"feedland": "0.5.60",
+
+"feedlanddatabase": "0.6.14",
+
+"foldertojson": "0.4.7",
+
+"opml": "0.5.1",
+
+"opmltojs": "0.4.12",
+
+"reallysimple": "0.4.24",
+
 #### 7/25/23; 10:57:10 AM by DW
 
 Changed the URL for config.urlStarterFeeds to begin with https:// because the read is flowing through a proxy server.
