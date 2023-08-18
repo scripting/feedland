@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<opml version="2.0">
+	<head>
+		<title>Deeper into FeedLand</title>
+		<dateCreated>Mon, 12 Sep 2022 12:32:27 GMT</dateCreated>
+		<description>It's a community of feeds, news and people.</description>
+		<urlPublic>http://docs.feedland.org/about.opml</urlPublic>
+		<ownerTwitterScreenName>davewiner</ownerTwitterScreenName>
+		<ownerName>Dave Winer</ownerName>
+		<ownerId>dave.winer@gmail.com</ownerId>
+		<urlUpdateSocket>wss://drummer.land/</urlUpdateSocket>
+		<dateModified>Wed, 02 Aug 2023 22:13:20 GMT</dateModified>
+		<expansionState>1,7,9,17</expansionState>
+		<lastCursor>16</lastCursor>
+		</head>
+	<body>
+		<outline text="What is FeedLand?" created="Mon, 17 Oct 2022 14:59:18 GMT">
+			<outline text="It's an application that runs in your web browser for managing lists of feeds, sharing them with other users (both in and outside of FeedLand), and reading and sharing news. " created="Mon, 17 Oct 2022 14:59:29 GMT"/>
+			<outline text="I'm constantly adding features and learning from how people use the product. The goal is to help lift the feed world in a new direction. There are still a lot of ideas to explore, and FeedLand is (hopefully) the beginning of that process. It represents a chance for &lt;i&gt;all of us&lt;/i&gt; to contribute to making news work better. " created="Wed, 19 Oct 2022 13:26:52 GMT"/>
+			<outline text="So FeedLand is feeds, news and people and software that connects it all together." created="Wed, 19 Oct 2022 13:27:05 GMT"/>
+			<outline text="BTW, there's a special &lt;a href=&quot;http://docs.feedland.org/firstThings.opml&quot;&gt;docs page&lt;/a&gt; for getting started, this page goes into a lot more detail, and is appropriate to read once you've spent some time with the product. " created="Sat, 17 Sep 2022 12:47:01 GMT"/>
+			</outline>
+		<outline text="Community" created="Fri, 09 Sep 2022 13:19:07 GMT" isComment="false">
+			<outline text="People subscribe to feeds, we squeeze news out of feeds, and shape it into products. " created="Wed, 19 Oct 2022 15:33:59 GMT"/>
+			<outline text="People can add new feeds. There's a limit of 250 new feeds for each user.  " created="Fri, 09 Sep 2022 13:24:42 GMT"/>
+			<outline text="You can also subscribe to feeds other people have added. No limit there. Subscribe to as many as you like." created="Sat, 17 Sep 2022 12:48:29 GMT"/>
+			<outline text="Everyone can see everything. Our lists and categories are there for everyone to use. " created="Wed, 19 Oct 2022 15:33:03 GMT"/>
+			<outline text="A FeedLand community works together shaping news flows." created="Wed, 19 Oct 2022 15:35:23 GMT"/>
+			</outline>
+		<outline text="Getting started" created="Mon, 17 Oct 2022 15:01:47 GMT">
+			<outline text="I am running a FeedLand server at &lt;a href=&quot;http://feedland.org/&quot;&gt;feedland.org&lt;/a&gt;. There's a small group of people that formed the start of the community. There's room for more, but over time I expect we'll encourage people to start their own communities. I expect the server software will ultimately be available with an open source license. " created="Mon, 17 Oct 2022 15:01:57 GMT"/>
+			</outline>
+		<outline text="How do I use it?" created="Mon, 17 Oct 2022 14:59:20 GMT">
+			<outline text="To get started, log in at &lt;a href=&quot;http://feedland.org&quot;&gt;feedland.org&lt;/a&gt; with your Twitter account. We're just using it for identity, so we have a name for you that's different from everyone else's name." created="Mon, 17 Oct 2022 15:03:36 GMT"/>
+			<outline text="Add some feeds to your list by browsing the hotlist, my subscription list, or choose the &lt;i&gt;Add a few feeds&lt;/i&gt; command in the Tools menu. " created="Mon, 17 Oct 2022 15:04:22 GMT"/>
+			<outline text="Once you've done that, let's focus on the heart of the app, your Feed List page. " created="Mon, 17 Oct 2022 15:05:24 GMT"/>
+			</outline>
+		<outline text="Your Feed List" created="Wed, 19 Oct 2022 13:28:28 GMT">
+			<outline text="At the center of your FeedLand world is the Feed List. " created="Wed, 19 Oct 2022 13:28:31 GMT"/>
+			<outline text="You can get to it by choosing My Feeds in the first menu. " created="Wed, 19 Oct 2022 13:28:48 GMT"/>
+			<outline text="All the feeds you subscribe to are listed. " created="Wed, 19 Oct 2022 13:29:01 GMT"/>
+			<outline text="You can change the order in which they appear by clicking on the column titles." created="Wed, 19 Oct 2022 13:29:39 GMT"/>
+			<outline text="From the feed list, you can categorize feeds, read news, see which feeds have recently updated, see who else is subscribed to a feed, see the stats for each feed. There's a lot of functionality packed into this page." created="Wed, 19 Oct 2022 13:29:33 GMT"/>
+			<outline text="Also you can read everyone else's feed lists, and subscribe to any of the feeds they're subscribed to. You can quickly see which ones you have already subscribed to with the checkbox next to the feed's title. " created="Wed, 19 Oct 2022 13:30:55 GMT"/>
+			<outline text="In the screen shot below, we go through all the features of the Feed List page in great detail." created="Wed, 19 Oct 2022 13:31:40 GMT"/>
+			</outline>
+		<outline text="Screen shot" created="Mon, 17 Oct 2022 15:05:57 GMT">
+			<outline text="&lt;div style=&quot;border: 1px solid silver; width: 650px; padding-top: 10px; padding-bottom: 10px; text-align: center;&quot;&gt;&lt;img src=&quot;http://scripting.com/images/2022/10/17/feedlistPageScreen.png&quot;&gt;" created="Mon, 17 Oct 2022 15:06:02 GMT"/>
+			<outline text="Your &lt;i&gt;feed list&lt;/i&gt; is a table where each row is a feed." created="Mon, 17 Oct 2022 15:12:19 GMT"/>
+			<outline text="You can control the &lt;i&gt;sort order&lt;/i&gt; of the list. Click on Title to sort alphabetically. Click on When to sort chronologically, and Ct to sort on the number of subscribers. If you click again it'll reverse the order, so if you were viewing alphabetically, it would switch to reverse-alphabetic." created="Mon, 17 Oct 2022 15:12:39 GMT"/>
+			<outline text="Each line starts with a &lt;i&gt;wedge.&lt;/i&gt; If you click it, the feed expands to show the most recent five stories in the feed, with a link to the story. Click the wedge again to collapse. If you hover over the link to the story, the description of the story pops up. &lt;a href=&quot;http://scripting.com/images/2022/10/24/viewStoriesInFeedListScreen.png&quot;&gt;Screen shot&lt;/a&gt;. " created="Mon, 17 Oct 2022 15:13:38 GMT"/>
+			<outline text="The &lt;i&gt;checkbox&lt;/i&gt; indicates if you're subscribed to the feed. If you're viewing someone else's list you will probably see some unchecked boxes. When you check or uncheck a box the effect takes place immediately. One click to subscribe or unsubscribe. " created="Mon, 17 Oct 2022 15:14:30 GMT"/>
+			<outline text="The third column is the title of the feed. It links to the &lt;i&gt;Feed Info&lt;/i&gt; page for the feed, where you can get detailed info about the feed. " created="Mon, 17 Oct 2022 15:15:31 GMT"/>
+			<outline text="Immediately after the feed title is an icon that connects to the &lt;i&gt;categories dialog&lt;/i&gt; for the feed. It will only be present if you're subscribed to the feed. It's dark if you've set some categories, light if you haven't, so you can quickly see which feeds you have still to assign to categories. Categories allow you to route items from feeds to different tabs when reading news. You define the categories in the Settings dialog, linked to the menu in the upper right corner of the sccreen." created="Mon, 17 Oct 2022 15:15:55 GMT"/>
+			<outline text="The next column, &lt;i&gt;When,&lt;/i&gt; says how long it has been since the feed published a new item. When you sort your feed list this way (the default) it's basically a new kind of feed reader, one which I discovered kind of by accident after implementing the feature. It's makes the Feed List page 100 times more useful imho." created="Mon, 17 Oct 2022 15:17:21 GMT"/>
+			<outline text="The &lt;i&gt;Ct&lt;/i&gt;  column says how many people have subscribed to the feed. " created="Mon, 17 Oct 2022 15:18:37 GMT"/>
+			<outline text="If you hover over the green Info icon you can quickly see basic stats about the feed. I found this useful for debugging and left it in, because we're always debugging. ;-)" created="Mon, 17 Oct 2022 15:18:57 GMT"/>
+			<outline text="Many of the items have tool tips, for example the feed title has as its tool tip the description of the feed. It's good to have it there because sometimes the feed titles aren't that helpful. " created="Mon, 17 Oct 2022 15:20:08 GMT"/>
+			<outline text="The white on orange XML icon is present on many of the pages in FeedLand. It always likes to the XML representation of the data on the page you're viewing. In this case, it links to the OPML version of your subscription list. " created="Mon, 17 Oct 2022 15:32:29 GMT"/>
+			<outline text="The + Feed button brings up a dialog that allows you to enter the URL of a feed to subscribe to. This button is a remnant of earlier versions of FeedLand. Now there's a command in the Menu that does this, and it's present everywhere, not just on the Feed List page. We left it here, because why not. " created="Mon, 17 Oct 2022 15:33:28 GMT"/>
+			<outline text="The link at the top of the page where it says this is a list of the feeds that cluelessnewbie is subscribed to, links to the main news page for the user, where you can see the latest news items from all these feeds. You can use FeedLand as a news reader, but it's also totally valid to use it to manage your subscriptions to use in another feed reader that you're already using. " created="Mon, 17 Oct 2022 15:34:46 GMT"/>
+			</outline>
+		<outline text="The Feed Info page" created="Wed, 19 Oct 2022 13:36:05 GMT">
+			<outline text="When you click on the title of a feed you are taken to the Feed Info page for that feed. Here's a screen shot. " created="Wed, 19 Oct 2022 13:36:10 GMT"/>
+			<outline text="&lt;div style=&quot;border: 1px solid silver; width: 650px; padding-top: 10px; padding-bottom: 10px; margin-bottom: 20px; text-align: center;&quot;&gt;&lt;img src=&quot;http://scripting.com/images/2022/10/19/feedInfoScreenShot.png&quot;&gt;" created="Wed, 19 Oct 2022 13:51:40 GMT"/>
+			<outline text="When you click on the &lt;i&gt;Title, &lt;/i&gt;you're taken to the home page of the site the feed is associated with, via the top-level &amp;lt;link&gt; element in the feed." created="Wed, 19 Oct 2022 13:53:40 GMT"/>
+			<outline text="&lt;i&gt;Description&lt;/i&gt; comes from the top-level &amp;lt;description&gt; element in the feed. " created="Wed, 19 Oct 2022 13:54:54 GMT"/>
+			<outline text="The link to the &lt;i&gt;Feed&lt;/i&gt; displays the contents of the feed on &lt;a href=&quot;http://xmlviewer.scripting.com/?url=http%3A%2F%2Fscripting.com%2Frss.xml&quot;&gt;xmlviewer.scripting.com&lt;/a&gt;. If you need the actual URL of the feed, you can copy it from the text at the top of the xmlviewer page. I'm sorry it has to be like this, but most browsers screw with the display of feeds, and sometimes you need to actually see the source of the feed itself not a friendly rendering of the feed. " created="Wed, 19 Oct 2022 13:55:19 GMT"/>
+			<outline text="&lt;i&gt;Categories&lt;/i&gt; lists the categories you have assigned the feed to. If you click the (Edit) button you can change the category assignments in the &lt;a href=&quot;http://scripting.com/images/2022/10/19/categoriesDialogScreen.png&quot;&gt;dialog&lt;/a&gt;. " created="Wed, 19 Oct 2022 13:56:38 GMT"/>
+			<outline text="&lt;i&gt;When added&lt;/i&gt; says when the feed was first added to the FeedLand database, and by whom. " created="Wed, 19 Oct 2022 13:58:27 GMT"/>
+			<outline text="&lt;i&gt;When updated&lt;/i&gt; says the last time we found a new item in the feed. We do recognize other changes in the feed, for example if the text of an item changes, but for us to flag a feed as updated there has to be a wholly new item." created="Wed, 19 Oct 2022 13:54:54 GMT"/>
+			<outline text="&lt;i&gt;Items / Checks&lt;/i&gt; says how many items we have from this feed in the database, and how many times it has been checked for new stuff. There's a button next to this item that tells the server to check the feed right now. " created="Wed, 19 Oct 2022 13:59:52 GMT"/>
+			<outline text="&lt;i&gt;Last renew&lt;/i&gt; says when the feed's associated &lt;a href=&quot;http://home.rsscloud.co/&quot;&gt;rssCloud&lt;/a&gt; server has been last notified that FeedLand wants to be pinged when the feed updates. This protocol is part of the RSS 2.0 standard, and is widely supported on the web. However not all feeds support it. So if there is no date or time there, it means the feed doesn't have this support. In either case we check the feed manually periodically for new stuff. Feeds that support rssCloud should update instantly when they change. For feeds that support the protocol, we must renew within 25 hours or the subscription will be cancelled, but we try to do it within 23, because in this case it's better to be a little early. " created="Wed, 19 Oct 2022 14:01:35 GMT"/>
+			<outline text="&lt;i&gt;Secs to read&lt;/i&gt; says how long it took the FeedLand server to read the feed. It's usually pretty quick, well under a second, but if the number is higher, that could indicate a problem with the feed, or possibly with the FeedLand server. " created="Wed, 19 Oct 2022 14:03:57 GMT"/>
+			<outline text="&lt;i&gt;Subscribers&lt;/i&gt; tells you who is subscribed to this feed. If you click on a name you are taken to their Feed List, where you may get ideas for feeds you want to subscribe to. " created="Wed, 19 Oct 2022 14:04:45 GMT"/>
+			<outline text="The &lt;i&gt;big blue button&lt;/i&gt; at the bottom of the page says either Unsubscribe, if you're subscribed to the feed, or Subscribe if you're not. " created="Wed, 19 Oct 2022 13:54:55 GMT"/>
+			</outline>
+		<outline text="Reading feeds" created="Wed, 19 Oct 2022 14:30:11 GMT">
+			<outline text="FeedLand has two basic ways to read the content of feeds -- the river and mailbox views.  " created="Wed, 19 Oct 2022 14:30:14 GMT"/>
+			<outline text="Here's a simple way to compare them. First go to the &lt;a href=&quot;http://feedland.org/?feedurl=http%3A%2F%2Fscripting.com%2Frss.xml&quot;&gt;Feed Info page&lt;/a&gt; for Scripting News, my blog. " created="Wed, 19 Oct 2022 14:32:11 GMT"/>
+			<outline text="When you're viewing a Feed Info page a new menu appears, the View menu, with two choices enabled -- &lt;i&gt;View as river&lt;/i&gt; and &lt;i&gt;View as mailbox.  &lt;/i&gt;" created="Wed, 19 Oct 2022 14:32:51 GMT"/>
+			<outline text="I've included screen shots below to give an idea. There are benefits to each of the views. At this writing (October 2022) the mailbox view still could use a lot of features, I have focused on the river view. I hope to get some time to add the features soon. " created="Wed, 19 Oct 2022 14:42:18 GMT"/>
+			<outline text="&lt;div style=&quot;border: 1px solid silver; width: 650px; padding-top: 10px; margin-top: 20px; padding-bottom: 10px; margin-bottom: 20px; text-align: center;&quot;&gt;&lt;img src=&quot;http://scripting.com/images/2022/10/19/riverScreen.png&quot;&gt;" created="Wed, 19 Oct 2022 14:37:49 GMT"/>
+			<outline text="&lt;div style=&quot;border: 1px solid silver; width: 650px; padding-top: 10px; padding-bottom: 10px; margin-bottom: 20px; text-align: center;&quot;&gt;&lt;img src=&quot;http://scripting.com/images/2022/10/19/mailboxScreen.png&quot;&gt;" created="Wed, 19 Oct 2022 14:40:24 GMT"/>
+			</outline>
+		<outline text="Settings" created="Thu, 20 Oct 2022 15:44:57 GMT">
+			<outline text="The Settings command in the System menu opens a tabbed dialog box with settings. The System menu is in the top right corner of the screen." created="Thu, 20 Oct 2022 15:44:59 GMT"/>
+			<outline text="The first panel configures &lt;a href=&quot;http://docs.feedland.org/categories.opml&quot;&gt;Categories&lt;/a&gt;. " created="Thu, 20 Oct 2022 15:45:46 GMT"/>
+			<outline text="The second panel is for &lt;a href=&quot;http://docs.feedland.org/newsProducts.opml&quot;&gt;News Products&lt;/a&gt;. " created="Thu, 20 Oct 2022 15:46:20 GMT"/>
+			<outline text="The third panel makes it possible to set the URL of the app you use for linkblogging. It's hooked up to the RT icon below each item in the river display. &lt;a href=&quot;http://scripting.com/images/2022/10/20/recycleIconScreen.png&quot;&gt;Screen shot&lt;/a&gt;. By default the linker app is &lt;a href=&quot;http://radio3.io/&quot;&gt;Radio3&lt;/a&gt;, but this setting is there so that you can change it. Any software used for that will hopefully tell you how to make this change.   " created="Thu, 20 Oct 2022 15:46:40 GMT"/>
+			<outline text="The fourth panel -- Misc -- allows you to change some random settings." created="Thu, 20 Oct 2022 15:49:18 GMT" flBulletedSubs="true">
+				<outline text="&lt;i&gt;News is the home page. &lt;/i&gt;If you check this box, when you go to feedland.org you will be taken to your News page. If you uncheck it, you'll go to your Feed List page. Default is unchecked." created="Thu, 20 Oct 2022 15:49:42 GMT"/>
+				<outline text="&lt;i&gt;Show news items in a small box at the top of the screen. &lt;/i&gt;If checked, you will get a box through which news scrolls, one story at a time, in realtime. Default is unchecked. &lt;a href=&quot;http://scripting.com/images/2022/10/20/newsbox.png&quot;&gt;Screen shot&lt;/a&gt;. " created="Thu, 20 Oct 2022 15:52:38 GMT"/>
+				<outline text="&lt;i&gt;Block background updates for Feed List page.&lt;/i&gt; If checked, the Feed List page won't change unless you reload the page. I needed this for debugging, but you may prefer not to be interrupted by changes, so I left it in. Default is unchecked." created="Thu, 20 Oct 2022 15:52:49 GMT"/>
+				</outline>
+			</outline>
+		</body>
+	</opml>

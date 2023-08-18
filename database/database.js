@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.6.14";  
+var myProductName = "feedlandDatabase", myVersion = "0.6.17";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -1198,6 +1198,7 @@ function checkFeedAndItems (feedUrl, callback, flNewFeed=false) {
 		});
 	}
 function checkOneFeed (feedUrl, callback) {
+	console.log ("checkOneFeed: feedUrl == " + feedUrl); //8/18/23 by DW
 	checkFeedAndItems (feedUrl, function (err, theFeed, feedRec) {
 		if (err) {
 			if (callback !== undefined) {
@@ -2632,7 +2633,7 @@ function buildLikesFeed (screenname, callback) { //10/19/22 by DW
 		}
 	}
 
-function pleaseNotify (urlServer, port, path, urlFeed, domain, callback) { //rssCloud support
+function rssCloudRenew (urlServer, port, path, feedUrl, domain, callback) {
 	var now = new Date ();
 	const theRequest = {
 		url: urlServer,
@@ -2646,11 +2647,11 @@ function pleaseNotify (urlServer, port, path, urlFeed, domain, callback) { //rss
 			domain, //12/12/22 by DW
 			port,
 			path,
-			url1: urlFeed,
+			url1: feedUrl,
 			protocol: "http-post"
 			})
 		};
-	console.log ("pleaseNotify: theRequest == " + utils.jsonStringify (theRequest)); //12/10/22 by DW
+	console.log ("rssCloudRenew: feedUrl == " + utils.jsonStringify (feedUrl)); //8/18/23 by DW
 	requestWithRedirect (theRequest, function (err, response, body) {
 		if (err) {
 			callback (err);
@@ -2672,7 +2673,7 @@ function renewNextSubscriptionIfReady (options) { //rssCloud support
 					if (result.length > 0) { 
 						var feedRec = result [0];
 						if (utils.secondsSince (feedRec.whenLastCloudRenew) > options.ctSecsBetwRenews) { //ready to be renewed
-							pleaseNotify (feedRec.urlCloudServer, options.port, options.feedUpdatedCallback, feedRec.feedUrl, options.domain, function (err, data) {
+							rssCloudRenew (feedRec.urlCloudServer, options.port, options.feedUpdatedCallback, feedRec.feedUrl, options.domain, function (err, data) {
 								if (err) {
 									console.log ("renewNextSubscriptionIfReady: err.message == " + err.message + ", feedRec.urlCloudServer == " + feedRec.urlCloudServer + ", feedRec.feedUrl == " + feedRec.feedUrl);
 									}
@@ -2693,7 +2694,7 @@ function renewNextSubscriptionIfReady (options) { //rssCloud support
 function renewFeedNow (feedUrl, options, callback) { //rssCloud support
 	isFeedInDatabase (feedUrl, function (flInDatabase, feedRec) {
 		if (flInDatabase) {
-			pleaseNotify (feedRec.urlCloudServer, options.port, options.feedUpdatedCallback, feedRec.feedUrl, options.domain, function (err, data) {
+			rssCloudRenew (feedRec.urlCloudServer, options.port, options.feedUpdatedCallback, feedRec.feedUrl, options.domain, function (err, data) {
 				if (err) {
 					console.log ("renewFeedNow: err.message == " + err.message + ", feedRec.urlCloudServer == " + feedRec.urlCloudServer + ", feedRec.feedUrl == " + feedRec.feedUrl);
 					}

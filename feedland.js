@@ -1,4 +1,4 @@
-const myVersion = "0.5.63", myProductName = "feedland"; 
+const myVersion = "0.5.65", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -445,6 +445,14 @@ function getRssCloudOptions () {
 	options.websocketPort = (appconfig.flWebsocketEnabled) ? appconfig.websocketPort : undefined;
 	return (options);
 	}
+
+function handleRssCloudPing (feedUrl, callback) { //8/18/23 by DW
+	console.log ("\nhandleRssCloudPing: feedUrl == " + feedUrl + "\n");
+	database.checkOneFeed (feedUrl, function (err, data) {
+		callback ("Thanks for the update! ;-)");
+		});
+	}
+
 function getServerConfig (screenname) { //5/8/23 by DW
 	var serverConfig = { //7/5/23 by DW
 		maxFeedItems: config.maxFeedItems
@@ -555,9 +563,7 @@ function handleHttpRequest (theRequest) {
 					return (true);
 				case config.rssCloud.feedUpdatedCallback: //10/9/22 by DW
 					var jstruct = qs.parse (theRequest.postBody);
-					database.checkOneFeed (jstruct.url, function (err, data) {
-						returnPlainText ("Thanks for the update! ;-)");
-						});
+					handleRssCloudPing (jstruct.url, returnPlainText); //8/18/23 by DW
 					return (true); 
 				default: 
 					return (false); //not consumed

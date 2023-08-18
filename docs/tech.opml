@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<opml version="2.0">
+	<head>
+		<title>FeedLand tech</title>
+		<dateCreated>Sun, 02 Oct 2022 21:04:21 GMT</dateCreated>
+		<description>Technical notes about FeedLand.</description>
+		<urlPublic>http://docs.feedland.org/tech.opml</urlPublic>
+		<ownerTwitterScreenName>davewiner</ownerTwitterScreenName>
+		<ownerName>Dave Winer</ownerName>
+		<ownerId>http://twitter.com/davewiner</ownerId>
+		<urlUpdateSocket>ws://drummer.scripting.com:1232/</urlUpdateSocket>
+		<dateModified>Sat, 08 Oct 2022 16:14:29 GMT</dateModified>
+		<expansionState>3,6,9,10,15</expansionState>
+		<lastCursor>16</lastCursor>
+		</head>
+	<body>
+		<outline text="What is this?" created="Sun, 02 Oct 2022 21:04:21 GMT">
+			<outline text="Technical notes for ourselves, as developers, and info for users who are interested. " created="Sun, 02 Oct 2022 21:04:36 GMT"/>
+			</outline>
+		<outline text="Different kinds of pages in FeedLand" created="Sat, 24 Sep 2022 14:50:24 GMT" type="outline">
+			<outline text="single-category river" created="Sat, 24 Sep 2022 14:59:51 GMT">
+				<outline text="when you click on the category name in a Feed Info page, it takes you to a river with just the items from that category" created="Sat, 24 Sep 2022 14:59:56 GMT"/>
+				<outline text="can't send you to the tabbed river because the category might not be viewable in a tab (not all categories are)." created="Sat, 24 Sep 2022 15:00:33 GMT"/>
+				</outline>
+			<outline text="single-feed river" created="Sat, 24 Sep 2022 14:50:41 GMT">
+				<outline text="when you click on a feed's name in a list, it takes you to a river where all you see are the items in that feed in reverse chron order" created="Sat, 24 Sep 2022 15:02:19 GMT"/>
+				<outline text="the items come from the database" created="Sat, 24 Sep 2022 15:02:46 GMT"/>
+				<outline text="the explanatory text at the top of the page is about the feed" created="Sat, 24 Sep 2022 15:02:53 GMT"/>
+				<outline text="when you click on the name of the feed at the top it should take you to the Feed Info page." created="Sat, 24 Sep 2022 15:08:12 GMT"/>
+				</outline>
+			<outline text="multi-tabbed river" created="Sat, 24 Sep 2022 14:50:31 GMT">
+				<outline text="what you get when you choose My news in the menu" created="Sat, 24 Sep 2022 15:03:58 GMT"/>
+				<outline text="this is the most sensible thing to put into your news product" created="Sat, 24 Sep 2022 15:04:22 GMT"/>
+				<outline text="in fact we could make this completely automatic, a special subdomain that displays your news" created="Sat, 24 Sep 2022 15:04:30 GMT"/>
+				<outline text="requires no login, would have to test carefully against that" created="Sat, 24 Sep 2022 15:04:50 GMT"/>
+				<outline text="no links to internal feedland pages unless the user is logged in" created="Sat, 24 Sep 2022 15:05:00 GMT"/>
+				</outline>
+			<outline text="mailbox reader" created="Sat, 24 Sep 2022 15:00:00 GMT">
+				<outline text="a problem -- it doesn't access the feed info from the database, it gets it straight from the feed." created="Sat, 24 Sep 2022 15:01:03 GMT"/>
+				<outline text="maybe it's not a problem. i haven't heard anyone complain" created="Sat, 24 Sep 2022 15:01:30 GMT"/>
+				</outline>
+			<outline text="feedlist" created="Sat, 24 Sep 2022 14:50:57 GMT">
+				<outline text="I think of this as the home page. It's what I edit, it's where my power is as a user and editor." created="Sat, 24 Sep 2022 15:05:17 GMT"/>
+				<outline text="And it's also a news reader because if you have the When column selected it's a freaking blog. " created="Sat, 24 Sep 2022 15:05:36 GMT"/>
+				<outline text="And you can read the first five news items of each feed right there, you don't have to go anywhere. " created="Sat, 24 Sep 2022 15:06:08 GMT"/>
+				</outline>
+			<outline text="subscription log" created="Sat, 24 Sep 2022 14:50:58 GMT">
+				<outline text="max length of subscription log?" created="Sat, 24 Sep 2022 14:51:32 GMT"/>
+				</outline>
+			<outline text="hotlist" created="Sat, 24 Sep 2022 14:51:08 GMT">
+				<outline text="we will eventually have a calendar so you can view the hotlist through time" created="Sat, 24 Sep 2022 15:07:11 GMT"/>
+				<outline text="we're doing the archive every night" created="Sat, 24 Sep 2022 15:07:26 GMT"/>
+				</outline>
+			</outline>
+		<outline text="What is a user?" created="Sat, 08 Oct 2022 15:39:42 GMT">
+			<outline text="A user subscribes to feeds. " created="Sat, 08 Oct 2022 15:39:46 GMT"/>
+			<outline text="A user can have a news product page on my.feedland.org." created="Sat, 08 Oct 2022 15:39:59 GMT"/>
+			</outline>
+		<outline text="What's on a feedlist page?" created="Sat, 08 Oct 2022 15:37:51 GMT">
+			<outline text="At the top of the page is an explainer that says whose feeds these are and links to the news page for that user. " created="Sat, 08 Oct 2022 15:37:59 GMT"/>
+			<outline text="A white on orange XML icon that links to the OPML subscription list for this user" created="Sat, 08 Oct 2022 15:40:28 GMT"/>
+			<outline text="A big list of feeds" created="Sat, 08 Oct 2022 15:41:44 GMT">
+				<outline text="at the top of the list are column headers: title, when and ct " created="Sat, 08 Oct 2022 15:41:50 GMT">
+					<outline text="title is the title from the feed, it has a tooltip that's the description" created="Sat, 08 Oct 2022 15:42:31 GMT"/>
+					<outline text="when is how long since the feed has updated, ie a new item was posted" created="Sat, 08 Oct 2022 15:42:57 GMT"/>
+					<outline text="ct is the number of subscribers to that feed" created="Sat, 08 Oct 2022 15:43:11 GMT"/>
+					<outline text="you can click on each of the column headers to sort on it, click again and you sort in reverse order" created="Sat, 08 Oct 2022 15:43:33 GMT"/>
+					</outline>
+				<outline text="in each item are several columns" created="Sat, 08 Oct 2022 15:44:23 GMT">
+					<outline text="a wedge that you can click to expand the item to reveal the most recent five stories" created="Sat, 08 Oct 2022 15:44:30 GMT">
+						<outline text="each story shows its title (or description if it has no title). " created="Sat, 08 Oct 2022 15:44:47 GMT"/>
+						<outline text="no tool tip for the story text" created="Sat, 08 Oct 2022 15:45:13 GMT"/>
+						<outline text="then a permalink to the story on the web, with a tooltip containing the description, abbreviated to 280 chars if necessary" created="Sat, 08 Oct 2022 15:45:26 GMT"/>
+						</outline>
+					<outline text="a checkbox that indicates whether or not you're subscribed to the feed. click the box to toggle the value which is immediately reflected in the database." created="Sat, 08 Oct 2022 16:13:59 GMT"/>
+					<outline text="the title of the feed, as described above, with an icon of a label that when clicked opens the category dialog. the categories are as specified in the Settings dialog.  " created="Sat, 08 Oct 2022 15:46:53 GMT"/>
+					<outline text="the last column is a white on green info icon. if you hover over the icon you get stats about the feed. if you click the icon you go to the feed info page for the feed." created="Sat, 08 Oct 2022 15:48:33 GMT"/>
+					</outline>
+				</outline>
+			</outline>
+		</body>
+	</opml>

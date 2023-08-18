@@ -1,0 +1,173 @@
+<html>
+	<head>
+		<title id="idPageTitle">FeedLand: [%title%]</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		
+		<script src="//s3.amazonaws.com/scripting.com/code/includes/jquery-1.9.1.min.js"></script>
+		<link href="//s3.amazonaws.com/scripting.com/code/includes/bootstrap.css" rel="stylesheet">
+		<script src="//s3.amazonaws.com/scripting.com/code/includes/bootstrap.min.js"></script>
+		<link rel="stylesheet" href="//s3.amazonaws.com/scripting.com/code/fontawesome/5.12.0/css/all.css">
+		<link href="//fonts.googleapis.com/css?family=Ubuntu:400,500i,700" rel="stylesheet">
+		<script src="//s3.amazonaws.com/scripting.com/code/includes/basic/code.js"></script>
+		<link href="//s3.amazonaws.com/scripting.com/code/includes/basic/styles.css" rel="stylesheet" type="text/css">
+		
+		<script src="http://api.nodestorage.io/api.js"></script>
+		<script src="http://fargo.io/code/shared/emojify.js"></script>
+		<link rel="stylesheet" href="http://fargo.io/code/shared/emojify.css"/>
+		<script src="http://fargo.io/code/markdownConverter.js"></script>
+		<script src="http://fargo.io/cms/dateFormat.js"></script>
+		<script src="http://fargo.io/code/browsers/outlinebrowser.js"></script>
+		<link href="http://fargo.io/code/browsers/outlinebrowser.css" rel="stylesheet" type="text/css">
+		
+		<script src="http://fargo.io/code/shared/xml.js"></script>
+		<script src="http://fargo.io/code/shared/reader.js"></script>
+		
+		<script src="http://scripting.com/code/pagepark/templates/opml/code.js"></script>
+		<link href="http://scripting.com/code/pagepark/templates/opml/styles.css" rel="stylesheet" type="text/css">
+		
+		<!-- Facebook metadata -->
+			<meta property="og:url" content="[%url%]" />
+			<meta property="og:type" content="website" />
+			<meta property="og:title" content="[%title%]" />
+			<meta property="og:description" content="[%description%]" />
+			<meta property="og:image" content="[%image%]" />
+			<meta property="og:site_name" content="[%sitename%]" />
+		<!-- Twitter metadata -->
+			<meta name="twitter:card" content="summary_large_image">
+			<meta name="twitter:site" content="@[%ownerTwitterScreenName%]">
+			<meta name="twitter:title" content="[%title%]">
+			<meta name="twitter:description" content="[%description%]">
+			<meta name="twitter:image:src" content="[%image%]">
+		
+		<script>
+			var jstruct = [%bodytext%];
+			
+			function docsStartup () { //10/7/21 by DW
+				//embolden the navlinks for the page we're on
+					$(".ulNavlinks li a").each (function () {
+						var href = $(this).prop ("href");
+						var menufname = stringLastField (href, "/");
+						var thisfname = stringLastField (window.location.href, "/");
+						if (menufname == thisfname) {
+							var parent = $(this).parent ();
+							$(parent).html ("<b>" + $(this).text () + "</b>");
+							}
+						});
+				}
+			</script>
+		<style>
+			.divOutlineContainer {
+				margin-top: 0;
+				}
+			.divLastUpdate {
+				margin-top: 0;
+				}
+			.divFrontierIcon {
+				margin-top: 15px;
+				}
+			.tbDocs {
+				}
+			.tdNavlinks {
+				vertical-align: top;
+				}
+			.divSidebarLinks {
+				border: 1px solid silver;
+				padding-top: 15px;
+				padding-bottom: 40px;
+				vertical-align: top;
+				text-align: center;
+				background-color: white;
+				width: 100px;
+				}
+			.ulNavlinks {
+				margin-top: 15px;
+				margin-bottom: 15px;
+				list-style-type: none;
+				margin-left: 0;
+				}
+			.ulNavlinks li {
+				margin-bottom: 10px;
+				}
+			.tdSpacer {
+				width: 20px;
+				}
+			
+			/* 10/20/22 by DW */
+				.divRenderedOutline .divOutlineText {
+					font-family: "Ubuntu";
+					font-size: 18px;
+					line-height: 140%;
+					}
+				.divOutlineContainer {
+					margin-left: 5;
+					margin-right: 15;
+					}
+			
+			/* styles for tablet */
+				@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+					.divPageBody {
+						width: 98%;
+						margin-top: 50px;
+						}
+					.tdSpacer {
+						width: 30px;
+						}
+					}
+			
+			</style>
+		</head>
+	<body>
+		<div class="divPageBody">
+			<table class="tbDocs">
+				<tr class="trDocs">
+					<td class="tdNavlinks">
+						
+						<div class="divSidebarLinks">
+							<div class="divFrontierIcon">
+								<a href="http://feedland.org/" target="_blank" title="feedland.org">
+									<img src="http://scripting.com/images/2022/10/21/beet.png">
+									</a>
+								</div>
+							<ul class="ulNavlinks">
+								<li><a href="firstThings.opml">Startup</a></li>
+								<li><a href="about.opml">Deeper</a></li>
+								<li><a href="yourFeed.opml">Your Feed</a></li>
+								<li><a href="categories.opml">Categories</a></li>
+								<li><a href="newsProducts.opml">News Products</a></li>
+								<li><a href="misc.opml">Extras</a></li>
+								</ul>
+							</div>
+						
+						</td>
+					<td class="tdSpacer">
+						</td>
+					<td>
+						<div class="divOutlineContainer" id="idOutlineContainer" style="display: none;">
+							<div class="divXmlIcon" id="idXmlIcon"></div>
+							<div class="divLastUpdate"><b>Last update</b>: <span id="idWhenLastUpdate"></span>.</div>
+							<div class="divOutlineTitle" id="idOutlineTitle">
+								</div>
+							<div class="divOutlineDescription" id="idOutlineDescription">
+								</div>
+							<div class="divOutlineDisplayer" id="idOutlineDisplayer">
+								</div>
+							<div class="divWhenCreated"><b>Posted</b>: <span id="idWhenCreated"></span>.</div>
+							<div class="divOutlineFooter" id="idOutlineFooter">
+								</div>
+							<div class="divComments" id="idComments">
+								<div id="disqus_thread"></div>
+								</div>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+		<script>
+			$(document).ready (function () {
+				docsStartup ();
+				startup ();
+				});
+			</script>
+		</body>
+	</html>

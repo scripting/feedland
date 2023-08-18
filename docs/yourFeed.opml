@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<opml version="2.0">
+	<head>
+		<title>Your FeedLand feed</title>
+		<dateCreated>Sun, 06 Nov 2022 21:26:18 GMT</dateCreated>
+		<description>There's a feed with your name on it, ready to go.</description>
+		<urlPublic>http://docs.feedland.org/yourFeed.opml</urlPublic>
+		<ownerTwitterScreenName>davewiner</ownerTwitterScreenName>
+		<ownerName>Dave Winer</ownerName>
+		<ownerId>dave.winer@gmail.com</ownerId>
+		<urlUpdateSocket>wss://drummer.land/</urlUpdateSocket>
+		<dateModified>Tue, 01 Aug 2023 16:43:31 GMT</dateModified>
+		<expansionState></expansionState>
+		<lastCursor>9</lastCursor>
+		</head>
+	<body>
+		<outline text="It's a feed" created="Mon, 17 Oct 2022 14:59:18 GMT" subs="[object Object]">
+			<outline text="One of the design goals of FeedLand was to create a feed-based alternative to social media apps like Twitter, Bluesky, Mastodon. So in addition to reading feeds, it made sense to give each user their own feed to post to. If people use this feature, we'll form more of the user interface around its two-way nature. " created="Tue, 01 Aug 2023 14:03:52 GMT"/>
+			</outline>
+		<outline text="How to" created="Sat, 05 Nov 2022 15:42:22 GMT" subs="[object Object],[object Object],[object Object],[object Object]">
+			<outline text="Choose &lt;i&gt;My feed&lt;/i&gt; from the first menu.  " created="Sat, 05 Nov 2022 15:42:35 GMT"/>
+			<outline text="A new page opens with an edit box at the top and a place for a feed of items below. " created="Sat, 05 Nov 2022 15:42:52 GMT"/>
+			<outline text="Click in the box and type something like &lt;i&gt;Hello World&lt;/i&gt; and click the Post button." created="Sat, 05 Nov 2022 15:43:13 GMT"/>
+			<outline text="In a moment the message you typed &lt;a href=&quot;http://scripting.com/images/2022/11/08/editboxwithitembelow.png&quot;&gt;appears below&lt;/a&gt; in the list of the feed's items. " created="Sat, 05 Nov 2022 15:43:45 GMT"/>
+			</outline>
+		<outline text="Screen shot of the edit box" created="Tue, 08 Nov 2022 16:37:45 GMT" subs="[object Object],[object Object]">
+			<outline text="&lt;img src=&quot;http://scripting.com/images/2023/04/05/editboxScreenShot.png&quot;&gt;" created="Wed, 05 Apr 2023 14:03:32 GMT"/>
+			<outline text="&lt;img src=&quot;http://scripting.com/images/2022/11/08/editboxscreen2.png&quot; &gt;&lt;br=&quot;&quot;&gt;" created="Tue, 08 Nov 2022 16:37:48 GMT" isComment="true"/>
+			</outline>
+		<outline text="Editing text" created="Tue, 08 Nov 2022 17:04:06 GMT" subs="[object Object],[object Object],[object Object],[object Object]">
+			<outline text="To edit the text in an item, click on the text in the list. The text then appears in the edit box. Make changes, when you're ready to publish click the &lt;i&gt;Update&lt;/i&gt; button. The text changes both in the feed and in the list. " created="Tue, 08 Nov 2022 16:36:41 GMT"/>
+			<outline text="If you decide you don't want to save your changes, click the Cancel button. " created="Tue, 08 Nov 2022 17:04:33 GMT"/>
+			<outline text="Here's a &lt;a href=&quot;http://scripting.com/images/2022/11/08/editboxbeingusedtoedittext.png&quot;&gt;screen shot&lt;/a&gt; of the edit box being used to edit an existing item." created="Tue, 08 Nov 2022 17:04:45 GMT"/>
+			<outline text="In this mode, the text is not saved to the server as you make changes. " created="Tue, 08 Nov 2022 17:04:59 GMT"/>
+			</outline>
+		<outline text="Notes" created="Sat, 05 Nov 2022 15:44:46 GMT" subs="[object Object],[object Object],[object Object],[object Object]">
+			<outline text="If you want more info about the published feed, click the (Feed) link next to the feed title. It will take you to the Feed Info page, which includes the URL of your feed. " created="Tue, 08 Nov 2022 17:02:36 GMT"/>
+			<outline text="If your username is bullmancuso, this is &lt;a href=&quot;http://data.feedland.org/feeds/bullmancuso.xml&quot;&gt;where&lt;/a&gt; your feed would be. " created="Tue, 08 Nov 2022 17:03:21 GMT"/>
+			<outline text="Here's the &lt;a href=&quot;http://feedland.org/?feedurl=http%3A%2F%2Fdata.feedland.org%2Ffeeds%2Fbullmancuso.xml&quot;&gt;Feed Info page&lt;/a&gt; for bullmancuso." created="Tue, 08 Nov 2022 18:52:09 GMT"/>
+			<outline text="If you want to change the title or description of your blog, choose Settings from the right-most menu, click on the Feed tab and you can edit it there. &lt;a href=&quot;http://scripting.com/images/2022/11/08/settingsdialogscreen.png&quot;&gt;Screen shot&lt;/a&gt;." created="Sat, 05 Nov 2022 15:44:59 GMT"/>
+			</outline>
+		<outline text="Markdown is just enough HTML" created="Tue, 08 Nov 2022 17:21:01 GMT" subs="[object Object],[object Object],[object Object],[object Object]">
+			<outline text="If you look at the &lt;a href=&quot;http://data.feedland.org/feeds/bullmancuso.xml&quot;&gt;feed&lt;/a&gt;, you'll see that the text is saved in the feed in both HTML and Markdown. " created="Tue, 08 Nov 2022 17:11:57 GMT"/>
+			<outline text="Here's a an example, an item that has a bit of markup, see how it appears in the description element as HTML and in the new source:markdown element in Markdown syntax. " created="Tue, 08 Nov 2022 17:22:04 GMT"/>
+			<outline text="&amp;lt;item&gt;" created="Tue, 08 Nov 2022 18:01:33 GMT" subs="[object Object],[object Object],[object Object],[object Object],[object Object]">
+				<outline text="&amp;lt;description&gt;Some &amp;lt;em&gt;italic&amp;lt;/em&gt; text.&amp;lt;/description&gt;" created="Tue, 08 Nov 2022 18:01:37 GMT"/>
+				<outline text="&amp;lt;pubDate&gt;Tue, 08 Nov 2022 17:59:11 GMT&amp;lt;/pubDate&gt;" created="Tue, 08 Nov 2022 18:02:06 GMT"/>
+				<outline text="&amp;lt;guid isPermaLink=&quot;false&quot;&gt;384060&amp;lt;/guid&gt;" created="Tue, 08 Nov 2022 18:02:09 GMT"/>
+				<outline text="&amp;lt;source:markdown&gt;Some _italic_ text.&amp;lt;/source:markdown&gt;" created="Tue, 08 Nov 2022 18:02:13 GMT"/>
+				<outline text="&amp;lt;/item&gt;" created="Tue, 08 Nov 2022 18:01:39 GMT"/>
+				</outline>
+			<outline text="A reader app is free to use either one, and will get the same result. I want to see if other content makers and reader devs will join me in favoring Markdown source when it's available over HTML. There are good &lt;a href=&quot;http://scripting.com/2022/08/25/210902.html?title=markdownIsJustEnoughHtml&quot;&gt;reasons&lt;/a&gt; why it's the way to go." created="Tue, 08 Nov 2022 18:13:54 GMT"/>
+			</outline>
+		<outline text="New features in April 2023" created="Wed, 05 Apr 2023 13:45:47 GMT" subs="[object Object],[object Object]">
+			<outline text="There's a new version of FeedLand where the personal feed got some new features.  " created="Wed, 05 Apr 2023 13:45:55 GMT"/>
+			<outline text="The new features:" created="Wed, 05 Apr 2023 13:46:50 GMT" flBulletedSubs="true" subs="[object Object],[object Object]">
+				<outline text="You can edit the title, link and enclosure for any feed item you write. " created="Wed, 05 Apr 2023 13:47:01 GMT"/>
+				<outline text="There's a bookmarklet that allows you to add an item to your feed that's a link to another website" created="Wed, 05 Apr 2023 13:47:28 GMT"/>
+				</outline>
+			</outline>
+		<outline text="The bookmarklet" created="Wed, 05 Apr 2023 14:11:49 GMT" subs="[object Object],[object Object],[object Object]">
+			<outline text="Here's the bookmarklet. As usual, drag the &lt;b&gt;FL&lt;/b&gt; text below from the web page into your browser's chrome. " created="Wed, 05 Apr 2023 13:47:45 GMT" subs="[object Object],[object Object]">
+				<outline text="&lt;a href=&quot;javascript:(function() {var params = &quot; &quot;;function=&quot;&quot; addparam=&quot;&quot; (name,=&quot;&quot; val)=&quot;&quot; {if=&quot;&quot; (params.length=&quot;&quot;&gt; 0) {params += &quot;&amp;&quot;;}params += name + &quot;=&quot; + encodeURIComponent (val);}addparam (&quot;linkblog&quot;, &quot;true&quot;);addparam (&quot;title&quot;, document.title);addparam (&quot;description&quot;, window.getSelection ().toString ());addparam (&quot;link&quot;, window.location.href);var callUrl = &quot;https://feedland.org/?&quot; + params;console.log (callUrl);window.open(callUrl, %27_blank%27);})();&quot; style=&quot;font-size: 28px; font-weight: bold; color: black;&quot; &gt;fl&lt;=&quot;&quot; a=&quot;&quot;&gt;&lt;/a&gt;" created="Thu, 20 Apr 2023 15:44:14 GMT"/>
+				<outline text="comment. if the html above gets screwed up, you can find a fresh copy here. " created="Thu, 20 Apr 2023 15:45:15 GMT" isComment="true" subs="[object Object]">
+					<outline text="http://scripting.com/code/feedland/home/bookmarklet.txt" created="Thu, 20 Apr 2023 15:45:34 GMT"/>
+					</outline>
+				</outline>
+			<outline text="When you are on a web page that you want to link to from your feed, click the bookmarklet. FeedLand will open in a new tab with the title of the page in the editbox and a link to the page in the link field in the Title, Link &amp; Enclosure section of the editbox. " created="Wed, 05 Apr 2023 13:50:18 GMT"/>
+			<outline text="If you select text on the page before clicking the bookmarklet, that text will appear in the editbox, and the title of the page will appear in the Title element of the TLE section of the editbox." created="Wed, 05 Apr 2023 14:13:36 GMT"/>
+			</outline>
+		<outline text="Linkblogging from inside FeedLand" created="Wed, 05 Apr 2023 15:20:05 GMT" subs="[object Object],[object Object],[object Object]">
+			<outline text="When you're looking at a timeline, there's a &lt;i class=&quot;fa fa-retweet&quot;&gt;&lt;/i&gt; icon that's used to post the item to a linkblog. " created="Wed, 05 Apr 2023 15:29:12 GMT"/>
+			<outline text="By default that is Radio3, but if you want, you can replace that with FeedLand by replacing the URL in the &lt;i&gt;Linker&lt;/i&gt; tab in Settings with this:" created="Wed, 05 Apr 2023 15:20:14 GMT" subs="[object Object]">
+				<outline text="&lt;code&gt;https://feedland.org/?linkblog=true&amp;&lt;/code&gt;" created="Wed, 05 Apr 2023 15:21:21 GMT"/>
+				</outline>
+			<outline text="Here's a &lt;a href=&quot;http://scripting.com/images/2023/04/05/linkerScreenShot.png&quot;&gt;screen shot&lt;/a&gt;." created="Wed, 05 Apr 2023 15:21:41 GMT"/>
+			</outline>
+		<outline text="Enclosures " created="Wed, 05 Apr 2023 14:12:01 GMT" subs="[object Object],[object Object]">
+			<outline text="You can link to a media file from the Enclosure element in the Title, Link &amp; Enclosure section. " created="Wed, 05 Apr 2023 14:12:04 GMT"/>
+			<outline text="When your feed is saved, FeedLand generates an RSS &amp;lt;enclosure&gt; element, including a link to the file, its type and size." created="Wed, 05 Apr 2023 14:12:33 GMT"/>
+			</outline>
+		</body>
+	</opml>

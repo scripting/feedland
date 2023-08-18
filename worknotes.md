@@ -1,3 +1,9 @@
+#### 8/18/23; 12:28:15 PM by DW
+
+Started adding back console.log calls. 
+
+handleRssCloudPing
+
 #### 7/26/23; 2:36:40 PM by DW
 
 Changed the dependencies in package.json to reference specific versions of the packages I authored using the caret, to basically always ask for the newest version available in that major version. 

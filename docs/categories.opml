@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<opml version="2.0">
+	<head>
+		<title>Categories in FeedLand</title>
+		<dateCreated>Thu, 08 Sep 2022 12:38:49 GMT</dateCreated>
+		<urlPublic>http://docs.feedland.org/categories.opml</urlPublic>
+		<description>Categories are essential to FeedLand.</description>
+		<ownerTwitterScreenName>davewiner</ownerTwitterScreenName>
+		<ownerName>Dave Winer</ownerName>
+		<ownerId>dave.winer@gmail.com</ownerId>
+		<urlUpdateSocket>wss://drummer.land/</urlUpdateSocket>
+		<dateModified>Sun, 30 Jul 2023 22:00:21 GMT</dateModified>
+		<expansionState>2,3,11,12,15,20,23</expansionState>
+		<lastCursor>0</lastCursor>
+		</head>
+	<body>
+		<outline text="What this is" created="Thu, 18 Aug 2022 15:40:59 GMT">
+			<outline text="Categories allow you to customize the news in FeedLand, assigning each feed you're subscribed to to one or more categories. You decide on the categories, and whether or not to display them on the News page of FeedLand. You can also use the categories in your &lt;a href=&quot;newsProducts.opml&quot;&gt;news products&lt;/a&gt;." created="Thu, 08 Sep 2022 12:41:05 GMT"/>
+			</outline>
+		<outline text="Deciding on your categories" created="Thu, 08 Sep 2022 12:43:32 GMT">
+			<outline text="First think about what categories you want to use initially. I recommend just using two or three, to get used to the concepts. You can change your mind later. Here's a suggestion of a list of categories to start with." created="Thu, 08 Sep 2022 12:43:36 GMT">
+				<outline text="All, Tech, Politics, NYT, Bloggers" created="Thu, 08 Sep 2022 12:44:33 GMT"/>
+				</outline>
+			<outline text="You would then assign feeds that are largely about tech to the Tech category. " created="Thu, 08 Sep 2022 12:45:42 GMT"/>
+			<outline text="If you were following a tech blogger, you would assign them to both Tech and Bloggers. " created="Thu, 08 Sep 2022 12:46:33 GMT"/>
+			<outline text="I recommend having an &lt;i&gt;All&lt;/i&gt; category, and unless you feel strongly that a feed should not be in it, that all feeds are. There are situations when you would not assign a feed to the All category. " created="Thu, 08 Sep 2022 12:46:54 GMT"/>
+			<outline text="When you've settled on a list of categories, open the Settings dialog, click on the Categories tab, and enter the category names, separated by commas, in the first box. You should leave the second box empty. It allows you to choose the categories that are displayed in tabs on the News page. You can come back to that later if you have too many categories to fit on the home page." created="Thu, 08 Sep 2022 12:48:09 GMT"/>
+			</outline>
+		<outline text="Assigning feeds to categories" created="Thu, 08 Sep 2022 12:51:15 GMT">
+			<outline text="Open the Feed List page. You'll notice a new icon next to the title of a feed. It looks like a tag. If the tag is dark that means the feed has categories already set, if it's light, only &lt;i&gt;All&lt;/i&gt; is checked. " created="Thu, 08 Sep 2022 12:51:23 GMT">
+				<outline text="&lt;img src=&quot;http://scripting.com/images/2022/09/08/feedlistItemsScreenShot.png&quot; alt=&quot;Screen shot of a few feeds from the FeedList page.&quot;&gt;" created="Thu, 08 Sep 2022 14:23:15 GMT"/>
+				</outline>
+			<outline text="When you click it a list of checkboxes for each of your categories appears. Only the &lt;i&gt;All&lt;/i&gt; checkbox is checked. " created="Thu, 08 Sep 2022 13:23:42 GMT"/>
+			<outline text="Click the categories that apply to this feed. The checkboxes are hot, they change in the database immediately when you click on them. " created="Thu, 08 Sep 2022 12:53:57 GMT"/>
+			<outline text="The title of the feed appears at the top of the dialog. If you hover the mouse over the title you'll see a tooltip with the description of the feed, as provided in the feed itself. Not all feeds have descriptions, and some of them aren't informative, but for now the title and description are all we have to go by here. " created="Thu, 08 Sep 2022 12:54:42 GMT"/>
+			<outline text="The arrows at the bottom of the dialog allow you to move between feeds in the Feed List without having to close and re-open the dialog. I made it work this way because all the clicking quickly became tedious. With this approach categorization is smooth and gratifying, and even at times fun." created="Thu, 08 Sep 2022 12:55:49 GMT"/>
+			</outline>
+		<outline text="Screen shot" created="Thu, 08 Sep 2022 14:28:20 GMT">
+			<outline text="This is what the Categories dialog looks like. They are the categories I've set for the &lt;a href=&quot;http://xmlviewer.scripting.com/?url=https://om.co/feed/&quot;&gt;feed&lt;/a&gt; of my friend Om Malik. He's a blogger who writes about tech and politics among many other things. " created="Thu, 08 Sep 2022 14:28:30 GMT">
+				<outline text="&lt;img src=&quot;http://scripting.com/images/2022/09/08/categoriesDialogScreenShot.png&quot; alt=&quot;Screen shot of the categories dialog.&quot;&gt;" created="Thu, 08 Sep 2022 14:18:35 GMT"/>
+				</outline>
+			</outline>
+		<outline text="Your news page now has tabs" created="Thu, 08 Sep 2022 12:57:00 GMT">
+			<outline text="Once you've established some categories and assigned some feeds to categories, have a look at your news page. " created="Thu, 08 Sep 2022 12:57:10 GMT">
+				<outline text="Choose &lt;i&gt;My news&lt;/i&gt; from the menu.  You should see your tabs, the order you specified them. Click on each tab to see the latest news in each category. &lt;a href=&quot;http://scripting.com/images/2022/11/03/newsPageScreen.png&quot;&gt;Screen shot&lt;/a&gt;." created="Thu, 03 Nov 2022 14:26:36 GMT"/>
+				</outline>
+			<outline text="That's the basic functionality of Categories in FeedlLand. There's more you can do, though -- read on. " created="Thu, 08 Sep 2022 12:58:57 GMT"/>
+			</outline>
+		<outline text="Using a category in a News Product" created="Thu, 08 Sep 2022 12:59:32 GMT">
+			<outline text="There's a new way to specify a tab in a news product, in addition to listing the feeds, or using an include. You can now specify a category.  " created="Thu, 08 Sep 2022 12:59:51 GMT"/>
+			<outline text="Suppose your name is bullmancuso and you have a category called NJ, and you want to include that in a tab in a news product. " created="Thu, 08 Sep 2022 13:00:44 GMT"/>
+			<outline text="Where you specify the tag in your outline, edit the attributes in Drummer. Click on the suitcase icon and add three properties: type, screenname and catname, like this:" created="Thu, 08 Sep 2022 13:01:49 GMT">
+				<outline text="&lt;img src=&quot;http://scripting.com/images/2022/09/08/categoryAtts.png&quot;&gt;" created="Thu, 08 Sep 2022 14:33:55 GMT"/>
+				</outline>
+			</outline>
+		<outline text="Getting an OPML subscription list for a category" created="Thu, 08 Sep 2022 13:05:50 GMT">
+			<outline text="You can also have an OPML subscription list for a category. Here's the URL for my NYT category." created="Thu, 08 Sep 2022 13:06:03 GMT">
+				<outline text="&lt;a href=&quot;http://feedland.org/opml?screenname=davewiner&amp;catname=nyt&quot;&gt;http://feedland.org/opml?screenname=davewiner&amp;catname=nyt&lt;/a&gt;" created="Thu, 08 Sep 2022 13:06:47 GMT"/>
+				</outline>
+			<outline text="To form your own, replace the values for screenname and catname." created="Thu, 08 Sep 2022 13:11:35 GMT"/>
+			</outline>
+		<outline text="If your News page is too crowded" created="Thu, 08 Sep 2022 13:12:41 GMT">
+			<outline text="Sometimes you need to have a category but don't want to display it on your home page. Maybe it's a topic you're using in a News Product for a client on a topic that doesn't interest you. " created="Thu, 08 Sep 2022 13:12:48 GMT"/>
+			<outline text="Open the Settings dialog, click on the Categories tab, and enter in the second box, the category names, separated by commas, of the categories you want to include on your News page. They do not have to be in the same order as the main category list. " created="Thu, 08 Sep 2022 12:48:09 GMT"/>
+			</outline>
+		<outline text="What does &quot;All&quot; mean?" created="Sat, 10 Sep 2022 16:22:04 GMT">
+			<outline text="When you create a new subscription, it is in no categories. " created="Sat, 10 Sep 2022 16:22:06 GMT"/>
+			<outline text="If you have no categories defined, ie you're a new user, if you open the Categories dialog for any feed you will have one choice, All. It will not be checked. It's just a suggestion." created="Sat, 10 Sep 2022 16:22:13 GMT"/>
+			<outline text="Basically All is a default category for every user. If you don't include it in your list, however, it will not be one of the checkboxes." created="Sat, 10 Sep 2022 16:22:21 GMT"/>
+			<outline text="Categories are low-tech, if you delete a category from your list, all subscriptions that you've categorized with that label will remain labeled. The values you put in that dialog control what's in the checkboxes and what's in the tabs on your News page. " created="Sat, 10 Sep 2022 16:22:25 GMT"/>
+			</outline>
+		</body>
+	</opml>

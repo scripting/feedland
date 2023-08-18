@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<opml version="2.0">
+	<head>
+		<title>News Products</title>
+		<dateCreated>Thu, 18 Aug 2022 15:40:59 GMT</dateCreated>
+		<description>How to create News Products in FeedLand. </description>
+		<urlPublic>http://docs.feedland.org/newsProducts.opml</urlPublic>
+		<ownerTwitterScreenName>davewiner</ownerTwitterScreenName>
+		<ownerName>Dave Winer</ownerName>
+		<ownerId>dave.winer@gmail.com</ownerId>
+		<urlUpdateSocket>wss://drummer.land/</urlUpdateSocket>
+		<dateModified>Thu, 03 Aug 2023 12:47:54 GMT</dateModified>
+		<expansionState>2,13,15</expansionState>
+		<lastCursor>1</lastCursor>
+		</head>
+	<body>
+		<outline text="What is a news product?" created="Thu, 18 Aug 2022 15:40:59 GMT">
+			<outline text="A news product is a one-page website you create with FeedLand for people outside of FeedLand to read.    " created="Mon, 19 Sep 2022 15:08:32 GMT"/>
+			<outline text="For example, my news product is  &lt;a href=&quot;http://my.feedland.org/davewiner/&quot;&gt;http://my.feedland.org/davewiner/&lt;/a&gt;." created="Wed, 28 Sep 2022 15:50:07 GMT"/>
+			<outline text="If you want the page to be on your domain, you can point a &lt;a href=&quot;https://en.wikipedia.org/wiki/CNAME_record&quot;&gt;CNAME record&lt;/a&gt; at your my.feedland page. It works, I've done it for &lt;a href=&quot;http://news.scripting.com/&quot;&gt;my own&lt;/a&gt; news product." created="Wed, 28 Sep 2022 16:01:43 GMT"/>
+			<outline text="The news content is maintained automatically by FeedLand according the feeds you subscribe to and the categories they're assigned to. You define the categories. " created="Mon, 19 Sep 2022 15:09:32 GMT"/>
+			<outline text="Think of FeedLand as a development system for news products, among other things. " created="Mon, 19 Sep 2022 14:54:51 GMT"/>
+			</outline>
+		<outline text="Examples" created="Mon, 19 Sep 2022 15:08:33 GMT">
+			<outline text="An example of a news product is &lt;a href=&quot;http://mlbriver.com/&quot;&gt;mlbriver.com&lt;/a&gt;. It's a constantly updated list of news stories about baseball. I created the template to be clean and simple. I could have put the news flow in the middle of a template with other information, or as part of a larger website. " created="Mon, 19 Sep 2022 15:08:33 GMT"/>
+			<outline text="Another example -- a reporter at a journalism site could maitain a list of feeds of sites they read regularly to stay informed on the topics they discover. Sharing that with readers creates a deeper connection with their sources and their readers, resulting in better journalism." created="Mon, 19 Sep 2022 15:13:24 GMT"/>
+			</outline>
+		<outline text="Screen shot" created="Mon, 19 Sep 2022 15:07:54 GMT">
+			<outline text="Expand this line to see a screen shot of a the mlbriver news product looks like." created="Mon, 19 Sep 2022 15:08:03 GMT" collapse="true">
+				<outline text="&lt;img src=&quot;http://scripting.com/images/2022/09/19/newsProductScreenShot.png&quot;&gt;" created="Mon, 19 Sep 2022 15:11:02 GMT"/>
+				</outline>
+			</outline>
+		<outline text="Requirement" created="Wed, 28 Sep 2022 16:03:20 GMT">
+			<outline text="First, learn how to use &lt;a href=&quot;http://docs.feedland.org/categories.opml&quot;&gt;categories&lt;/a&gt;, because news products build on categories. " created="Wed, 28 Sep 2022 16:37:13 GMT"/>
+			</outline>
+		<outline text="How you do it" created="Wed, 28 Sep 2022 16:04:02 GMT">
+			<outline text="In the FeedLand app, choose &lt;i&gt;Settings&lt;/i&gt; from the System menu (at the right end of the screen). " created="Wed, 28 Sep 2022 16:04:08 GMT"/>
+			<outline text="Click on the &lt;i&gt;Categories&lt;/i&gt; tab. The third text box is where you define the categories for your news product. Enter a few categories, separated by commas as with the others. Screen shot. " created="Wed, 28 Sep 2022 16:04:36 GMT"/>
+			<outline text="Click on the &lt;i&gt;News Products&lt;/i&gt; tab. You can choose a title, description and image to appear at the top of your page. Leave any of these items blank if you don't want to use them." created="Wed, 28 Sep 2022 16:05:37 GMT"/>
+			<outline text="You can enter some CSS styles or JavaScript code in the text boxes for CSS and Script. &lt;a href=&quot;http://scripting.com/images/2022/09/28/newsProductsSettingsPanel.png&quot;&gt;Screen shot&lt;/a&gt;. " created="Wed, 28 Sep 2022 16:06:36 GMT"/>
+			<outline text="When you're done, click OK to save the settings. " created="Wed, 28 Sep 2022 16:06:59 GMT"/>
+			<outline text="To see what your news product looks like choose &lt;i&gt;My news product&lt;/i&gt; from the menu. &lt;a href=&quot;http://scripting.com/images/2022/09/28/myNewsProductMenuItem.png&quot;&gt;Screen shot&lt;/a&gt;." created="Wed, 28 Sep 2022 16:07:15 GMT"/>
+			<outline text="When you're ready to share this, you can give the URL to people outside the FeedLand community. (See caveat at top of page.)" created="Wed, 28 Sep 2022 16:07:33 GMT"/>
+			</outline>
+		<outline text="Advanced forms of News Products" created="Wed, 28 Sep 2022 16:03:21 GMT">
+			<outline text="If all you want to do is one news product, and if your style and script needs are modest, you can stick with the method above. " created="Wed, 28 Sep 2022 16:09:03 GMT"/>
+			<outline text="But if you need to do more than one, or you want to enter lots of CSS and script code, you can create your news product in an outline, using &lt;a href=&quot;http://drummer.scripting.com/&quot;&gt;Drummer&lt;/a&gt;, or any outliner that can create OPML with attributes at the head and item levels. " created="Wed, 28 Sep 2022 16:09:22 GMT"/>
+			</outline>
+		<outline text="Outline-based news products" created="Mon, 19 Sep 2022 15:45:49 GMT">
+			<outline text="Specify the news product in an OPML file. " created="Wed, 21 Sep 2022 15:07:12 GMT"/>
+			<outline text="There are four three top-level sections -- tabs, script, style and html." created="Wed, 21 Sep 2022 15:07:12 GMT" flBulletedSubs="true">
+				<outline text="Under &lt;i&gt;tabs&lt;/i&gt; you list the names of the tabs, and the attributes tell FeedLand how to generate your tabs. " created="Wed, 21 Sep 2022 15:08:26 GMT"/>
+				<outline text="Under &lt;i&gt;script&lt;/i&gt;, enter any JavaScript code you want to run as the news product page is opened. " created="Wed, 21 Sep 2022 15:09:13 GMT"/>
+				<outline text="Under &lt;i&gt;style&lt;/i&gt;, enter any CSS styles that customize the look of the elements that FeedLand puts in the page.  " created="Wed, 21 Sep 2022 15:09:34 GMT"/>
+				<outline text="The &lt;i&gt;html&lt;/i&gt; section is a bit more complicated, so I explain it in a separate section below. " created="Thu, 06 Oct 2022 14:11:10 GMT"/>
+				</outline>
+			<outline text="Then feed the OPML file to a web app at products.scripting.com, where it generates the HTML source code for the app. You can iterate over the outline until you're ready to deploy. Then copy the HTML text to your web server, where you serve it as a normal HTML file. " created="Wed, 21 Sep 2022 15:10:16 GMT"/>
+			<outline text="When I say to &quot;feed&quot; the OPML to the app, what I mean is enter this kind of url in a browser's address bar:" created="Thu, 06 Oct 2022 14:08:04 GMT">
+				<outline text="&lt;code&gt;http://products.scripting.com/?template=&amp;lt;url of the template file&gt;&lt;/code&gt;" created="Thu, 06 Oct 2022 14:08:29 GMT"/>
+				</outline>
+			</outline>
+		<outline text="Demo" created="Wed, 21 Sep 2022 15:12:38 GMT">
+			<outline text="The best way to understand is to look at an example of a news product in an outline." created="Thu, 06 Oct 2022 14:12:48 GMT"/>
+			<outline text="Here's an &lt;a href=&quot;http://scripting.com/publicfolder/feedland/products/davesSetup.opml&quot;&gt;OPML file&lt;/a&gt; that specifies a news product. Open it in an outliner that understands OPML to use it as a starting point for your news product. " created="Wed, 21 Sep 2022 15:12:41 GMT"/>
+			<outline text="Here's a &lt;a href=&quot;http://product.scripting.com/?template=http://scripting.com/publicfolder/feedland/products/davesSetup.opml&quot;&gt;link&lt;/a&gt; to product.scripting.com that previews this news product. " created="Wed, 21 Sep 2022 15:13:32 GMT"/>
+			<outline text="And here's the product as &lt;a href=&quot;http://scripting.com/misc/feedlandDemo1.html&quot;&gt;deployed&lt;/a&gt; on scripting.com." created="Wed, 21 Sep 2022 15:13:52 GMT"/>
+			<outline text="And a &lt;a href=&quot;http://scripting.com/images/2022/10/06/demoScreenshot.png&quot;&gt;screen shot&lt;/a&gt; of what the demo should look like." created="Thu, 06 Oct 2022 14:19:24 GMT"/>
+			</outline>
+		<outline text="Specifying tabs" created="Wed, 21 Sep 2022 15:14:50 GMT">
+			<outline text="A tab displays the news from a collection of feeds in reverse-chronogic order. They're kind of like blogs but with news from RSS feeds. We also call them rivers of news or just rivers." created="Wed, 21 Sep 2022 15:15:28 GMT"/>
+			<outline text="There are three ways to specify the feeds whose items are displayed in the tab. " created="Wed, 21 Sep 2022 15:14:55 GMT">
+				<outline text="As a category." created="Wed, 21 Sep 2022 15:16:28 GMT"/>
+				<outline text="As a list of feeds in the outline." created="Wed, 21 Sep 2022 15:16:42 GMT"/>
+				<outline text="As an outline include of an OPML subscription list." created="Wed, 21 Sep 2022 15:16:35 GMT"/>
+				</outline>
+			<outline text="We use all three approaches in the demo setup." created="Wed, 21 Sep 2022 16:46:17 GMT"/>
+			</outline>
+		<outline text="The html section" created="Thu, 06 Oct 2022 14:20:36 GMT">
+			<outline text="In this section of the outline, you can completely re-design the part of the HTML file that products.scripting.com generates that contains the information on the page. You might want to do this if you are including the news product in a site, and have it look like it's part of that site. " created="Thu, 06 Oct 2022 14:20:40 GMT"/>
+			<outline text="Here's an &lt;a href=&quot;http://scripting.com/publicfolder/feedland/products/sideways.opml&quot;&gt;example&lt;/a&gt; of an outline file that has an html section. " created="Thu, 06 Oct 2022 14:22:45 GMT"/>
+			<outline text="If you completely expand the html section, this is what &lt;a href=&quot;http://scripting.com/images/2022/10/06/htmlSectionScreenShot.png&quot;&gt;you'll see&lt;/a&gt;. " created="Thu, 06 Oct 2022 14:26:15 GMT" image="http://scripting.com/images/2022/10/06/htmlSectionScreenShot.png"/>
+			<outline text="You can completely change the HTML here as long as the top element is of class &lt;i&gt;divNewsProduct. &lt;/i&gt;" created="Thu, 06 Oct 2022 14:27:14 GMT"/>
+			<outline text="There are macros pre-defined that allow you to pick up values set elsewhere in the template. " created="Thu, 06 Oct 2022 14:27:53 GMT"/>
+			<outline text="The news river will be inserted underneath the object whose id is &lt;i&gt;idRiverContent. &lt;/i&gt;" created="Thu, 06 Oct 2022 14:28:17 GMT"/>
+			</outline>
+		<outline text="Questions?" created="Sat, 29 Oct 2022 00:42:24 GMT">
+			<outline text="Here's a &lt;a href=&quot;https://github.com/scripting/feedlandSupport/issues/108&quot;&gt;thread&lt;/a&gt; specifically for help with News Products. " created="Sat, 29 Oct 2022 00:42:27 GMT"/>
+			</outline>
+		<outline text="Notes" created="Thu, 18 Aug 2022 15:56:03 GMT">
+			<outline text="You should be subscribed to a feed in FeedLand for it to be referenced in a tab. If no one is subscribed to the feed, then no news items will appear for it, because FeedLand won't check it if no one is subscribed.  " created="Thu, 18 Aug 2022 15:56:07 GMT"/>
+			<outline text="You can create a header at the top of the page of your news product by setting the title, description, and image head-level attributes in the outline. &lt;a href=&quot;https://user-images.githubusercontent.com/1686843/184154693-4155fc34-d0fe-4457-ab87-6e4d771ec605.png&quot;&gt;Screen shot&lt;/a&gt;. " created="Thu, 18 Aug 2022 15:57:06 GMT"/>
+			<outline text="You can use includes in your outline.  " created="Thu, 18 Aug 2022 16:15:33 GMT"/>
+			</outline>
+		</body>
+	</opml>

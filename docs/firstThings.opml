@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<opml version="2.0">
+	<head>
+		<title>Starting up in FeedLand</title>
+		<dateCreated>Fri, 16 Sep 2022 13:58:36 GMT</dateCreated>
+		<urlPublic>http://docs.feedland.org/firstThings.opml</urlPublic>
+		<description>First things a new user should do in FeedLand.</description>
+		<ownerTwitterScreenName>davewiner</ownerTwitterScreenName>
+		<ownerName>Dave Winer</ownerName>
+		<ownerId>dave.winer@gmail.com</ownerId>
+		<urlUpdateSocket>wss://drummer.land/</urlUpdateSocket>
+		<dateModified>Sun, 30 Jul 2023 20:24:57 GMT</dateModified>
+		<expansionState></expansionState>
+		<lastCursor>6</lastCursor>
+		</head>
+	<body>
+		<outline text="Welcome" created="Fri, 16 Sep 2022 14:29:04 GMT">
+			<outline text="The instructions on this page help you get started in FeedLand. " created="Fri, 16 Sep 2022 14:31:12 GMT"/>
+			<outline text="I'm sure you could figure it out yourself, but there are facts on this page that you need to know, and that will help us bring you into the small community of users, and let you know in advance of the limits and features of the system. " created="Wed, 19 Oct 2022 13:23:27 GMT"/>
+			</outline>
+		<outline text="Log in" created="Fri, 16 Sep 2022 13:35:51 GMT">
+			<outline text="First, go to &lt;a href=&quot;https://feedland.org/&quot;&gt;feedland.org&lt;/a&gt; and log in with your email address. " created="Fri, 16 Sep 2022 13:35:58 GMT"/>
+			<outline text="After logging in, you're offered a chance to add some feeds to your empty feed list.  " created="Fri, 16 Sep 2022 13:36:34 GMT"/>
+			<outline text="You might want to bookmark that page. While you're starting out with FeedLand, it'll be your home page." created="Fri, 21 Oct 2022 19:19:52 GMT"/>
+			</outline>
+		<outline text="Subscribe to some feeds. " created="Fri, 16 Sep 2022 13:37:08 GMT">
+			<outline text="Look at &lt;a href=&quot;https://feedland.org/?username=davewiner&quot;&gt;my feed list&lt;/a&gt;. If you see a feed you want to subscribe to, click the &lt;a href=&quot;http://scripting.com/2022/10/20/134911.html?title=someoneElsesFeedList&quot;&gt;checkbox&lt;/a&gt;. That's all you have to do." created="Fri, 16 Sep 2022 14:06:40 GMT"/>
+			<outline text="You can find the lists of the other users in the &lt;a href=&quot;https://feedland.org/?userslist&quot;&gt;Recent users&lt;/a&gt; page which is also accessible from the first menu." created="Fri, 16 Sep 2022 14:07:07 GMT"/>
+			<outline text="Another way to find feeds is to look in the &lt;a href=&quot;http://feedland.org/?hotlist&quot;&gt;Hotlist&lt;/a&gt; or the &lt;a href=&quot;http://feedland.org/?log&quot;&gt;Subscription log&lt;/a&gt;, accessible from the first menu. When you see something you like, click the checkbox next to it." created="Fri, 16 Sep 2022 14:08:30 GMT"/>
+			<outline text="To get back to &lt;i&gt;your&lt;/i&gt; feed list, choose &lt;i&gt;My feed list&lt;/i&gt; from the first menu." created="Fri, 16 Sep 2022 14:14:44 GMT"/>
+			</outline>
+		<outline text="Reading your feeds" created="Fri, 16 Sep 2022 14:04:33 GMT">
+			<outline text="A quick way to see stories in a feed is to click the wedge next to its name in the feed list. You'll see the titles of the most recent five stories, with links to the full text. If you hover over the link to the story, the description of the story pops up. &lt;a href=&quot;http://scripting.com/images/2022/10/24/viewStoriesInFeedListScreen.png&quot;&gt;Screen shot&lt;/a&gt;. " created="Mon, 24 Oct 2022 13:14:13 GMT"/>
+			<outline text="To see the news from all feeds you subscribe to, choose &lt;i&gt;My news&lt;/i&gt; from the first menu. " created="Fri, 16 Sep 2022 13:38:41 GMT"/>
+			</outline>
+		<outline text="Please, no massive OPML imports" created="Fri, 16 Sep 2022 14:21:00 GMT">
+			<outline text="You can import a feed list from other services, in the &lt;i&gt;Subscribe&lt;/i&gt; sub-menu of the first menu, but we ask that you not do that, at least to start, as you're getting familiar with the community. " created="Fri, 16 Sep 2022 14:09:31 GMT"/>
+			<outline text="We'd like to see how these lists grow when people slowly add feeds and pay attention to the feeds other people are following, and as we develop new ways to read and share news. " created="Fri, 16 Sep 2022 14:21:16 GMT"/>
+			<outline text="The idea is to create a &lt;i&gt;small&lt;/i&gt; creative community of people who love to share what they learn. We are not aiming to replace feed readers. " created="Fri, 16 Sep 2022 14:21:59 GMT"/>
+			<outline text="It's likely imho that you'll use the lists that FeedLand generates in other products.  " created="Fri, 16 Sep 2022 14:23:19 GMT"/>
+			</outline>
+		<outline text="Nothing is hidden" created="Fri, 16 Sep 2022 14:04:18 GMT">
+			<outline text="Something important about FeedLand. Everything is open to everyone. I can see your feed list and you can see mine. " created="Fri, 16 Sep 2022 13:37:49 GMT"/>
+			</outline>
+		<outline text="Exploring, getting help" created="Fri, 16 Sep 2022 14:04:49 GMT">
+			<outline text="That's it. There's a lot more you can do later, as you subscribe to more feeds, and meet other users. Explore. " created="Fri, 16 Sep 2022 13:39:16 GMT"/>
+			<outline text="Ask questions on the &lt;a href=&quot;https://github.com/scripting/feedlandSupport/issues&quot;&gt;support site&lt;/a&gt;, or the &lt;a href=&quot;http://feedland.slack.com/&quot;&gt;Slack group&lt;/a&gt;, or just say hello. Learn about the product via the pages in the Docs menu." created="Fri, 16 Sep 2022 14:12:34 GMT"/>
+			</outline>
+		</body>
+	</opml>

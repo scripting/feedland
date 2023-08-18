@@ -1,3 +1,11 @@
+#### 8/18/23 by DW
+
+Started adding back console.log calls. 
+
+checkOneFeed
+
+rssCloudRenew
+
 #### 7/14/23 by DW -- v0.6.14
 
 New -- config.maxGetAllUsers -- it's the number of users database.getAllUsers will return.

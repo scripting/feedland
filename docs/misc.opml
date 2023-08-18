@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<opml version="2.0">
+	<head>
+		<title>FeedLand Extras</title>
+		<dateCreated>Tue, 01 Nov 2022 15:51:42 GMT</dateCreated>
+		<description>New features, documented as they come online.</description>
+		<urlPublic>http://docs.feedland.org/misc.opml</urlPublic>
+		<ownerTwitterScreenName>davewiner</ownerTwitterScreenName>
+		<ownerName>Dave Winer</ownerName>
+		<ownerId>dave.winer@gmail.com</ownerId>
+		<urlUpdateSocket>wss://drummer.land/</urlUpdateSocket>
+		<dateModified>Thu, 03 Aug 2023 14:00:18 GMT</dateModified>
+		<expansionState>1</expansionState>
+		<lastCursor>2</lastCursor>
+		</head>
+	<body>
+		<outline text="About this page" created="Tue, 01 Nov 2022 15:51:42 GMT">
+			<outline text="As we move forward, after the first initial public release, we continue to add features. This is where they are documented, and in the &lt;a href=&quot;http://data.feedland.org/changenotes/&quot;&gt;Change Notes&lt;/a&gt; blog. " created="Tue, 01 Nov 2022 15:56:18 GMT"/>
+			</outline>
+		<outline text="Bookmarks in FeedLand" created="Fri, 30 Dec 2022 16:19:24 GMT">
+			<outline text="This feature goes back a long way, to the beginnings of Frontier and &lt;a href=&quot;http://scripting.com/autowebdocs/menusharingwalkthru_148.html&quot;&gt;Menu Sharing&lt;/a&gt; and through &lt;a href=&quot;http://docserver.scripting.com/drummer/general.opml#1629044069000&quot;&gt;Drummer&lt;/a&gt;, whose Bookmarks menu is imho a truly revolutionary thing. Here's a &lt;a href=&quot;http://scripting.com/images/2022/12/31/feedLandBookmarksDaveScreen.png&quot;&gt;screen shot&lt;/a&gt; of my current Bookmarks menu in Drummer. You can see I use it a lot. I expect your bookmarks menu will look something like that before too long. " created="Fri, 30 Dec 2022 16:19:28 GMT"/>
+			<outline text="There are two ways to create a bookmark." created="Sat, 31 Dec 2022 18:12:50 GMT" flNumberedSubs="true">
+				<outline text="When you're looking at a news item in a _river_ timeline, there's a new icon at the bottom, that &lt;a href=&quot;http://scripting.com/images/2022/12/31/feedLandItemBookmarkIcon.png&quot;&gt;looks like&lt;/a&gt; a bookmark. Click it. A dialog confirms that you want to add the bookmark. Then the Bookmarks editor window opens with the new bookmark added at the top. You can edit the text, and use the outliner reorganizing commands to move it where you want.  When you're finished, click OK and the menu outline is saved on the server, and the menu is automatically rebuilt with the new bookmark where you put it." created="Sat, 31 Dec 2022 18:12:53 GMT"/>
+				<outline text="If you're at a page in FeedLand that you want to get back to easily, say an interesting person's feed list, choose &lt;i&gt;Add Bookmark&lt;/i&gt; at the top of the Bookmarks menu. A dialog confirms you want to add this page to the menu. And the process of editing and placing the bookmark works exactly as it does for when creating a bookmark from a timeline." created="Sat, 31 Dec 2022 18:12:54 GMT"/>
+				</outline>
+			<outline text="The outliner is the same one as in Drummer. For an idea of how to use it see the &lt;a href=&quot;http://outlinerhowto.opml.org/&quot;&gt;Outliner howto&lt;/a&gt; document. " created="Sat, 31 Dec 2022 18:15:28 GMT"/>
+			</outline>
+		<outline text="Feeds of Likes" created="Tue, 01 Nov 2022 15:57:15 GMT">
+			<outline text="Each user can have a feed of all the items they &lt;i&gt;liked&lt;/i&gt; in FeedLand. " created="Tue, 01 Nov 2022 15:57:17 GMT"/>
+			<outline text="You must be logged in to be able to Like something. " created="Tue, 01 Nov 2022 15:57:46 GMT"/>
+			<outline text="&lt;img src=&quot;http://scripting.com/images/2022/11/01/likescreen.png&quot;&gt;" created="Tue, 01 Nov 2022 15:58:37 GMT"/>
+			<outline text="Click the thumb icon to like an item." created="Tue, 01 Nov 2022 15:58:26 GMT"/>
+			<outline text="When you like something it is added to your feed of likes, which you can then subscribe to &lt;a href=&quot;http://feedland.org/?feedurl=http://data.feedland.org/likes/davewiner.xml&quot;&gt;in FeedLand&lt;/a&gt; or any other &lt;a href=&quot;http://xmlviewer.scripting.com/?url=http%3A%2F%2Fdata.feedland.org%2Flikes%2Fdavewiner.xml&quot;&gt;app&lt;/a&gt; that can read an RSS 2.0 feed. " created="Tue, 01 Nov 2022 16:07:58 GMT"/>
+			<outline text="You have to like something before you actually have the feed. FeedLand won't create it until you like something. " created="Tue, 01 Nov 2022 16:08:43 GMT"/>
+			<outline text="Here's the address for my feed of likes: &lt;a href=&quot;http://xmlviewer.scripting.com/?url=http%3A%2F%2Fdata.feedland.org%2Flikes%2Fdavewiner.xml&quot;&gt;http://data.feedland.org/likes/davewiner.xml&lt;/a&gt;." created="Tue, 01 Nov 2022 16:09:14 GMT"/>
+			<outline text="And here's the &lt;a href=&quot;http://feedland.org/?feedurl=http%3A%2F%2Fdata.feedland.org%2Flikes%2Fdavewiner.xml&quot;&gt;Feed Info page&lt;/a&gt; for that feed. " created="Tue, 01 Nov 2022 16:17:10 GMT"/>
+			<outline text="Like icons appear in news pages. To see one of these pages, choose &lt;i&gt;My news&lt;/i&gt; from the first menu." created="Tue, 01 Nov 2022 16:10:42 GMT"/>
+			<outline text="Here's &lt;a href=&quot;http://feedland.org/?river=true&amp;screenname=davewiner&amp;catname=all&quot;&gt;my news page&lt;/a&gt;. If you're logged in you can like items on that page. " created="Tue, 01 Nov 2022 16:38:45 GMT"/>
+			</outline>
+		</body>
+	</opml>
