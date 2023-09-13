@@ -126,6 +126,9 @@ var config = {
 	
 	maxGetAllUsers: 100, //7/14/23 by DW
 	
+	flUseRiverCache: true, //9/13/23 by DW
+	ctSecsLifeRiverCache: 5 * 60, //9/13/23 by DW
+	
 	getUserOpmlSubscriptions: function (username, catname, callback) { //6/27/22 by DW
 		},
 	getStats: function () { //6/27/22 by DW
@@ -152,8 +155,6 @@ var stats = {
 	};
 
 var riverCache = new Object (); //8/22/22 by DW
-const flUseRiverCache = true; //9/14/22 by DW -- https://github.com/scripting/feedlandSupport/issues/54
-const ctSecsLifeRiverCache = 15 * 60; //cached rivers age-out after 60 minutes -- changed from 15 minutes -- 2/2/23 by DW
 
 var riverBuildLog = new Array (); //10/10/22 by DW
 var flRiverBuildLogChanged = false;
@@ -1299,7 +1300,7 @@ function getFeedItems (feedUrl, ctItems, callback) { //8/31/22 by DW
 	}
 
 function addToRiverCache (cachekey, feedUrlList, theRiver) { //9/15/22 by DW
-	if (flUseRiverCache) { 
+	if (config.flUseRiverCache) { 
 		riverCache [cachekey] = {
 			feedUrlList, 
 			river: theRiver,
@@ -1325,7 +1326,7 @@ function clearCachedRivers (feedUrl) { //8/22/22 by DW
 	}
 function clearOldCachedRivers () { //9/15/22 by DW
 	for (var cachekey in riverCache) {
-		if (utils.secondsSince (riverCache [cachekey].when) > ctSecsLifeRiverCache) {
+		if (utils.secondsSince (riverCache [cachekey].when) > config.ctSecsLifeRiverCache) {
 			console.log ("clearOldCachedRivers: deleting cache for the river whose key is " + cachekey);
 			delete riverCache [cachekey];
 			}

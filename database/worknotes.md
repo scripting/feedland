@@ -1,3 +1,13 @@
+#### 9/13/23 by DW
+
+two new config values:
+
+flUseRiverCache, ctSecsLifeRiverCache
+
+they used to be internal constants with values true and 15 * 60 (15 minutes).
+
+i want it to be possible to turn the cache off altogether, and make each river query go to the database, or to make the lifetime much shorter, so we can get closer to real time updates. 
+
 #### 8/18/23 by DW
 
 Started adding back console.log calls. 
