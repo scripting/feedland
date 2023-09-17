@@ -1,4 +1,4 @@
-const myVersion = "0.5.67", myProductName = "feedland"; 
+const myVersion = "0.5.73", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -53,6 +53,8 @@ var config = {
 	flNewsProducts: false, //1/20/23 by DW
 	flUserFeeds: false, 
 	flLikesFeeds: false, 
+	
+	urlNewsProductSource: "http://scripting.com/code/riverclient/index.html", //9/15/23 by DW
 	
 	urlStarterFeeds: "https://s3.amazonaws.com/scripting.com/publicfolder/feedland/subscriptionLists/starterfeeds.opml" //2/15/23 by DW
 	};
@@ -134,60 +136,6 @@ function subscribeToOpml (screenname, opmltext, flDeleteEnabled, callback) { //6
 function publishFileCallback (f, screenname, relpath, type, flprivate, filetext, url) {
 	}
 
-function asyncAddMacroToPagetable (pagetable, theRequest, callback) { //12/2/22 by DW
-	const maxDescChars = 300;
-	const params = theRequest.params;
-	function encode (s) {
-		if (s == null) {
-			return ("");
-			}
-		else {
-			return (utils.encodeXml (s));
-			}
-		}
-	
-	if (params === undefined) {
-		callback ();
-		}
-	else {
-		if (params.item === undefined) {
-			callback ();
-			}
-		else {
-			const sqltext = "select * from items where id = " + davesql.encode (params.item) + ";";
-			davesql.runSqltext (sqltext, function (err, result) {
-				if (err) {
-					callback (err);
-					}
-				else {
-					if (result.length == 0) {
-						callback ();
-						}
-					else {
-						let itemRec = result [0];
-						console.log ("asyncAddMacroToPagetable: itemRec.title == " + itemRec.title);
-						pagetable.metaTitle = encode (itemRec.title);
-						
-						let desc = utils.stripMarkup (itemRec.description);
-						desc = utils.maxStringLength (desc, maxDescChars, true, true);
-						pagetable.metaDescription = encode (desc);
-						
-						if (itemRec.link !== undefined) {
-							pagetable.metaUrl = encode (itemRec.link);
-							}
-						
-						pagetable.metaImageUrl = "http://scripting.com/images/2022/12/03/transparentSpace.png";
-						
-						pagetable.facebookImage = "";
-						pagetable.twitterImage = "";
-						
-						callback ();
-						}
-					}
-				});
-			}
-		}
-	}
 function addMacroToPagetable (pagetable) {
 	function getConfigJson () {
 		var theConfig = new Object ();
@@ -242,6 +190,212 @@ function addMacroToPagetable (pagetable) {
 		pagetable.facebookImage = "<meta property=\"og:image\" content=\"" + imgUrl + "\" />";
 		pagetable.twitterImage = "<meta name=\"twitter:image:src\" content=\"" + imgUrl + "\">";
 	
+	}
+function asyncAddMacroToPagetable (pagetable, theRequest, callback) { //12/2/22 by DW
+	const maxDescChars = 300;
+	const params = theRequest.params;
+	function encode (s) {
+		if (s == null) {
+			return ("");
+			}
+		else {
+			return (utils.encodeXml (s));
+			}
+		}
+	
+	if (params === undefined) {
+		callback ();
+		}
+	else {
+		if (params.item === undefined) {
+			callback ();
+			}
+		else {
+			const sqltext = "select * from items where id = " + davesql.encode (params.item) + ";";
+			davesql.runSqltext (sqltext, function (err, result) {
+				if (err) {
+					callback (err);
+					}
+				else {
+					if (result.length == 0) {
+						callback ();
+						}
+					else {
+						let itemRec = result [0];
+						console.log ("asyncAddMacroToPagetable: itemRec.title == " + itemRec.title);
+						pagetable.metaTitle = encode (itemRec.title);
+						
+						let desc = utils.stripMarkup (itemRec.description);
+						desc = utils.maxStringLength (desc, maxDescChars, true, true);
+						pagetable.metaDescription = encode (desc);
+						
+						if (itemRec.link !== undefined) {
+							pagetable.metaUrl = encode (itemRec.link);
+							}
+						
+						pagetable.metaImageUrl = "http://scripting.com/images/2022/12/03/transparentSpace.png";
+						
+						pagetable.facebookImage = "";
+						pagetable.twitterImage = "";
+						
+						callback ();
+						}
+					}
+				});
+			}
+		}
+	}
+
+function initNewsproductPagetable (pagetable) {
+	pagetable.productname = config.productName;
+	pagetable.productnameForDisplay = config.productnameForDisplay;
+	pagetable.version = myVersion;
+	pagetable.urlServerForClient = config.urlServerForClient; 
+	pagetable.flEnableLogin = false; 
+	pagetable.urlWebsocketServerForClient = undefined;
+	}
+function renderUserNewsproduct (screenname, callback) { //9/15/23 by DW
+	function checkUndefined (val) {
+		if (val === undefined) {
+			return ("");
+			}
+		else {
+			return (val);
+			}
+		}
+	database.getUserPrefs (screenname, function (err, thePrefs) {
+		if (err) {
+			callback (err);
+			}
+		else {
+			if (thePrefs.emailSecret !== undefined) { //1/17/23 by DW 
+				delete thePrefs.emailSecret;
+				}
+			const newsProductInfo = {
+				screenname,
+				categories: thePrefs.newsproductCategoryList,
+				title: thePrefs.newsproductTitle,
+				description: thePrefs.newsproductDescription,
+				image: thePrefs.newsproductImage,
+				style: thePrefs.newsproductStyle,
+				script: thePrefs.newsproductScript
+				}
+			var pagetable = {
+				screenname, 
+				
+				userPrefs: utils.jsonStringify (thePrefs),
+				
+				pageTitle: checkUndefined (newsProductInfo.title),
+				pageDescription: checkUndefined (newsProductInfo.description),
+				pageImage: checkUndefined (newsProductInfo.image),
+				
+				prefsPath: undefined,
+				docsPath: undefined,
+				theOutlineInJson: undefined
+				}
+			
+			initNewsproductPagetable (pagetable);
+			request (config.urlNewsProductSource, function (err, response, templatetext) {
+				if (err) {
+					callback (err);
+					}
+				else {
+					if ((response.statusCode >= 200) && (response.statusCode <= 299)) {
+						const pagetext = utils.multipleReplaceAll (templatetext.toString (), pagetable, false, "[%", "%]");
+						callback (undefined, pagetext);
+						}
+					else {
+						const message = "HTTP error == " + response.statusCode;
+						callback ({message});
+						}
+					}
+				});
+			}
+		});
+	return (true);
+	}
+function renderUserNewsproductWithTemplate (urlOutlineTemplate, theRequest, callback) { //9/16/23 by DW
+	var pagetable = {
+		urlTemplate: urlOutlineTemplate,
+		newsProductInfo: "undefined",
+		userPrefs: "undefined",
+		urlServerForClient: config.urlServerForClient,
+		urlServerHomePageSource: config.urlNewsProductSource
+		};
+	initNewsproductPagetable (pagetable);
+	function getOutlineTemplate (callback) {
+		opml.readOutline (urlOutlineTemplate, function (err, theOutline) {
+			if (err) {
+				callback (err);
+				}
+			else {
+				function getHeadAtt (name) {
+					var attval = "";
+					try {
+						if (theOutline.opml.head [name] !== undefined) {
+							attval = theOutline.opml.head [name];
+							}
+						}
+					catch (err) {
+						}
+					return (attval);
+					}
+				pagetable.pageTitle = getHeadAtt ("title");
+				pagetable.pageDescription = getHeadAtt ("description");
+				
+				var imageUrl = getHeadAtt ("image");
+				if (imageUrl.length != 0) {
+					pagetable.pageImage = "<img src=\"" + imageUrl + "\">";
+					}
+				else {
+					pagetable.pageImage = "";
+					}
+				
+				if (false) { //(config.flExpandIncludes) { //8/22/22 by DW
+					opml.expandIncludes (theOutline, function (theNewOutline) { //8/11/22 by DW
+						pagetable.theOutlineInJson = utils.jsonStringify (theNewOutline);
+						callback ();
+						});
+					}
+				else {
+					pagetable.theOutlineInJson = utils.jsonStringify (theOutline);
+					callback (undefined, theOutline);
+					}
+				}
+			});
+		}
+	function getHtmlTemplate (callback) {
+		request (pagetable.urlServerHomePageSource, function (err, response, templatetext) {
+			if (err) {
+				callback (err);
+				}
+			else {
+				if ((response.statusCode >= 200) && (response.statusCode <= 299)) {
+					callback (undefined, templatetext);
+					}
+				else {
+					const message = "HTTP error == " + response.statusCode;
+					callback ({message});
+					}
+				}
+			});
+		}
+	getOutlineTemplate (function (err, theOutline) {
+		if (err) {
+			callback (err);
+			}
+		else {
+			getHtmlTemplate (function (err, htmltemplate) {
+				if (err) {
+					callback (err);
+					}
+				else {
+					const pagetext = utils.multipleReplaceAll (htmltemplate.toString (), pagetable, false, "[%", "%]");
+					callback (undefined, pagetext);
+					}
+				});
+			}
+		});
 	}
 
 function addEmailToUserInDatabase (screenname, emailAddress, magicString, flNewUser, callback) { //12/7/22 by DW
@@ -332,7 +486,6 @@ function regenerateEmailSecret (screenname, callback) {
 		});
 	}
 
-
 function getUserRecFromEmail (emailAddress, emailSecret, callback) { //12/13/22 by DW
 	const sqltext = "select * from users where emailAddress = " + davesql.encode (emailAddress) + " and emailSecret = " + davesql.encode (emailSecret) + ";";
 	davesql.runSqltext (sqltext, function (err, result) {
@@ -349,7 +502,7 @@ function getUserRecFromEmail (emailAddress, emailSecret, callback) { //12/13/22 
 			}
 		});
 	}
-function isUserInDatabase (emailaddress, callback) { //2/15/23 by DW -- xxx
+function isUserInDatabase (emailaddress, callback) { //2/15/23 by DW
 	const sqltext = "select * from users where emailAddress = " + davesql.encode (emailaddress) + ";";
 	davesql.runSqltext (sqltext, function (err, result) {
 		if (err) {
@@ -420,6 +573,7 @@ function getScreenname (params, callback) { //12/23/22 by DW
 		}
 	}
 
+
 function everyNight () { //8/22/22 by DW
 	if (config.flNightlyBackup) { //3/29/23 by DW
 		database.backupDatabase (); 
@@ -485,6 +639,9 @@ function handleHttpRequest (theRequest) {
 	function returnPlainText (s) {
 		theRequest.httpReturn (200, "text/plain", s.toString ());
 		}
+	function returnHtml (htmltext) {
+		theRequest.httpReturn (200, "text/html", htmltext);
+		}
 	function returnData (jstruct) {
 		if (jstruct === undefined) {
 			jstruct = {};
@@ -548,6 +705,7 @@ function handleHttpRequest (theRequest) {
 			});
 		
 		}
+	
 	switch (theRequest.method) {
 		case "POST":
 			switch (theRequest.lowerpath) {
@@ -795,6 +953,35 @@ function handleHttpRequest (theRequest) {
 				case "/getfeedlistfromopml": //6/2/23 by DW
 					database.getFeedlistFromOpml (params.url, httpReturn);
 					return (true);
+				case "/newsproduct": //9/16/23 by DW
+					if (params.username !== undefined) {
+						renderUserNewsproduct (params.username, function (err, htmltext) {
+							if (err) {
+								returnError (err);
+								}
+							else {
+								returnHtml (htmltext);
+								}
+							});
+						}
+					else {
+						if (params.template !== undefined) {
+							renderUserNewsproductWithTemplate (params.template, theRequest, function (err, htmltext) {
+								if (err) {
+									returnError (err);
+									}
+								else {
+									returnHtml (htmltext);
+									}
+								});
+							}
+						else {
+							const message = "News products require either a username or template parameter.";
+							returnError ({message});
+							}
+						}
+					return (true);
+				
 				case config.rssCloud.feedUpdatedCallback: //12/12/22 by DW
 					returnPlainText (params.challenge);
 					return (true); 
@@ -803,6 +990,7 @@ function handleHttpRequest (theRequest) {
 				}
 			break;
 		}
+	
 	return (false); //not consumed
 	}
 var options = {

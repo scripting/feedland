@@ -1,3 +1,33 @@
+#### 9/17/23; 9:18:00 AM by DW
+
+Did more factoring and now newsproducts support is entirely within feedland.js, and all the code is under a single call -- /newsproduct.
+
+If a request comes in for /newsproduct with a <i>username</i> parameter, we render the news product specified by the prefs of the indicated user.
+
+something like https://feedland.org/newsproduct?username=bullmancuso
+
+If a request comes in  for /newsproduct with a <i>template</i> parameter, we get the outline it points to, and set pagetable values accordingly
+
+something like https://feedland.org/newsproduct?template=http://scripting.com/publicfolder/feedland/products/mlbriver.opml
+
+In both cases the client is specified by config.urlNewsProductSource, and for now the default should be fine. 
+
+#### 9/16/23; 9:26:30 AM by DW
+
+Moved the News Product server functionality into FeedLand server.
+
+New setting: config.urlNewsProductSource. The default value should be acceptable for now, so nothing to add to config.json.
+
+If a request comes in for "/newsproduct we render the news product specified by the username parameter
+
+something like http://my.feedland.org/bullmancuso
+
+If a request comes in with a template parameter, we get the outline, and set pagetable values accordingly
+
+something like http://feedland.org/?template=http://scripting.com/publicfolder/feedland/products/mlbriver.opml
+
+The same client app handles both forms of news product. The name of the project is RiverClient, and we should talk about it more. :-)
+
 #### 8/18/23; 12:28:15 PM by DW
 
 Started adding back console.log calls. 
