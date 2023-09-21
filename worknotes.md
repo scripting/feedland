@@ -1,3 +1,7 @@
+#### 9/21/23; 12:04:07 PM by DW
+
+Added feedlandVersion to the pagetable when we build the home page. 
+
 #### 9/20/23; 10:39:13 AM by DW
 
 Static file storage in an SQL table. 

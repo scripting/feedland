@@ -1,4 +1,4 @@
-const myVersion = "0.5.74", myProductName = "feedland"; 
+const myVersion = "0.5.75", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -179,6 +179,7 @@ function addMacroToPagetable (pagetable) {
 	pagetable.flUserFeeds = config.flUserFeeds;  //1/20/23 by DW
 	pagetable.flLikesFeeds = config.flLikesFeeds;  //1/20/23 by DW
 	pagetable.configJson = getConfigJson (); //1/21/23 by DW
+	pagetable.feedlandVersion = myVersion; //9/21/23 by DW
 	
 	//12/2/22 by DW -- set up the normal case for the Facebook/Twitter metadata
 		pagetable.metaUrl = "https://feedland.org/";
