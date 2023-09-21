@@ -1,4 +1,4 @@
-const myVersion = "0.5.73", myProductName = "feedland"; 
+const myVersion = "0.5.74", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -55,6 +55,7 @@ var config = {
 	flLikesFeeds: false, 
 	
 	urlNewsProductSource: "http://scripting.com/code/riverclient/index.html", //9/15/23 by DW
+	flStaticFilesInSql: false, //9/20/23 by DW
 	
 	urlStarterFeeds: "https://s3.amazonaws.com/scripting.com/publicfolder/feedland/subscriptionLists/starterfeeds.opml" //2/15/23 by DW
 	};
@@ -395,6 +396,65 @@ function renderUserNewsproductWithTemplate (urlOutlineTemplate, theRequest, call
 					}
 				});
 			}
+		});
+	}
+
+function getStaticFileInSql (screenname, relpath, flprivate, callback) { //9/20/23 by DW
+	const sqltext = "select * from staticfiles where screenname = " + davesql.encode (screenname) + " and relpath = " + davesql.encode (relpath) + " and flprivate = " + davesql.encode (flprivate) + ";";
+	davesql.runSqltext (sqltext, function (err, result) {
+		if (err) {
+			callback (err);
+			}
+		else {
+			if (result.length == 0) {
+				const message = "Can't find the file " + relpath + " for the user " + screenname + ".";
+				callback ({message});
+				}
+			else {
+				const theFileRec = result [0];
+				const theReturnedData = {
+					filedata: theFileRec.filecontents.toString (),
+					filestats: {
+						relpath: theFileRec.relpath,
+						type: theFileRec.type,
+						screenname: theFileRec.screenname,
+						flprivate: theFileRec.flprivate,
+						ctSaves: theFileRec.ctSaves,
+						whenCreated: theFileRec.whenCreated,
+						whenUpdated: theFileRec.whenUpdated
+						}
+					};
+				callback (undefined, theReturnedData);
+				}
+			}
+		});
+	}
+function publishStaticFileInSql (screenname, relpath, type, flprivate, filecontents, callback) { //9/20/23 by DW
+	const now = new Date ();
+	const fileRec = {
+		screenname, 
+		relpath, 
+		type,
+		flprivate,
+		filecontents,
+		whenCreated: now,
+		whenUpdated: now,
+		ctSaves: 1
+		};
+	getStaticFileInSql (screenname, relpath, flprivate, function (err, theOriginalFile) {
+		if (!err) {
+			fileRec.whenCreated = theOriginalFile.filestats.whenCreated;
+			fileRec.ctSaves = theOriginalFile.filestats.ctSaves + 1;
+			}
+		const sqltext = "replace into staticfiles " + davesql.encodeValues (fileRec) + ";";
+		davesql.runSqltext (sqltext, function (err, result) {
+			if (err) {
+				callback (err);
+				}
+			else {
+				callback (undefined, fileRec);
+				}
+			});
 		});
 	}
 
@@ -993,22 +1053,27 @@ function handleHttpRequest (theRequest) {
 	
 	return (false); //not consumed
 	}
-var options = {
-	everySecond,
-	everyMinute,
-	httpRequest: handleHttpRequest, 
-	publishFile: publishFileCallback, //3/18/22 by DW
-	addMacroToPagetable, //4/30/22 by DW
-	asyncAddMacroToPagetable, //12/2/22 by DW
-	addEmailToUserInDatabase, //12/7/22 by DW
-	getScreenname, //12/23/22 by DW
-	getScreenNameFromEmail, //1/10/23 by DW
-	isUserInDatabase //2/15/23 by DW
-	}
+
 function start () {
+	var options = {
+		everySecond,
+		everyMinute,
+		httpRequest: handleHttpRequest, 
+		publishFile: publishFileCallback, //3/18/22 by DW
+		addMacroToPagetable, //4/30/22 by DW
+		asyncAddMacroToPagetable, //12/2/22 by DW
+		addEmailToUserInDatabase, //12/7/22 by DW
+		getScreenname, //12/23/22 by DW
+		getScreenNameFromEmail, //1/10/23 by DW
+		isUserInDatabase //2/15/23 by DW
+		}
 	daveappserver.start (options, function (appConfig) {
 		for (var x in appConfig) {
 			config [x] = appConfig [x];
+			}
+		if (config.flStaticFilesInSql) { //9/20/23 by DW
+			appConfig.getStaticFile = getStaticFileInSql;
+			appConfig.publishStaticFile = publishStaticFileInSql;
 			}
 		blog.start (config, function () {
 			davesql.start (config.database, function () {

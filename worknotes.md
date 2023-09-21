@@ -1,3 +1,13 @@
+#### 9/20/23; 10:39:13 AM by DW
+
+Static file storage in an SQL table. 
+
+Added new callback facility in daveappserver, we install our callbacks if config.flStaticFilesInSql is true. 
+
+* getStaticFileInSql
+
+* publishStaticFileInSql
+
 #### 9/17/23; 9:18:00 AM by DW
 
 Did more factoring and now newsproducts support is entirely within feedland.js, and all the code is under a single call -- /newsproduct.
