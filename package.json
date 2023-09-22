@@ -2,7 +2,7 @@
 	"name": "feedland",
 	"description": "The top level of the FeedLand server, the source code for the NPM feedland package.",
 	"author": "Dave Winer <dave@scripting.com>",
-	"version": "0.5.75",
+	"version": "0.5.93",
 	"license": "GPLV2",
 	"main": "feedland.js",
 	"files": [
@@ -19,19 +19,15 @@
 		"sanitize-html": "*",
 		"marked": "3.0.8",
 		"nodejs-websocket": "*",
-		
-		
-		
-		
 		"daveutils": "^0.4.64",
 		"davetwitter": "^0.6.39",
-		"daveappserver": "^0.6.24",
+		"daveappserver": "^0.7.6",
 		"daverss": "^0.6.2",
 		"daves3": "^0.4.11",
-		"davesql": "^0.4.25",
+		"davesql": "^0.5.7",
 		"reallysimple": "^0.4.24",
 		"davegithub": "^0.5.4",
-		"feedlanddatabase": "^0.6.14",
+		"feedlanddatabase": "^0.6.21",
 		"opml": "^0.5.1"
 		} 
 	}

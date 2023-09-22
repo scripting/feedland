@@ -1,3 +1,7 @@
+#### 9/21/23; 6:24:11 PM by DW
+
+Wrote a callback for the new davesql logCallback, we watch for calls that took 5 seconds or more or had 1000 or more results. Obviously these numbers need to be configurable. First I want to get a feel for how it works, and later will add a stack trace, so we can see definitively who's making the call in question. 
+
 #### 9/21/23; 12:04:07 PM by DW
 
 Added feedlandVersion to the pagetable when we build the home page. 

@@ -1,4 +1,4 @@
-const myVersion = "0.5.75", myProductName = "feedland"; 
+const myVersion = "0.5.93", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -402,6 +402,7 @@ function renderUserNewsproductWithTemplate (urlOutlineTemplate, theRequest, call
 
 function getStaticFileInSql (screenname, relpath, flprivate, callback) { //9/20/23 by DW
 	const sqltext = "select * from staticfiles where screenname = " + davesql.encode (screenname) + " and relpath = " + davesql.encode (relpath) + " and flprivate = " + davesql.encode (flprivate) + ";";
+	console.log ("getStaticFileInSql: screenname == " + screenname + ", relpath == " + relpath); //9/21/23 by DW
 	davesql.runSqltext (sqltext, function (err, result) {
 		if (err) {
 			callback (err);
@@ -442,6 +443,7 @@ function publishStaticFileInSql (screenname, relpath, type, flprivate, fileconte
 		whenUpdated: now,
 		ctSaves: 1
 		};
+	console.log ("publishStaticFileInSql: screenname == " + screenname + ", relpath == " + relpath); //9/21/23 by DW
 	getStaticFileInSql (screenname, relpath, flprivate, function (err, theOriginalFile) {
 		if (!err) {
 			fileRec.whenCreated = theOriginalFile.filestats.whenCreated;
@@ -1055,6 +1057,29 @@ function handleHttpRequest (theRequest) {
 	return (false); //not consumed
 	}
 
+function logSqlCalls (options) { //9/21/23 by DW
+	const minsecs = 5, maxresults = 1000, now = new Date ();
+	if (!options.err) { //errors are logged elsewhere, we're looking for performance problems
+		var flLog = false;
+		if (options.ctsecs >= minsecs) {
+			flLog = true;
+			}
+		else {
+			if (options.result !== undefined) {
+				if (options.result.length > maxresults) {
+					flLog = true;
+					}
+				}
+			}
+		if (flLog) {
+			console.log ();
+			console.log ("logSqlCalls: " + now.toLocaleTimeString () + ", ctsecs == " + options.ctsecs + ", options.result.length == " + options.result.length + ".");
+			console.log ("\nlogSqlCalls: sqltext == " + options.sqltext);
+			console.log ();
+			}
+		}
+	}
+
 function start () {
 	var options = {
 		everySecond,
@@ -1077,6 +1102,7 @@ function start () {
 			appConfig.publishStaticFile = publishStaticFileInSql;
 			}
 		blog.start (config, function () {
+			config.database.logCallback = logSqlCalls; //9/21/23 by DW
 			davesql.start (config.database, function () {
 				database.start (config, function () {
 					if (config.flBackupOnStartup) { //1/9/23 by DW
