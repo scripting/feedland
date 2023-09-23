@@ -1,4 +1,4 @@
-const myVersion = "0.5.93", myProductName = "feedland"; 
+const myVersion = "0.5.94", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -1058,7 +1058,7 @@ function handleHttpRequest (theRequest) {
 	}
 
 function logSqlCalls (options) { //9/21/23 by DW
-	const minsecs = 5, maxresults = 1000, now = new Date ();
+	const minsecs = 3, maxresults = 1000, now = new Date ();
 	if (!options.err) { //errors are logged elsewhere, we're looking for performance problems
 		var flLog = false;
 		if (options.ctsecs >= minsecs) {
@@ -1075,6 +1075,7 @@ function logSqlCalls (options) { //9/21/23 by DW
 			console.log ();
 			console.log ("logSqlCalls: " + now.toLocaleTimeString () + ", ctsecs == " + options.ctsecs + ", options.result.length == " + options.result.length + ".");
 			console.log ("\nlogSqlCalls: sqltext == " + options.sqltext);
+			console.trace (); 
 			console.log ();
 			}
 		}
