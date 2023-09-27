@@ -1,3 +1,7 @@
+#### 9/27/23 AM by DW -- v0.6.24
+
+Exported convertItemList, needed it in the code for the SQL based websocket notifications. 
+
 #### 9/13/23 by DW
 
 two new config values:

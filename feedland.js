@@ -1,4 +1,4 @@
-const myVersion = "0.5.94", myProductName = "feedland"; 
+const myVersion = "0.5.95", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -57,6 +57,12 @@ var config = {
 	urlNewsProductSource: "http://scripting.com/code/riverclient/index.html", //9/15/23 by DW
 	flStaticFilesInSql: false, //9/20/23 by DW
 	
+	flUseSqlForSockets: false, //9/26/23 by DW
+	minSecsBetwSqlSocketChecks: 5, //9/26/23 by DW
+	
+	logMinSecs: 5,  //9/26/23 by DW
+	logMaxResults: 1000,  //9/26/23 by DW
+	
 	urlStarterFeeds: "https://s3.amazonaws.com/scripting.com/publicfolder/feedland/subscriptionLists/starterfeeds.opml" //2/15/23 by DW
 	};
 
@@ -64,6 +70,8 @@ var whenLastDayRollover = new Date ();
 var whenLastFeedCheck = new Date ();
 var whenLastCloudRenew = new Date ();
 var emailCache = new Object (); //12/14/22 by DW
+var idLastNewItem = undefined; //9/26/23 by DW
+var whenLastSqlSocketCheck = new Date (); //9/26/23 by DW
 
 function viewMemoryUsage () { //9/14/22 by DW
 	var jstruct = process.memoryUsage ();
@@ -80,6 +88,73 @@ function notifySocketSubscribers (verb, payload, flPayloadIsString, callbackToQu
 		daveappserver.notifySocketSubscribers (verb, payload, flPayloadIsString, callbackToQualify);
 		}
 	}
+
+function initLastNewItem (callback) { //9/26/23 by DW
+	const sqltext = "select id from items order by id desc limit 1;";
+	davesql.runSqltext (sqltext, function (err, result) {
+		if (err) {
+			console.log ("initLastNewItem: " + err.message); 
+			if (callback !== undefined) {
+				callback ();
+				}
+			}
+		else {
+			if (result.length == 0) {
+				console.log ("initLastNewItem: error setting idLastNewItem."); 
+				if (callback !== undefined) {
+					callback ();
+					}
+				}
+			else {
+				idLastNewItem = result [0].id;
+				console.log ("initLastNewItem: idLastNewItem == " + idLastNewItem);
+				if (callback !== undefined) {
+					callback ();
+					}
+				}
+			}
+		});
+	}
+function notifySocketSubscribersFromSql () { //9/26/23 by DW
+	const sqltext = "select * from items where id > " + davesql.encode (idLastNewItem) + " order by id desc;";
+	davesql.runSqltext (sqltext, function (err, result) {
+		if (err) {
+			console.log ("notifySocketSubscribersFromSql: " + err.message); 
+			}
+		else {
+			if (result.length > 0) {
+				let feedRecs = new Object (); //if more than one item for a feed, we only have to get the feed data once
+				result.forEach (function (item) {
+					console.log (item.id);
+					function sendmessage (feedRec) {
+						let jstruct = {
+							item: database.convertDatabaseItem (item),
+							theFeed: feedRec
+							}
+						database.updateSocketSubscribers ("newItem", jstruct);
+						}
+					if (feedRecs [item.feedUrl] === undefined) {
+						database.getFeed (item.feedUrl, function (err, feedRec) {
+							if (err) {
+								console.log ("sendNotificationForOneItem: err.message == " + err.message);
+								}
+							else {
+								feedRecs [item.feedUrl] = feedRec;
+								sendmessage (feedRec);
+								}
+							});
+						}
+					else {
+						sendmessage (feedRecs [item.feedUrl]);
+						}
+					});
+				idLastNewItem = result [0].id;
+				console.log ("notifySocketSubscribersFromSql: idLastNewItem == " + idLastNewItem);
+				}
+			}
+		});
+	}
+
 function unsubList (screenname, urlArray, callback) { //6/28/22 by DW -- move into database code
 	var returnArray = new Array ();
 	function unsubnext (ix) {
@@ -691,6 +766,12 @@ function everySecond () {
 		database.updateNextFeedIfReady ();
 		whenLastFeedCheck = now;
 		}
+	if (config.flWebsocketEnabled && config.flUseSqlForSockets) { //9/26/23 by DW
+		if (utils.secondsSince (whenLastSqlSocketCheck) >= config.minSecsBetwSqlSocketChecks)  {
+			notifySocketSubscribersFromSql ();
+			whenLastSqlSocketCheck = now;
+			}
+		}
 	if (!utils.sameDay (now, whenLastDayRollover)) {
 		whenLastDayRollover = now;
 		everyNight (); //8/22/22 by DW
@@ -1058,15 +1139,15 @@ function handleHttpRequest (theRequest) {
 	}
 
 function logSqlCalls (options) { //9/21/23 by DW
-	const minsecs = 3, maxresults = 1000, now = new Date ();
+	const now = new Date ();
 	if (!options.err) { //errors are logged elsewhere, we're looking for performance problems
 		var flLog = false;
-		if (options.ctsecs >= minsecs) {
+		if (options.ctsecs >= config.logMinSecs) {
 			flLog = true;
 			}
 		else {
 			if (options.result !== undefined) {
-				if (options.result.length > maxresults) {
+				if (options.result.length > config.logMaxResults) {
 					flLog = true;
 					}
 				}
@@ -1075,7 +1156,6 @@ function logSqlCalls (options) { //9/21/23 by DW
 			console.log ();
 			console.log ("logSqlCalls: " + now.toLocaleTimeString () + ", ctsecs == " + options.ctsecs + ", options.result.length == " + options.result.length + ".");
 			console.log ("\nlogSqlCalls: sqltext == " + options.sqltext);
-			console.trace (); 
 			console.log ();
 			}
 		}
@@ -1106,6 +1186,9 @@ function start () {
 			config.database.logCallback = logSqlCalls; //9/21/23 by DW
 			davesql.start (config.database, function () {
 				database.start (config, function () {
+					if (config.flWebsocketEnabled && config.flUseSqlForSockets) { //9/26/23 by DW
+						initLastNewItem (); //9/26/23 by DW
+						}
 					if (config.flBackupOnStartup) { //1/9/23 by DW
 						database.backupDatabase (); 
 						}

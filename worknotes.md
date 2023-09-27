@@ -1,3 +1,15 @@
+#### 9/26/23; 12:08:03 PM by DW
+
+New config settings 
+
+* config.flUseSqlForSockets = false and config.minSecsBetwSqlSocketChecks = 5
+
+* config.logMinSecs = 5, config.logMaxResults = 1000
+
+If flUseSqlForSockets, we find out what the new items are by doing an SQL query, and then sending webocket messages to the users we're connected to. If you're running FeedLand in a multi-instance environment, you have to do it this way. All the servers are scanning feeds and receiving rssCloud pings all the time, the only place where all the info is, is in the database. 
+
+In logSqlCalls turned off call to console.trace. Wasn't generating any useful info. 
+
 #### 9/21/23; 6:24:11 PM by DW
 
 Wrote a callback for the new davesql logCallback, we watch for calls that took 5 seconds or more or had 1000 or more results. Obviously these numbers need to be configurable. First I want to get a feel for how it works, and later will add a stack trace, so we can see definitively who's making the call in question. 

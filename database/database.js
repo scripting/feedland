@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.6.22";  
+var myProductName = "feedlandDatabase", myVersion = "0.6.24";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -17,6 +17,7 @@ exports.saveFeed = saveFeed; //4/28/22 by DW
 exports.saveItem = saveItem; 
 exports.convertDatabaseFeed = convertDatabaseFeed;
 exports.convertDatabaseItem = convertDatabaseItem;
+exports.convertItemList = convertItemList; //9/26/23 by DW
 exports.isFeedInDatabase = isFeedInDatabase;
 exports.isItemInDatabase = isItemInDatabase;
 exports.updateSocketSubscribers = updateSocketSubscribers;

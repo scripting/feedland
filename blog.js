@@ -225,8 +225,6 @@ function addFeedIfNecessary (screenname, callback) { //5/8/22 by DW
 			}
 		});
 	}
-
-
 function getEnclosureInfo (enclosureUrl, callback) { //4/3/23 by DW
 	var options = {
 		method: "HEAD",
@@ -251,7 +249,6 @@ function getEnclosureInfo (enclosureUrl, callback) { //4/3/23 by DW
 			}
 		});
 	}
-
 function checkEnclosure (itemRec, callback) { //4/3/23 by DW
 	function isNull (val) {
 		if (val === undefined) {
@@ -283,7 +280,6 @@ function checkEnclosure (itemRec, callback) { //4/3/23 by DW
 			}
 		}
 	}
-
 function newPost (jsontext, screenname, callback) {
 	var feedUrl = getBlogUrl (screenname), itemRecFromClient, whenstart = new Date ();
 	var itemRec = {
