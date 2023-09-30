@@ -161,14 +161,16 @@ function buildRss (screenname, callback) {
 								}
 							});
 						
-						var f = config.localRssPath + screenname + ".xml";
-						utils.sureFilePath (f, function () {
-							fs.writeFile (f, xmltext, function (err) {
-								if (err) {
-									console.log ("buildRss: err.message == " + err.message);
-									}
+						if (config.flWriteRssFilesLocally) { //9/27/23 by DW
+							var f = config.localRssPath + screenname + ".xml";
+							utils.sureFilePath (f, function () {
+								fs.writeFile (f, xmltext, function (err) {
+									if (err) {
+										console.log ("buildRss: err.message == " + err.message);
+										}
+									});
 								});
-							});
+							}
 						}
 					});
 				});

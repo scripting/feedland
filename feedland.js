@@ -1,4 +1,4 @@
-const myVersion = "0.5.95", myProductName = "feedland"; 
+const myVersion = "0.5.96", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -20,6 +20,7 @@ var config = {
 	urlForFeeds: "http://data.feedland.org/feeds/", //11/5/22 by DW
 	s3PathForFeeds: "/data.feedland.org/feeds/",
 	
+	flWriteRssFilesLocally: true, //9/27/23 by DW
 	localRssPath: "data/feeds/",
 	generatorForFeed: myProductName + " v" + myVersion,
 	docsForFeed: "https://cyber.harvard.edu/rss/rss.html",

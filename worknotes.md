@@ -1,3 +1,11 @@
+9/27/23; 6:46:23 PM by DW -- v0.5.96
+
+config.flWriteRssFilesLocally is new, default true. 
+
+if true we write out RSS files to the local hard drive.
+
+set it false obviously if your system doesn't have the ability to write to the local drive.
+
 #### 9/26/23; 12:08:03 PM by DW
 
 New config settings 
