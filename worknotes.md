@@ -1,4 +1,10 @@
-9/27/23; 6:46:23 PM by DW -- v0.5.96
+#### 10/1/23; 10:34:40 AM by DW -- v0.5.97
+
+Add a callback to notifySocketSubscribersFromSql that's called as we notify user's machines that there's a new item so we can clear the river cache accordingly. Previously we had turned off river caching. I want it back on.
+
+Commented the console.log that emits the id of each new item. 
+
+#### 9/27/23; 6:46:23 PM by DW -- v0.5.96
 
 config.flWriteRssFilesLocally is new, default true. 
 

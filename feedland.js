@@ -1,4 +1,4 @@
-const myVersion = "0.5.96", myProductName = "feedland"; 
+const myVersion = "0.5.98", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -116,7 +116,7 @@ function initLastNewItem (callback) { //9/26/23 by DW
 			}
 		});
 	}
-function notifySocketSubscribersFromSql () { //9/26/23 by DW
+function notifySocketSubscribersFromSql (callback) { //9/26/23 by DW
 	const sqltext = "select * from items where id > " + davesql.encode (idLastNewItem) + " order by id desc;";
 	davesql.runSqltext (sqltext, function (err, result) {
 		if (err) {
@@ -126,13 +126,15 @@ function notifySocketSubscribersFromSql () { //9/26/23 by DW
 			if (result.length > 0) {
 				let feedRecs = new Object (); //if more than one item for a feed, we only have to get the feed data once
 				result.forEach (function (item) {
-					console.log (item.id);
 					function sendmessage (feedRec) {
 						let jstruct = {
 							item: database.convertDatabaseItem (item),
 							theFeed: feedRec
 							}
 						database.updateSocketSubscribers ("newItem", jstruct);
+						if (callback !== undefined) { //10/1/23 by DW
+							callback (jstruct);
+							}
 						}
 					if (feedRecs [item.feedUrl] === undefined) {
 						database.getFeed (item.feedUrl, function (err, feedRec) {
@@ -769,7 +771,9 @@ function everySecond () {
 		}
 	if (config.flWebsocketEnabled && config.flUseSqlForSockets) { //9/26/23 by DW
 		if (utils.secondsSince (whenLastSqlSocketCheck) >= config.minSecsBetwSqlSocketChecks)  {
-			notifySocketSubscribersFromSql ();
+			notifySocketSubscribersFromSql (function (jstruct) { //10/1/23 by DW -- added callback
+				database.clearCachedRivers (jstruct.item.feedUrl);
+				});
 			whenLastSqlSocketCheck = now;
 			}
 		}

@@ -1,3 +1,17 @@
+#### 10/3/23; 4:28:08 PM by DW
+
+Added debugging code for the river cache. 
+
+We now log when we add a river to the cache, or delete a river because a feed it uses updated, or because it aged-out. 
+
+The names of the routines should tell you which is happening.
+
+#### 10/1/23; 10:19:34 AM by DW -- v0.6.25
+
+Export clearCachedRivers so it can be called from the SQL socket subscriber code.
+
+When we send notification to users that a feed has updated, we can also send that info to the river cache, so we can turn caching back on.
+
 #### 9/27/23 AM by DW -- v0.6.24
 
 Exported convertItemList, needed it in the code for the SQL based websocket notifications. 

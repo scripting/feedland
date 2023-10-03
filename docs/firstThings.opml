@@ -9,9 +9,9 @@
 		<ownerName>Dave Winer</ownerName>
 		<ownerId>dave.winer@gmail.com</ownerId>
 		<urlUpdateSocket>wss://drummer.land/</urlUpdateSocket>
-		<dateModified>Sun, 30 Jul 2023 20:24:57 GMT</dateModified>
-		<expansionState></expansionState>
-		<lastCursor>6</lastCursor>
+		<dateModified>Tue, 08 Aug 2023 14:43:16 GMT</dateModified>
+		<expansionState>3</expansionState>
+		<lastCursor>4</lastCursor>
 		</head>
 	<body>
 		<outline text="Welcome" created="Fri, 16 Sep 2022 14:29:04 GMT">

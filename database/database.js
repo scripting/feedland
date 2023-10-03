@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.6.24";  
+var myProductName = "feedlandDatabase", myVersion = "0.6.26";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -54,6 +54,7 @@ exports.getFeedsInCategory = getFeedsInCategory; //9/19/22 by DW
 exports.getRiverFromEverything = getRiverFromEverything; //10/14/22 by DW
 exports.getRiverFromHotlist = getRiverFromHotlist; //10/15/22 by DW
 exports.getRiverFromUserFeeds = getRiverFromUserFeeds; //12/3/22 by DW
+exports.clearCachedRivers = clearCachedRivers; //10/1/23 by DW
 
 exports.isLiked = isLiked; //9/17/22 by DW
 exports.toggleItemLike = toggleItemLike; //9/17/22 by DW
@@ -68,6 +69,7 @@ exports.isFeedInRiver = isFeedInRiver; //2/1/23 by DW
 
 
 exports.getFeedlistFromOpml = getFeedlistFromOpml; //6/1/23 by DW
+
 
 
 const fs = require ("fs");
@@ -1302,6 +1304,7 @@ function getFeedItems (feedUrl, ctItems, callback) { //8/31/22 by DW
 
 function addToRiverCache (cachekey, feedUrlList, theRiver) { //9/15/22 by DW
 	if (config.flUseRiverCache) { 
+		console.log ("addToRiverCache: cachekey == " + cachekey); //10/3/23 by DW
 		riverCache [cachekey] = {
 			feedUrlList, 
 			river: theRiver,
@@ -1313,11 +1316,13 @@ function clearCachedRivers (feedUrl) { //8/22/22 by DW
 	for (var cachekey in riverCache) {
 		var feedUrlList = riverCache [cachekey].feedUrlList;
 		if (feedUrlList === undefined) { //the "everything" river -- 10/14/22 by DW
+			console.log ("clearCachedRivers: deleting cache for the river whose key is " + cachekey); //10/3/23 by DW
 			delete riverCache [cachekey];
 			}
 		else {
 			for (var i = 0; i < feedUrlList.length; i++) {
 				if (feedUrlList [i] == feedUrl) {
+					console.log ("clearCachedRivers: deleting cache for the river whose key is " + cachekey); //10/3/23 by DW
 					delete riverCache [cachekey];
 					break;
 					}
@@ -1328,7 +1333,7 @@ function clearCachedRivers (feedUrl) { //8/22/22 by DW
 function clearOldCachedRivers () { //9/15/22 by DW
 	for (var cachekey in riverCache) {
 		if (utils.secondsSince (riverCache [cachekey].when) > config.ctSecsLifeRiverCache) {
-			console.log ("clearOldCachedRivers: deleting cache for the river whose key is " + cachekey);
+			console.log ("clearOldCachedRivers: deleting cache for the river whose key is " + cachekey); //10/3/23 by DW
 			delete riverCache [cachekey];
 			}
 		}

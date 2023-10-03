@@ -9,9 +9,9 @@
 		<ownerName>Dave Winer</ownerName>
 		<ownerId>dave.winer@gmail.com</ownerId>
 		<urlUpdateSocket>wss://drummer.land/</urlUpdateSocket>
-		<dateModified>Thu, 03 Aug 2023 12:47:54 GMT</dateModified>
-		<expansionState>2,13,15</expansionState>
-		<lastCursor>1</lastCursor>
+		<dateModified>Thu, 14 Sep 2023 14:39:57 GMT</dateModified>
+		<expansionState>2,8,11,13,19,21,29,31</expansionState>
+		<lastCursor>22</lastCursor>
 		</head>
 	<body>
 		<outline text="What is a news product?" created="Thu, 18 Aug 2022 15:40:59 GMT">
