@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.6.26";  
+var myProductName = "feedlandDatabase", myVersion = "0.6.27";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -1313,16 +1313,19 @@ function addToRiverCache (cachekey, feedUrlList, theRiver) { //9/15/22 by DW
 		}
 	}
 function clearCachedRivers (feedUrl) { //8/22/22 by DW
+	function logit () { //10/3/23 by DW
+		console.log ("clearCachedRivers: deleting cache for the river whose key is " + cachekey + ". feedUrl == " + feedUrl);
+		}
 	for (var cachekey in riverCache) {
 		var feedUrlList = riverCache [cachekey].feedUrlList;
 		if (feedUrlList === undefined) { //the "everything" river -- 10/14/22 by DW
-			console.log ("clearCachedRivers: deleting cache for the river whose key is " + cachekey); //10/3/23 by DW
+			logit (); //10/3/23 by DW
 			delete riverCache [cachekey];
 			}
 		else {
 			for (var i = 0; i < feedUrlList.length; i++) {
 				if (feedUrlList [i] == feedUrl) {
-					console.log ("clearCachedRivers: deleting cache for the river whose key is " + cachekey); //10/3/23 by DW
+					logit (); //10/3/23 by DW
 					delete riverCache [cachekey];
 					break;
 					}
