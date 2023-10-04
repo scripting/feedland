@@ -1,3 +1,7 @@
+#### 10/4/23; 12:07:22 PM by DW
+
+Don't call clearCachedRivers if config.flUseSqlForSockets is true.
+
 #### 10/3/23; 4:28:08 PM by DW
 
 Added debugging code for the river cache. 

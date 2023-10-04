@@ -1,3 +1,7 @@
+#### 10/4/23; 12:12:21 PM by DW
+
+We have to call notifySocketSubscribersFromSql even if config.flWebsocketEnabled is false because we're using that mechanism to clear the river cache. So we check config.flWebsocketEnabled where we're sending the message.
+
 #### 10/1/23; 10:34:40 AM by DW -- v0.5.97
 
 Add a callback to notifySocketSubscribersFromSql that's called as we notify user's machines that there's a new item so we can clear the river cache accordingly. Previously we had turned off river caching. I want it back on.

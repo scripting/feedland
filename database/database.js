@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.6.27";  
+var myProductName = "feedlandDatabase", myVersion = "0.6.28";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -573,7 +573,9 @@ function saveItem (itemRec, callback) {
 			}
 		else {
 			itemRec.id = result.insertId; //7/12/22 by DW
-			clearCachedRivers (itemRec.feedUrl); //10/16/22 by DW
+			if (!config.flUseSqlForSockets) { //10/4/23 by DW
+				clearCachedRivers (itemRec.feedUrl); //10/16/22 by DW
+				}
 			callback (undefined, result);
 			}
 		});
@@ -1167,7 +1169,9 @@ function checkFeedItems (feedRec, itemsArray, flNewFeed, callback) {
 			if (ctNewItems > 0) {
 				feedRec.whenUpdated = whenstart;  //7/10/22 by DW
 				updateSocketSubscribers ("updatedFeed", convertDatabaseFeed (feedRec));
-				clearCachedRivers (feedUrl); //8/22/22 by DW
+				if (!config.flUseSqlForSockets) { //10/4/23 by DW
+					clearCachedRivers (feedUrl); //8/22/22 by DW
+					}
 				saveFeed (feedRec, function () {  //7/10/22 by DW
 					callback (undefined);
 					});

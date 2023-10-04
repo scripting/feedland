@@ -1,4 +1,4 @@
-const myVersion = "0.5.99", myProductName = "feedland"; 
+const myVersion = "0.5.100", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -131,7 +131,9 @@ function notifySocketSubscribersFromSql (callback) { //9/26/23 by DW
 							item: database.convertDatabaseItem (item),
 							theFeed: feedRec
 							}
-						database.updateSocketSubscribers ("newItem", jstruct);
+						if (config.flWebsocketEnabled) { //10/4/23 by DW
+							database.updateSocketSubscribers ("newItem", jstruct);
+							}
 						if (callback !== undefined) { //10/1/23 by DW
 							callback (jstruct);
 							}
@@ -769,7 +771,7 @@ function everySecond () {
 		database.updateNextFeedIfReady ();
 		whenLastFeedCheck = now;
 		}
-	if (config.flWebsocketEnabled && config.flUseSqlForSockets) { //9/26/23 by DW
+	if (config.flUseSqlForSockets) { //9/26/23 by DW && 10/4/23 by DW
 		if (utils.secondsSince (whenLastSqlSocketCheck) >= config.minSecsBetwSqlSocketChecks)  {
 			notifySocketSubscribersFromSql (function (jstruct) { //10/1/23 by DW -- added callback
 				database.clearCachedRivers (jstruct.item.feedUrl);
