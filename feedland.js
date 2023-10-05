@@ -1,4 +1,4 @@
-const myVersion = "0.5.100", myProductName = "feedland"; 
+const myVersion = "0.5.101", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -787,8 +787,9 @@ function everySecond () {
 function handleHttpRequest (theRequest) {
 	var now = new Date ();
 	const params = theRequest.params;
-	function returnPlainText (s) {
-		theRequest.httpReturn (200, "text/plain", s.toString ());
+	function returnPlainText (theString) {
+		theString = (theString === undefined) ? "" : theString.toString ();
+		theRequest.httpReturn (200, "text/plain", theString);
 		}
 	function returnHtml (htmltext) {
 		theRequest.httpReturn (200, "text/html", htmltext);
