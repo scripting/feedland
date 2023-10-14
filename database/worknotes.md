@@ -1,3 +1,7 @@
+#### 10/12/23; 8:55:00 AM by DW
+
+Support for reading lists is ready.
+
 #### 10/4/23; 12:07:22 PM by DW
 
 Don't call clearCachedRivers if config.flUseSqlForSockets is true.

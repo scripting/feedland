@@ -1,4 +1,4 @@
-const myVersion = "0.5.101", myProductName = "feedland"; 
+const myVersion = "0.6.2", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -55,6 +55,8 @@ var config = {
 	flUserFeeds: false, 
 	flLikesFeeds: false, 
 	
+	urlStarterFeeds: "https://s3.amazonaws.com/scripting.com/publicfolder/feedland/subscriptionLists/starterfeeds.opml", //2/15/23 by DW
+	
 	urlNewsProductSource: "http://scripting.com/code/riverclient/index.html", //9/15/23 by DW
 	flStaticFilesInSql: false, //9/20/23 by DW
 	
@@ -64,7 +66,9 @@ var config = {
 	logMinSecs: 5,  //9/26/23 by DW
 	logMaxResults: 1000,  //9/26/23 by DW
 	
-	urlStarterFeeds: "https://s3.amazonaws.com/scripting.com/publicfolder/feedland/subscriptionLists/starterfeeds.opml" //2/15/23 by DW
+	flUseReadingLists: true, //10/10/23 by DW
+	minSecsBetwReadingListChecks: 60,  //10/10/23 by DW
+	minSecsBetwIndividualReadingListCheck: 5 * 60  //10/10/23 by DW
 	};
 
 var whenLastDayRollover = new Date ();
@@ -73,6 +77,7 @@ var whenLastCloudRenew = new Date ();
 var emailCache = new Object (); //12/14/22 by DW
 var idLastNewItem = undefined; //9/26/23 by DW
 var whenLastSqlSocketCheck = new Date (); //9/26/23 by DW
+var whenLastReadingListCheck = new Date (); //10/10/23 by DW
 
 function viewMemoryUsage () { //9/14/22 by DW
 	var jstruct = process.memoryUsage ();
@@ -688,7 +693,6 @@ function isEmailInDatabase (emailAddress, callback) { //1/12/23 by DW
 			});
 		}
 	}
-
 function getScreenname (params, callback) { //12/23/22 by DW
 	function tryWithTwitterLogin () {
 		davetwitter.getScreenName (params.oauth_token, params.oauth_token_secret, function (screenname) {
@@ -700,14 +704,13 @@ function getScreenname (params, callback) { //12/23/22 by DW
 				}
 			});
 		}
-	
-	if ((params.emailaddress !== undefined) && (params.emailcode !== undefined)) { //xxx
+	if ((params.emailaddress !== undefined) && (params.emailcode !== undefined)) {
 		getUserRecFromEmail (params.emailaddress, params.emailcode, function (err, userRec) {
 			if (err) {
 				tryWithTwitterLogin ();
 				}
 			else {
-				callback (undefined, userRec.screenname);
+				callback (undefined, userRec.screenname, userRec); //10/6/23 by DW
 				}
 			});
 		}
@@ -717,13 +720,6 @@ function getScreenname (params, callback) { //12/23/22 by DW
 	}
 
 
-function everyNight () { //8/22/22 by DW
-	if (config.flNightlyBackup) { //3/29/23 by DW
-		database.backupDatabase (); 
-		}
-	}
-function everyMinute () {
-	}
 function getRssCloudOptions () {
 	let options = new Object ();
 	for (var x in config.rssCloud) {
@@ -742,7 +738,6 @@ function getRssCloudOptions () {
 	options.websocketPort = (appconfig.flWebsocketEnabled) ? appconfig.websocketPort : undefined;
 	return (options);
 	}
-
 function handleRssCloudPing (feedUrl, callback) { //8/18/23 by DW
 	console.log ("\nhandleRssCloudPing: feedUrl == " + feedUrl + "\n");
 	database.checkOneFeed (feedUrl, function (err, data) {
@@ -759,31 +754,7 @@ function getServerConfig (screenname) { //5/8/23 by DW
 		}
 	return (serverConfig);
 	}
-function everySecond () {
-	var now = new Date ();
-	if (config.flRenewSubscriptions) { //10/29/22 by DW
-		if (utils.secondsSince (whenLastCloudRenew) >= config.rssCloud.minSecsBetwRenews)  { //10/9/22 by DW
-			database.renewNextSubscriptionIfReady (getRssCloudOptions ());
-			whenLastCloudRenew = now;
-			}
-		}
-	if (utils.secondsSince (whenLastFeedCheck) >= config.minSecsBetwFeedChecks)  {
-		database.updateNextFeedIfReady ();
-		whenLastFeedCheck = now;
-		}
-	if (config.flUseSqlForSockets) { //9/26/23 by DW && 10/4/23 by DW
-		if (utils.secondsSince (whenLastSqlSocketCheck) >= config.minSecsBetwSqlSocketChecks)  {
-			notifySocketSubscribersFromSql (function (jstruct) { //10/1/23 by DW -- added callback
-				database.clearCachedRivers (jstruct.item.feedUrl);
-				});
-			whenLastSqlSocketCheck = now;
-			}
-		}
-	if (!utils.sameDay (now, whenLastDayRollover)) {
-		whenLastDayRollover = now;
-		everyNight (); //8/22/22 by DW
-		}
-	}
+
 function handleHttpRequest (theRequest) {
 	var now = new Date ();
 	const params = theRequest.params;
@@ -846,8 +817,7 @@ function handleHttpRequest (theRequest) {
 			}
 		}
 	function callWithScreenname (callback) {
-		
-		getScreenname (params, function (err, screenname) { //12/23/22 by DW
+		getScreenname (params, function (err, screenname, userRec) { //12/23/22 by DW
 			if (err) {
 				returnError (err);
 				}
@@ -855,7 +825,6 @@ function handleHttpRequest (theRequest) {
 				callback (screenname);
 				}
 			});
-		
 		}
 	
 	switch (theRequest.method) {
@@ -1134,6 +1103,23 @@ function handleHttpRequest (theRequest) {
 						}
 					return (true);
 				
+				case "/checkreadinglist": //10/9/23 by DW
+					database.checkReadingList (params.url, httpReturn);
+					return (true);
+				case "/subscribetoreadinglist": //10/9/23 by DW
+					callWithScreenname (function (screenname) {
+						database.subscribeToReadingList (screenname, params.url, httpReturn);
+						});
+					return (true);
+				case "/unsubreadinglist": //10/13/23 by DW
+					callWithScreenname (function (screenname) {
+						database.deleteReadingListSubscription (screenname, params.url, httpReturn);
+						});
+					return (true);
+				case "/getreadinglistsubscriptions": //10/13/23 by DW
+					database.getReadingListSubscriptions (params.screenname, httpReturn);
+					return (true);
+				
 				case config.rssCloud.feedUpdatedCallback: //12/12/22 by DW
 					returnPlainText (params.challenge);
 					return (true); 
@@ -1166,6 +1152,47 @@ function logSqlCalls (options) { //9/21/23 by DW
 			console.log ("\nlogSqlCalls: sqltext == " + options.sqltext);
 			console.log ();
 			}
+		}
+	}
+
+function everyNight () {
+	if (config.flNightlyBackup) { //3/29/23 by DW
+		database.backupDatabase (); 
+		}
+	}
+function everyMinute () {
+	}
+function everySecond () {
+	var now = new Date ();
+	if (config.flRenewSubscriptions) { //10/29/22 by DW
+		if (utils.secondsSince (whenLastCloudRenew) >= config.rssCloud.minSecsBetwRenews)  { //10/9/22 by DW
+			database.renewNextSubscriptionIfReady (getRssCloudOptions ());
+			whenLastCloudRenew = now;
+			}
+		}
+	if (config.flUpdateFeedsInBackground) {
+		if (utils.secondsSince (whenLastFeedCheck) >= config.minSecsBetwFeedChecks)  {
+			database.updateNextFeedIfReady ();
+			whenLastFeedCheck = now;
+			}
+		}
+	if (config.flUseSqlForSockets) { //9/26/23 by DW && 10/4/23 by DW
+		if (utils.secondsSince (whenLastSqlSocketCheck) >= config.minSecsBetwSqlSocketChecks)  {
+			notifySocketSubscribersFromSql (function (jstruct) { //10/1/23 by DW -- added callback
+				database.clearCachedRivers (jstruct.item.feedUrl);
+				});
+			whenLastSqlSocketCheck = now;
+			}
+		}
+	if (config.flUseReadingLists) { //10/10/23 by DW
+		if (utils.secondsSince (whenLastReadingListCheck) >= config.minSecsBetwReadingListChecks)  {
+			database.checkNextReadingListfReady ();
+			whenLastReadingListCheck = now;
+			}
+		}
+	if (!utils.sameDay (now, whenLastDayRollover)) {
+		whenLastDayRollover = now;
+		everyNight (); //8/22/22 by DW
 		}
 	}
 

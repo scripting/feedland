@@ -1,3 +1,7 @@
+#### 10/12/23; 8:56:07 AM by DW
+
+Support for reading lists.
+
 #### 10/4/23; 12:12:21 PM by DW
 
 We have to call notifySocketSubscribersFromSql even if config.flWebsocketEnabled is false because we're using that mechanism to clear the river cache. So we check config.flWebsocketEnabled where we're sending the message.
