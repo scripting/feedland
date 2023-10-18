@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.7.1";  
+var myProductName = "feedlandDatabase", myVersion = "0.7.2";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -1986,9 +1986,13 @@ function getFeedsInCategory (screenname, catname, callback) {
 				var returnedArray = new Array (); //9/5/22 by DW
 				removeNullValues (result); 
 				result.forEach (function (sub) {
-					if (sub.urlReadingList.length == 0) { //10/13/23 by DW
-						sub.urlReadingList = undefined;
+					
+					if (sub.urlReadingList !== undefined) { //10/16/23 by DW
+						if (sub.urlReadingList.length == 0) { //10/13/23 by DW
+							sub.urlReadingList = undefined;
+							}
 						}
+					
 					returnedArray.push (convertCategories (sub));
 					});
 				callback (undefined, returnedArray);
@@ -3157,7 +3161,7 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 		}
 	
 	function getReadingListSubscriptions (screenname, callback) { //10/13/23 by DW
-		const sqltext = "select s.opmlUrl, s.whenCreated, r.title, r.description, r.ctChecks, r.whoFirstSubscribed, r.feedUrls from readinglistsubscriptions as s, readinglists as r where s.opmlUrl = r.opmlUrl and s.screenname = " + davesql.encode (screenname) + ";";
+		const sqltext = "select s.opmlUrl, s.whenCreated, r.title, r.description, r.ctChecks, r.whenChecked, r.whoFirstSubscribed, r.feedUrls from readinglistsubscriptions as s, readinglists as r where s.opmlUrl = r.opmlUrl and s.screenname = " + davesql.encode (screenname) + ";";
 		davesql.runSqltext (sqltext, function (err, result) {
 			if (err) {
 				callback (err);

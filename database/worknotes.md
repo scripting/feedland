@@ -1,3 +1,7 @@
+#### 10/16/23; 11:31:41 AM by DW
+
+Fixed bug where urlReadingList would be undefined, would cause the server to crash.
+
 #### 10/12/23; 8:55:00 AM by DW
 
 Support for reading lists is ready.
