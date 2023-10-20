@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.7.2";  
+var myProductName = "feedlandDatabase", myVersion = "0.7.4";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -75,7 +75,7 @@ exports.subscribeToReadingList = subscribeToReadingList; //10/9/23 by DW
 exports.checkNextReadingListfReady = checkNextReadingListfReady; //10/10/23 by DW
 exports.getReadingListSubscriptions = getReadingListSubscriptions; //10/13/23 by DW
 exports.deleteReadingListSubscription = deleteReadingListSubscription; //10/13/23 by DW
-
+exports.getReadingListsInfo = getReadingListsInfo; //10/19/23 by DW
 
 const fs = require ("fs");
 const md5 = require ("md5");
@@ -1803,7 +1803,42 @@ function countNewSubscriptions (screenname, callback) { //7/20/22 by DW
 			}
 		});
 	}
+
+
 function subscribeToFeed (screenname, feedUrl, callback) {
+	function checkFeedUrl (feedUrl, callback) { //10/20/23 by DW
+		function findFeedsFromHTML (html) {
+			const regex = /<link[^>]+type="application\/(?:rss\+xml|atom\+xml)"[^>]+href="([^"]+)"[^>]*>/g;
+			let match;
+			const feeds = [];
+			while ((match = regex.exec(html)) !== null) {
+				feeds.push(match[1]);
+				}
+			return feeds;
+			}
+		reallysimple.readFeed (feedUrl, function (err, theFeed) {
+			if (err) {
+				httpReadUrl (feedUrl, function (err, htmltext) {
+					if (err) {
+						callback (err);
+						}
+					else {
+						var feedlist = findFeedsFromHTML (htmltext);
+						if (feedlist.length == 0) {
+							const message = "Can't find any feeds in the HTML text.";
+							callback ({message});
+							}
+						else {
+							callback (undefined, feedlist [0]);
+							}
+						}
+					});
+				}
+			else {
+				callback (undefined, feedUrl);
+				}
+			});
+		}
 	function checkMaxSubs (theCount, callback) { //10/14/22 by DW
 		if (theCount < config.maxNewFeedSubscriptions) {
 			callback (true, config.maxNewFeedSubscriptions); 
@@ -1822,89 +1857,92 @@ function subscribeToFeed (screenname, feedUrl, callback) {
 				}
 			}
 		}
-	isFeedInDatabase (feedUrl, function (flInDatabase, feedRec) {
-		if (flInDatabase) {
-			isUserSubscribed (feedUrl, screenname, function (err, jstruct) {
-				if (err) {
-					callback (err);
-					}
-				else {
-					if (jstruct.flSubscribed) {
-						callback (undefined, convertDatabaseFeed (feedRec));
+	checkFeedUrl (feedUrl, function (err, feedUrl) { //10/20/23 by DW
+		isFeedInDatabase (feedUrl, function (flInDatabase, feedRec) {
+			if (flInDatabase) {
+				isUserSubscribed (feedUrl, screenname, function (err, jstruct) {
+					if (err) {
+						callback (err);
 						}
 					else {
-						addSubscription (screenname, feedUrl, function (err, result) {
-							if (err) {
-								callback (err);
-								}
-							else {
-								addFeedToUserFeedsOpmlFile (screenname, feedRec, function (err) {
-									if (err) {
-										callback (err);
-										}
-									else {
-										callback (undefined, convertDatabaseFeed (feedRec));
-										}
-									});
-								}
-							});
-						}
-					}
-				});
-			}
-		else {
-			countNewSubscriptions (screenname, function (err, theCount) { //7/20/22 by DW
-				if (err) {
-					callback (err);
-					}
-				else {
-					checkMaxSubs (theCount, function (flAllowNewSub, actualMax) {
-						if (flAllowNewSub) {
-							reallysimple.readFeed (feedUrl, function (err, theFeed) {
+						if (jstruct.flSubscribed) {
+							callback (undefined, convertDatabaseFeed (feedRec));
+							}
+						else {
+							addSubscription (screenname, feedUrl, function (err, result) {
 								if (err) {
-									let message = "Can't subscribe because there was an error reading the feed."; //9/25/22 by DW
-									callback ({message});
+									callback (err);
 									}
 								else {
-									var feedRec = setupNewFeedRec (feedUrl, theFeed);
-									feedRec.ctItems = theFeed.items.length; //7/13/22 by DW
-									feedRec.whoFirstSubscribed = screenname; //7/20/22 by DW
-									feedRec.ctSubs = 1; //8/31/22 by DW
-									saveFeed (feedRec, function () {
-										addSubscription (screenname, feedUrl, function (err, result) {
-											if (err) {
-												callback (err);
-												}
-											else {
-												addFeedToUserFeedsOpmlFile (screenname, feedRec, function (err) {
-													if (err) {
-														callback (err);
-														}
-													else { //8/19/22 by DW -- return before we check in all the new feed items
-														let whenstart = new Date ();
-														checkFeedItems (feedRec, theFeed.items, true, function () {
-															myConsoleLog ("subscribeToFeed: checkFeedItems returned after " + utils.secondsSince (whenstart) + " seconds");
-															});
-														myConsoleLog ("subscribeToFeed: returning before all the feed items are checked. " + whenstart.toLocaleTimeString ());
-														callback (undefined, convertDatabaseFeed (feedRec));
-														}
-													});
-												}
-											});
+									addFeedToUserFeedsOpmlFile (screenname, feedRec, function (err) {
+										if (err) {
+											callback (err);
+											}
+										else {
+											callback (undefined, convertDatabaseFeed (feedRec));
+											}
 										});
 									}
 								});
 							}
-						else {
-							const message = "Can't add the new subscription because you've already created " + actualMax + " new subs.";
-							callback ({message});
-							}
-						});
-					}
-				});
-			}
+						}
+					});
+				}
+			else {
+				countNewSubscriptions (screenname, function (err, theCount) { //7/20/22 by DW
+					if (err) {
+						callback (err);
+						}
+					else {
+						checkMaxSubs (theCount, function (flAllowNewSub, actualMax) {
+							if (flAllowNewSub) {
+								reallysimple.readFeed (feedUrl, function (err, theFeed) {
+									if (err) {
+										let message = "Can't subscribe because there was an error reading the feed."; //9/25/22 by DW
+										callback ({message});
+										}
+									else {
+										var feedRec = setupNewFeedRec (feedUrl, theFeed);
+										feedRec.ctItems = theFeed.items.length; //7/13/22 by DW
+										feedRec.whoFirstSubscribed = screenname; //7/20/22 by DW
+										feedRec.ctSubs = 1; //8/31/22 by DW
+										saveFeed (feedRec, function () {
+											addSubscription (screenname, feedUrl, function (err, result) {
+												if (err) {
+													callback (err);
+													}
+												else {
+													addFeedToUserFeedsOpmlFile (screenname, feedRec, function (err) {
+														if (err) {
+															callback (err);
+															}
+														else { //8/19/22 by DW -- return before we check in all the new feed items
+															let whenstart = new Date ();
+															checkFeedItems (feedRec, theFeed.items, true, function () {
+																myConsoleLog ("subscribeToFeed: checkFeedItems returned after " + utils.secondsSince (whenstart) + " seconds");
+																});
+															myConsoleLog ("subscribeToFeed: returning before all the feed items are checked. " + whenstart.toLocaleTimeString ());
+															callback (undefined, convertDatabaseFeed (feedRec));
+															}
+														});
+													}
+												});
+											});
+										}
+									});
+								}
+							else {
+								const message = "Can't add the new subscription because you've already created " + actualMax + " new subs.";
+								callback ({message});
+								}
+							});
+						}
+					});
+				}
+			});
 		});
 	}
+
 function getRecentSubscriptions (callback) { //7/23/22 by DW
 	const sqltext = "select s.listName, s.feedUrl, f.title, f.description, s.whenUpdated from subscriptions as s, feeds as f where s.feedUrl = f.feedUrl and f.whoFirstSubscribed = s.listName order by s.whenUpdated desc limit " + config.maxRecentSubscriptions + ";";
 	davesql.runSqltext (sqltext, function (err, result) {
@@ -3170,6 +3208,37 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 				callback (undefined, removeNullValues (result));
 				}
 			});
+		}
+	function getReadingListsInfo (jsontext, callback) { //10/19/23 by DW
+		var theList, flerror = false;
+		try {
+			theList = JSON.parse (jsontext);
+			}
+		catch (err) {
+			callback (err);
+			flerror = true;
+			}
+		if (!flerror) {
+			function getWhereClause () {
+				var listtext = "";
+				theList.forEach (function (url) {
+					if (listtext.length > 0) {
+						listtext += ",";
+						}
+					listtext += davesql.encode (url);
+					});
+				return ("opmlUrl in (" + listtext + ")");
+				}
+			const sqltext = "select * from readinglists where " + getWhereClause () + ";";
+			davesql.runSqltext (sqltext, function (err, result) {
+				if (err) {
+					callback (err);
+					}
+				else {
+					callback (undefined, result);
+					}
+				});
+			}
 		}
 	
 	function deleteFeedSubscriptionsFromReadingList (screenname, opmlUrl, callback) { //10/13/23 by DW

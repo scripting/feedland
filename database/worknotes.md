@@ -1,3 +1,7 @@
+#### 10/20/23; 10:15:18 AM by DW
+
+If you try to subscribe to a feed but it's not a feed, it's html, we look for a <link> element in the html that points to an RSS or Atom feed, and use that instead.
+
 #### 10/16/23; 11:31:41 AM by DW
 
 Fixed bug where urlReadingList would be undefined, would cause the server to crash.

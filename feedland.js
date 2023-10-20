@@ -1,4 +1,4 @@
-const myVersion = "0.6.3", myProductName = "feedland"; 
+const myVersion = "0.6.4", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -1118,6 +1118,9 @@ function handleHttpRequest (theRequest) {
 					return (true);
 				case "/getreadinglistsubscriptions": //10/13/23 by DW
 					database.getReadingListSubscriptions (params.screenname, httpReturn);
+					return (true);
+				case "/getreadinglisstinfo": //10/19/23 by DW
+					database.getReadingListsInfo (params.jsontext, httpReturn);
 					return (true);
 				
 				case config.rssCloud.feedUpdatedCallback: //12/12/22 by DW
