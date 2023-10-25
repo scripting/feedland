@@ -1,4 +1,4 @@
-const myVersion = "0.6.4", myProductName = "feedland"; 
+const myVersion = "0.6.6", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -915,7 +915,7 @@ function handleHttpRequest (theRequest) {
 					return (true); 
 				case "/isusersubscribed": //5/18/22 by DW
 					callWithScreenname (function (screenname) {
-						database.isUserSubscribed (theRequest.params.url, screenname, httpReturn);
+						database.isUserSubscribed (params.url, screenname, params.urlreadinglist, httpReturn); //10/23/23 by DW -- new param, urlreadinglist
 						});
 					return (true); 
 				case "/getusersubcriptions": //5/20/22 by DW

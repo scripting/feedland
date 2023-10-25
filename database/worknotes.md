@@ -1,3 +1,13 @@
+#### 10/23/23; 9:42:27 AM by DW
+
+When checking if a feed changed it's possible for a comparison to fail, not sure which field, or why. 
+
+I wrapped the check in a try statement so that should take care of the error. 
+
+#### 10/20/23; 11:29:57 AM by DW
+
+config.flRiverBuildLogEnabled was defaulting true, and used up all the disk space on the feedland.org server. This was a mistake. I changed it to default to false. 
+
 #### 10/20/23; 10:15:18 AM by DW
 
 If you try to subscribe to a feed but it's not a feed, it's html, we look for a <link> element in the html that points to an RSS or Atom feed, and use that instead.
