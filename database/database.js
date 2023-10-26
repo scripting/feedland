@@ -2887,6 +2887,60 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 	}
 
 //reading lists -- 10/9/23 by DW
+	
+	
+	
+	function upgradeReadingLists (callback) { //10/25/23 by DW
+		console.log ("upgradeReadingLists");
+		const sqltext = "select * from readinglists;";
+		davesql.runSqltext (sqltext, function (err, result) {
+			if (err) {
+				console.log ("upgradeReadingLists: err.message == " + err.message);
+				if (callback !== undefined) {
+					callback (err);
+					}
+				}
+			else {
+				function doNext (ix) {
+					if (ix < result.length) {
+						const listRec = result [ix];
+						getNodeArrayFromOpml (listRec.opmlUrl, function (err, theNodeArray) {
+							if (err) {
+								console.log ("upgradeReadingLists: err.message == " + err.message);
+								}
+							else {
+								
+								var feedUrlsArray = new Array ();
+								theNodeArray.forEach (function (item) {
+									feedUrlsArray.push (item.xmlUrl);
+									});
+								
+								listRec.feedUrls = utils.jsonStringify (feedUrlsArray);
+								const sqltext = "replace into readinglists " + davesql.encodeValues (listRec);
+								davesql.runSqltext (sqltext, function (err, result) {
+									if (err) {
+										console.log ("upgradeReadingLists: err.message == " + err.message);
+										}
+									else {
+										doNext (ix + 1);
+										}
+									});
+								}
+							});
+						}
+					else {
+						if (callback !== undefined) {
+							callback ();
+							}
+						}
+					}
+				doNext (0);
+				}
+			});
+		}
+	
+	
+	
 	function parseFeedUrls (result) {
 		result.forEach (function (item) { //10/23/23 by DW
 			try {
@@ -2910,48 +2964,65 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 						callback (err);
 						}
 					else {
-						var urlsToSubscribeTo = new Array ();
-						function notFindSubscription (feedUrl, opmlUrl) {
-							var notfound = true;
-							theSubscriptions.forEach (function (item) {
-								if ((item.feedUrl == feedUrl) && (item.urlReadingList == opmlUrl)) {
-									notfound = false;
-									}
-								});
-							return (notfound);
-							}
-						listRec.feedUrls.forEach (function (feedUrl) {
-							if (notFindSubscription (feedUrl, opmlUrl)) {
-								urlsToSubscribeTo.push (feedUrl);
-								}
-							});
-						console.log ("checkSubsForOneUserAndOneReadingList: urlsToSubscribeTo == " + utils.jsonStringify (urlsToSubscribeTo));
-						
-						function doNextSub (ix) {
-							if (ix < urlsToSubscribeTo.length) {
-								const subRec = {
-									listName: screenname, 
-									feedUrl: urlsToSubscribeTo [ix],
-									categories: ",podcasts,", //fix me
-									whenUpdated: new Date (),
-									urlReadingList: opmlUrl
-									};
-								const sqltext = "insert into subscriptions " + davesql.encodeValues (subRec);
-								davesql.runSqltext (sqltext, function (err, result) {
-									if (err) {
-										callback (err);
-										}
-									else {
-										myConsoleLog ("batchSubscribe: added subscription, subRec == " + utils.jsonStringify (subRec));
-										doNextSub (ix + 1)
-										}
-									});
+						getNodeArrayFromOpml (opmlUrl, function (err, theNodeArray) { //10/25/23 by DW
+							if (err) {
+								callback (err);
 								}
 							else {
-								callback (undefined, urlsToSubscribeTo);
+								var urlsToSubscribeTo = new Array ();
+								function notFindSubscription (feedUrl, opmlUrl) {
+									var notfound = true;
+									theSubscriptions.forEach (function (item) {
+										if ((item.feedUrl == feedUrl) && (item.urlReadingList == opmlUrl)) {
+											notfound = false;
+											}
+										});
+									return (notfound);
+									}
+								function getCategoriesFor (feedUrl) { //10/25/23 by DW
+									var categories = undefined;
+									theNodeArray.forEach (function (item) {
+										if (item.xmlUrl == feedUrl) {
+											categories = item.category;
+											}
+										});
+									return (categories);
+									}
+								listRec.feedUrls.forEach (function (feedUrl) {
+									if (notFindSubscription (feedUrl, opmlUrl)) {
+										urlsToSubscribeTo.push (feedUrl);
+										}
+									});
+								console.log ("checkSubsForOneUserAndOneReadingList: urlsToSubscribeTo == " + utils.jsonStringify (urlsToSubscribeTo));
+								
+								function doNextSub (ix) {
+									if (ix < urlsToSubscribeTo.length) {
+										const theFeedUrl = urlsToSubscribeTo [ix];
+										const subRec = {
+											listName: screenname, 
+											feedUrl: theFeedUrl,
+											categories: getCategoriesFor (theFeedUrl),
+											whenUpdated: new Date (),
+											urlReadingList: opmlUrl
+											};
+										const sqltext = "replace into subscriptions " + davesql.encodeValues (subRec);
+										davesql.runSqltext (sqltext, function (err, result) {
+											if (err) {
+												callback (err);
+												}
+											else {
+												myConsoleLog ("batchSubscribe: added subscription, subRec == " + utils.jsonStringify (subRec));
+												doNextSub (ix + 1)
+												}
+											});
+										}
+									else {
+										callback (undefined, urlsToSubscribeTo);
+										}
+									}
+								doNextSub (0);
 								}
-							}
-						doNextSub (0);
+							});
 						}
 					});
 				}
@@ -3533,11 +3604,14 @@ function start (options, callback) {
 			config [x] = options [x];
 			}
 		}
+	
+	
 	if (callback !== undefined) {
 		callback (undefined);
 		}
 	
-	
 	setInterval (everySecond, 1000); //10/10/22 by DW
 	utils.runEveryMinute (everyMinute); //9/15/22 by DW
+	
+	
 	}

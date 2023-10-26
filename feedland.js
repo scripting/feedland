@@ -1,4 +1,4 @@
-const myVersion = "0.6.6", myProductName = "feedland"; 
+const myVersion = "0.6.7", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -130,34 +130,43 @@ function notifySocketSubscribersFromSql (callback) { //9/26/23 by DW
 		else {
 			if (result.length > 0) {
 				let feedRecs = new Object (); //if more than one item for a feed, we only have to get the feed data once
-				result.forEach (function (item) {
-					function sendmessage (feedRec) {
-						let jstruct = {
-							item: database.convertDatabaseItem (item),
-							theFeed: feedRec
-							}
-						if (config.flWebsocketEnabled) { //10/4/23 by DW
-							database.updateSocketSubscribers ("newItem", jstruct);
-							}
-						if (callback !== undefined) { //10/1/23 by DW
-							callback (jstruct);
-							}
-						}
-					if (feedRecs [item.feedUrl] === undefined) {
-						database.getFeed (item.feedUrl, function (err, feedRec) {
-							if (err) {
-								console.log ("sendNotificationForOneItem: err.message == " + err.message);
+				
+				function doNext (ix) {
+					if (ix < result.length) {
+						const item = result [ix];
+						function sendmessage (feedRec) {
+							let jstruct = {
+								item: database.convertDatabaseItem (item),
+								theFeed: feedRec
 								}
-							else {
-								feedRecs [item.feedUrl] = feedRec;
-								sendmessage (feedRec);
+							if (config.flWebsocketEnabled) { //10/4/23 by DW
+								database.updateSocketSubscribers ("newItem", jstruct);
 								}
-							});
+							if (callback !== undefined) { //10/1/23 by DW
+								callback (jstruct);
+								}
+							}
+						if (feedRecs [item.feedUrl] === undefined) {
+							database.getFeed (item.feedUrl, function (err, feedRec) {
+								if (err) {
+									console.log ("notifySocketSubscribersFromSql: err.message == " + err.message);
+									}
+								else {
+									feedRecs [item.feedUrl] = feedRec;
+									sendmessage (feedRec);
+									}
+								doNext (ix + 1);
+								});
+							}
+						else {
+							sendmessage (feedRecs [item.feedUrl]);
+							doNext (ix + 1);
+							}
 						}
-					else {
-						sendmessage (feedRecs [item.feedUrl]);
-						}
-					});
+					}
+				doNext (0);
+				
+				
 				idLastNewItem = result [0].id;
 				console.log ("notifySocketSubscribersFromSql: idLastNewItem == " + idLastNewItem);
 				}

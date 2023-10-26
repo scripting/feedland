@@ -1,3 +1,13 @@
+#### 10/26/23; 10:38:53 AM by DW -- v0.6.7
+
+Reading lists in all their glory!
+
+I had to build a whole new layer in the database. The feeling was we couldn't build newsproducts without having the ability to have subscriptions handled offsite, owned by the user, or by an org that creates such lists. We're starting the first one, called FeedCorps, to prime the pump for the bootstrap. I want to create associations of news flows, I think this is how we create new ecosystems for blogging and journalism.
+
+Most of the new stuff is in feedlanddatabase. 
+
+Also, just had to fix SQL-based notification which went in last month. There was a serious error in the implementation that didn't show up until reading lists came along. See the big comment at the head of notifySocketSubscribersFromSql.
+
 #### 10/12/23; 8:56:07 AM by DW
 
 Support for reading lists.
