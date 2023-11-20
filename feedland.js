@@ -1,4 +1,4 @@
-const myVersion = "0.6.7", myProductName = "feedland"; 
+const myVersion = "0.6.28", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -68,7 +68,9 @@ var config = {
 	
 	flUseReadingLists: true, //10/10/23 by DW
 	minSecsBetwReadingListChecks: 60,  //10/10/23 by DW
-	minSecsBetwIndividualReadingListCheck: 5 * 60  //10/10/23 by DW
+	minSecsBetwIndividualReadingListCheck: 5 * 60, //10/10/23 by DW
+	
+	flWordPressIdentityDefault: false //11/13/23 by DW
 	};
 
 var whenLastDayRollover = new Date ();
@@ -78,6 +80,23 @@ var emailCache = new Object (); //12/14/22 by DW
 var idLastNewItem = undefined; //9/26/23 by DW
 var whenLastSqlSocketCheck = new Date (); //9/26/23 by DW
 var whenLastReadingListCheck = new Date (); //10/10/23 by DW
+
+
+function getFeedList (callback) { //11/6/23 by DW
+	const sqltext = "select feedUrl from feeds;";
+	davesql.runSqltext (sqltext, function (err, result) {
+		if (err) {
+			callback (err);
+			}
+		else {
+			var theList = new Array ();
+			result.forEach (function (item) {
+				theList.push (utils.trimWhitespace (item.feedUrl));
+				});
+			callback (undefined, theList);
+			}
+		});
+	}
 
 function viewMemoryUsage () { //9/14/22 by DW
 	var jstruct = process.memoryUsage ();
@@ -274,6 +293,8 @@ function addMacroToPagetable (pagetable) {
 	pagetable.flLikesFeeds = config.flLikesFeeds;  //1/20/23 by DW
 	pagetable.configJson = getConfigJson (); //1/21/23 by DW
 	pagetable.feedlandVersion = myVersion; //9/21/23 by DW
+	pagetable.flWordPressIdentityDefault = config.flWordPressIdentityDefault; //11/13/23 by DW
+	pagetable.mysqlVersion = config.mysqlVersion; //11/18/23 by DW
 	
 	//12/2/22 by DW -- set up the normal case for the Facebook/Twitter metadata
 		pagetable.metaUrl = "https://feedland.org/";
@@ -556,7 +577,7 @@ function publishStaticFileInSql (screenname, relpath, type, flprivate, fileconte
 	}
 
 function addEmailToUserInDatabase (screenname, emailAddress, magicString, flNewUser, callback) { //12/7/22 by DW
-	database.isUserInDatabase (screenname, function (flInDatabase, userRec) {
+	database.findUserWithScreenname (screenname, function (flInDatabase, userRec) {
 		if (flNewUser) { //1/7/23 by DW
 			if (flInDatabase) {
 				const message = "Can't create the user \"" + screenname + "\" because there already is a user with that name."
@@ -643,6 +664,86 @@ function regenerateEmailSecret (screenname, callback) {
 		});
 	}
 
+function loginWordpressUser (accessToken, theUserInfo, callback) { //10/31/23 by DW
+	function setWordpressAppData (userRec, callback) {
+		var apps;
+		if ((userRec.apps === undefined) || (userRec.apps == null)) { //11/4/23 by DW
+			apps = new Object ();
+			}
+		else {
+			apps = JSON.parse (userRec.apps);
+			}
+		var wordpress = (apps.wordpress === undefined) ? new Object () : apps.wordpress;
+		wordpress.accessToken = accessToken;
+		wordpress.userInfo = theUserInfo;
+		apps.wordpress = wordpress;
+		userRec.apps = apps;
+		const sqltext = "replace into users " + davesql.encodeValues (userRec);
+		davesql.runSqltext (sqltext, function (err, result) {
+			if (err) {
+				callback (err);
+				}
+			else {
+				callback (undefined, userRec);
+				}
+			});
+		}
+	database.findUserWithEmail (theUserInfo.email, function (flEmailUsed, userRec) { 
+		if (flEmailUsed) {
+			setWordpressAppData (userRec, callback); //return the userRec
+			}
+		else {
+			if (config.flEnableNewUsers) {
+				const screenname = theUserInfo.username;
+				database.findUserWithScreenname (screenname, function (flInDatabase, userRec) {
+					if (flInDatabase) {
+						const message = "Can't create the user \"" + screenname + "\" because there already is a user with that name.";
+						callback ({message});
+						}
+					else {
+						const now = new Date ();
+						const newUserRec = {
+							screenname, 
+							emailAddress: theUserInfo.email, 
+							emailSecret: utils.getRandomPassword (10),
+							whenCreated: now,
+							whenUpdated: now,
+							ctStartups: 1,
+							whenLastStartup: now,
+							apps: {
+								wordpress: {
+									accessToken
+									}
+								}
+							};
+						const sqltext = "insert into users " + davesql.encodeValues (newUserRec);
+						davesql.runSqltext (sqltext, function (err, result) {
+							if (err) {
+								callback (err);
+								}
+							else {
+								callback (undefined, newUserRec);
+								}
+							});
+						}
+					});
+				}
+			else {
+				const message = "Can't create the user \"" + screenname + "\" because new users are not being accepted here at this time.";
+				callback ({message});
+				}
+			}
+		});
+	}
+
+function removeNullValuesFromObject (obj) { //9/26/22 by DW
+	for (var x in obj) { 
+		if (obj [x] == null) {
+			obj [x] = undefined;
+			}
+		}
+	return (obj);
+	}
 function getUserRecFromEmail (emailAddress, emailSecret, callback) { //12/13/22 by DW
 	const sqltext = "select * from users where emailAddress = " + davesql.encode (emailAddress) + " and emailSecret = " + davesql.encode (emailSecret) + ";";
 	davesql.runSqltext (sqltext, function (err, result) {
@@ -654,24 +755,18 @@ function getUserRecFromEmail (emailAddress, emailSecret, callback) { //12/13/22 
 				callback ({"message": "There is no user with that email address, or the access code is incorrect."});
 				}
 			else {
-				callback (undefined, result [0]);
+				callback (undefined, removeNullValuesFromObject (result [0]));
 				}
 			}
 		});
 	}
-function isUserInDatabase (emailaddress, callback) { //2/15/23 by DW
-	const sqltext = "select * from users where emailAddress = " + davesql.encode (emailaddress) + ";";
-	davesql.runSqltext (sqltext, function (err, result) {
-		if (err) {
-			callback (false);
+function isUserAdmin (emailaddress, callback) { //11/3/23 by DW
+	database.findUserWithEmail (emailaddress, function (flUserExists, userRec) { 
+		if (flUserExists) {
+			callback (userRec.role == "admin", userRec);
 			}
 		else {
-			if (result.length == 0) {
-				callback (false);
-				}
-			else {
-				callback (true, result [0]);
-				}
+			callback (false);
 			}
 		});
 	}
@@ -703,32 +798,58 @@ function isEmailInDatabase (emailAddress, callback) { //1/12/23 by DW
 		}
 	}
 function getScreenname (params, callback) { //12/23/22 by DW
-	function tryWithTwitterLogin () {
+	function badloginCallback () {
+		callback ({message: "Can't do the thing you want because the accessToken is not valid."});    
+		}
+	if (config.flUseTwitterIdentity) {
 		davetwitter.getScreenName (params.oauth_token, params.oauth_token_secret, function (screenname) {
 			if (screenname === undefined) {
-				callback ({message: "Can't do the thing you want because the accessToken is not valid."});    
+				badloginCallback ();
 				}
 			else {
 				callback (undefined, screenname);
 				}
 			});
 		}
-	if ((params.emailaddress !== undefined) && (params.emailcode !== undefined)) {
-		getUserRecFromEmail (params.emailaddress, params.emailcode, function (err, userRec) {
-			if (err) {
-				tryWithTwitterLogin ();
-				}
-			else {
-				callback (undefined, userRec.screenname, userRec); //10/6/23 by DW
-				}
-			});
-		}
 	else {
-		tryWithTwitterLogin ();
+		if ((params.emailaddress !== undefined) && (params.emailcode !== undefined)) {
+			getUserRecFromEmail (params.emailaddress, params.emailcode, function (err, userRec) {
+				if (err) {
+					badloginCallback ();
+					}
+				else {
+					if (config.flEnableSupervisorMode) { //11/11/23 by DW
+						if (params.actingas === undefined) { //11/4/23 by DW
+							callback (undefined, userRec.screenname); 
+							}
+						else {
+							if (userRec.role == "admin") {
+								database.findUserWithScreenname (params.actingas, function (flInDatabase) {
+									if (flInDatabase) {
+										console.log ("\nfeedland: params.actingas == " + params.actingas + "\n");
+										callback (undefined, params.actingas); 
+										}
+									else {
+										callback (undefined, userRec.screenname); 
+										}
+									});
+								}
+							else {
+								callback (undefined, userRec.screenname); 
+								}
+							}
+						}
+					else {
+						callback (undefined, userRec.screenname); 
+						}
+					}
+				});
+			}
+		else {
+			badloginCallback ();
+			}
 		}
 	}
-
-
 function getRssCloudOptions () {
 	let options = new Object ();
 	for (var x in config.rssCloud) {
@@ -750,10 +871,12 @@ function getRssCloudOptions () {
 function handleRssCloudPing (feedUrl, callback) { //8/18/23 by DW
 	console.log ("\nhandleRssCloudPing: feedUrl == " + feedUrl + "\n");
 	database.checkOneFeed (feedUrl, function (err, data) {
+		if (err) { //11/20/23 by DW
+			console.log ("\nhandleRssCloudPing: err.message == " + err.message + "\n");
+			}
 		callback ("Thanks for the update! ;-)");
 		});
 	}
-
 function getServerConfig (screenname) { //5/8/23 by DW
 	var serverConfig = { //7/5/23 by DW
 		maxFeedItems: config.maxFeedItems
@@ -826,7 +949,7 @@ function handleHttpRequest (theRequest) {
 			}
 		}
 	function callWithScreenname (callback) {
-		getScreenname (params, function (err, screenname, userRec) { //12/23/22 by DW
+		getScreenname (params, function (err, screenname) { //12/23/22 by DW
 			if (err) {
 				returnError (err);
 				}
@@ -1002,6 +1125,9 @@ function handleHttpRequest (theRequest) {
 				case "/getriverfromuserfeeds": //12/3/22 by DW
 					database.getRiverFromUserFeeds (httpReturn);
 					return (true);
+				case "/getriverfromreadinglist": //11/12/23 by DW
+					database.getRiverFromReadingList (params.url, httpReturn);
+					return (true);
 				case "/getfeeditems": //8/31/22 by DW
 					database.getFeedItems (params.url, params.maxItems, httpReturn);
 					return (true); 
@@ -1037,6 +1163,9 @@ function handleHttpRequest (theRequest) {
 						database.getUserPrefs (screenname, httpReturn);
 						});
 					return (true);
+				case "/getuserinfo": //11/10/23 by DW -- private info like apps configuration are removed from this version
+					database.getUserInfo (params.screenname, httpReturn);
+					return (true);
 				case "/renewfeednow": //10/9/22 by DW
 					database.renewFeedNow (params.url, getRssCloudOptions (), httpReturn);
 					return (true);
@@ -1066,7 +1195,7 @@ function handleHttpRequest (theRequest) {
 						returnData ({flInDatabase: false});
 						}
 					else {
-						database.isUserInDatabase (params.screenname, function (flInDatabase, userRec) {
+						database.findUserWithScreenname (params.screenname, function (flInDatabase, userRec) {
 							returnData ({flInDatabase});
 							});
 						}
@@ -1131,6 +1260,12 @@ function handleHttpRequest (theRequest) {
 				case "/getreadinglisstinfo": //10/19/23 by DW
 					database.getReadingListsInfo (params.jsontext, httpReturn);
 					return (true);
+				case "/getreadinglistfollowers": //10/28/23 by DW
+					database.getReadingListFollowers (params.url, httpReturn);
+					return (true); 
+				case "/getfeedlist": //11/6/23 by DW
+					getFeedList (httpReturn);
+					return (true); 
 				
 				case config.rssCloud.feedUpdatedCallback: //12/12/22 by DW
 					returnPlainText (params.challenge);
@@ -1165,6 +1300,19 @@ function logSqlCalls (options) { //9/21/23 by DW
 			console.log ();
 			}
 		}
+	}
+function getMysqlVersion (callback) { //11/18/23 by DW
+	const sqltext = "select version () as version;";
+	davesql.runSqltext (sqltext, function (err, result) {
+		var theVersion = undefined;
+		if (!err) {
+			if (result.length > 0) {
+				theVersion = result [0].version;
+				}
+			}
+		callback (undefined, theVersion);
+		});
+	
 	}
 
 function everyNight () {
@@ -1219,7 +1367,10 @@ function start () {
 		addEmailToUserInDatabase, //12/7/22 by DW
 		getScreenname, //12/23/22 by DW
 		getScreenNameFromEmail, //1/10/23 by DW
-		isUserInDatabase //2/15/23 by DW
+		findUserWithScreenname: database.findUserWithScreenname, //2/15/23 by DW & 11/4/23 by DW
+		findUserWithEmail: database.findUserWithEmail, //11/4/23 by DW
+		loginWordpressUser, //10/31/23 by DW
+		isUserAdmin //11/3/23 by DW
 		}
 	daveappserver.start (options, function (appConfig) {
 		for (var x in appConfig) {
@@ -1233,12 +1384,15 @@ function start () {
 			config.database.logCallback = logSqlCalls; //9/21/23 by DW
 			davesql.start (config.database, function () {
 				database.start (config, function () {
-					if (config.flWebsocketEnabled && config.flUseSqlForSockets) { //9/26/23 by DW
-						initLastNewItem (); //9/26/23 by DW
-						}
-					if (config.flBackupOnStartup) { //1/9/23 by DW
-						database.backupDatabase (); 
-						}
+					getMysqlVersion (function (err, mysqlVersion) { //11/18/23 by DW
+						config.mysqlVersion = mysqlVersion;
+						if (config.flWebsocketEnabled && config.flUseSqlForSockets) { //9/26/23 by DW
+							initLastNewItem (); //9/26/23 by DW
+							}
+						if (config.flBackupOnStartup) { //1/9/23 by DW
+							database.backupDatabase (); 
+							}
+						});
 					});
 				});
 			});

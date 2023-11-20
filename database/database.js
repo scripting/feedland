@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.7.6";  
+var myProductName = "feedlandDatabase", myVersion = "0.7.17";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -31,6 +31,7 @@ exports.getRecentSubscriptions = getRecentSubscriptions; //7/23/22 by DW
 exports.getRiverFromList = getRiverFromList; //8/3/22 by DW
 exports.getRiverFromOpml = getRiverFromOpml; //8/21/22 by DW
 exports.getRiverFromScreenname = getRiverFromScreenname; //4/25/23 by DW
+exports.getRiverFromReadingList = getRiverFromReadingList; //11/12/23 by DW
 
 exports.backupDatabase = backupDatabase; //8/22/22 by DW
 exports.getFeedItems = getFeedItems; //8/31/22 by DW
@@ -43,11 +44,14 @@ exports.getHotlist = getHotlist; //moved from viewers.js -- 9/6/22 by DW
 exports.getHotlistOpml = getHotlistOpml; //moved from viewers.js -- 9/6/22 by DW
 exports.getFeedSearch = getFeedSearch; //12/26/22 by DW
 
-exports.isUserInDatabase = isUserInDatabase; //9/16/22 by DW
+exports.findUserWithScreenname = findUserWithScreenname; //9/16/22 by DW
+exports.findUserWithEmail = findUserWithEmail; //11/4/23 by DW
+
 exports.setUserPrefs = setUserPrefs; //9/16/22 by DW
 exports.getAllUsers = getAllUsers; //9/16/22 by DW
 exports.getUserCategories = getUserCategories; //9/19/22 by DW
 exports.getUserPrefs = getUserPrefs; //9/26/22 by DW
+exports.getUserInfo = getUserInfo; //11/10/23 by DW
 
 exports.getRiverFromCategory = getRiverFromCategory; //9/15/22 by DW
 exports.getFeedsInCategory = getFeedsInCategory; //9/19/22 by DW
@@ -76,6 +80,7 @@ exports.checkNextReadingListfReady = checkNextReadingListfReady; //10/10/23 by D
 exports.getReadingListSubscriptions = getReadingListSubscriptions; //10/13/23 by DW
 exports.deleteReadingListSubscription = deleteReadingListSubscription; //10/13/23 by DW
 exports.getReadingListsInfo = getReadingListsInfo; //10/19/23 by DW
+exports.getReadingListFollowers = getReadingListFollowers; //10/28/23 by DW
 
 const fs = require ("fs");
 const md5 = require ("md5");
@@ -89,6 +94,8 @@ const request = require ("request"); //8/21/22 by DW
 const rss = require ("daverss"); //9/17/22 by DW
 const s3 = require ("daves3");
 const davegithub = require ("davegithub"); //9/30/22 by DW
+const feedhunter = require ("feedhunter"); //11/8/23 by DW
+const xml2js = require ("xml2js"); //11/17/23 by DW
 
 var config = {
 	flEnableNewUsers: true, //12/12/22 by DW
@@ -136,6 +143,8 @@ var config = {
 	
 	flUseRiverCache: true, //9/13/23 by DW
 	ctSecsLifeRiverCache: 5 * 60, //9/13/23 by DW
+	
+	flCheckForDeleted: false, //11/20/23 by DW
 	
 	getUserOpmlSubscriptions: function (username, catname, callback) { //6/27/22 by DW
 		},
@@ -332,23 +341,27 @@ function getNodeArrayFromOpml (urlOpml, callback) { //10/11/23 by DW
 			}
 		});
 	}
+function getUrlArrayFromOutline (theOutline) { //10/28/23 by DW
+	var feedUrlList = new Array ();
+	opml.visitAll (theOutline, function (node) {
+		if (notComment (node)) {
+			if (node.type == "rss") {
+				if (node.xmlUrl !== undefined) {
+					feedUrlList.push (node.xmlUrl);
+					}
+				}
+			}
+		return (true); //keep visiting
+		});
+	return (feedUrlList);
+	}
 function getUrlArrayFromOpml (urlOpml, callback) { //6/1/23 by DW
 	getOutlineFromOpml (urlOpml, function (err, theOutline) {
 		if (err) {
 			callback (err);
 			}
 		else {
-			var feedUrlList = new Array ();
-			opml.visitAll (theOutline, function (node) {
-				if (notComment (node)) {
-					if (node.type == "rss") {
-						if (node.xmlUrl !== undefined) {
-							feedUrlList.push (node.xmlUrl);
-							}
-						}
-					}
-				return (true); //keep visiting
-				});
+			var feedUrlList = getUrlArrayFromOutline (theOutline);
 			callback (undefined, feedUrlList, theOutline);
 			}
 		});
@@ -755,7 +768,8 @@ function getUpdatedFeed (feedUrl, callback) {
 			callback (err);
 			}
 		else {
-			const sqltext = "select * from items where flDeleted=false and feedUrl=" + davesql.encode (feedUrl) + " order by pubDate desc limit " + config.maxRiverItems + ";";
+			const deleteCheck = (config.flCheckForDeleted) ? " flDeleted=false and " : ""; //11/20/23 by DW
+			const sqltext = "select * from items where " + deleteCheck + " and feedUrl=" + davesql.encode (feedUrl) + " order by pubDate desc limit " + config.maxRiverItems + ";";
 			davesql.runSqltext (sqltext, function (err, result) {
 				if (err) {
 					callback (err);
@@ -1287,7 +1301,8 @@ function getFeed (feedUrl, callback) {
 	}
 function getFeedItems (feedUrl, ctItems, callback) { //8/31/22 by DW
 	ctItems = (ctItems === undefined) ? config.maxRiverItems : ctItems;
-	const sqltext = "select * from items where flDeleted=false and feedurl=" + davesql.encode (feedUrl) + " order by pubDate desc limit " + ctItems + ";"; 
+	const deleteCheck = (config.flCheckForDeleted) ? " flDeleted=false and " : ""; //11/20/23 by DW
+	const sqltext = "select * from items where " + deleteCheck + " feedurl=" + davesql.encode (feedUrl) + " order by pubDate desc limit " + ctItems + ";"; 
 	davesql.runSqltext (sqltext, function (err, result) {
 		if (err) {
 			callback (err);
@@ -1418,7 +1433,9 @@ function getRiver (feedUrl, screenname, callback, metadata=undefined) {
 			}
 		
 		if (feedClause.length > 0) { //10/14/22 by DW
-			feedClause = " and " + feedClause;
+			if (config.flCheckForDeleted) { //11/20/23 by DW
+				feedClause = " and " + feedClause;
+				}
 			}
 		
 		return (feedClause);
@@ -1467,7 +1484,9 @@ function getRiver (feedUrl, screenname, callback, metadata=undefined) {
 		
 		return (theRiver);
 		}
-	const sqltext = "select * from items where flDeleted=false " + getFeedClause () + " order by pubDate desc limit " + config.maxRiverItems + ";"; 
+	
+	const deleteCheck = (config.flCheckForDeleted) ? " flDeleted=false " : ""; //11/20/23 by DW
+	const sqltext = "select * from items where " + deleteCheck + getFeedClause () + " order by pubDate desc limit " + config.maxRiverItems + ";"; 
 	davesql.runSqltext (sqltext, function (err, result) {
 		if (err) {
 			if (callback !== undefined) {
@@ -1715,6 +1734,18 @@ function getRiverFromUserFeeds (callback) { //12/3/22 by DW
 		}
 	}
 
+function getRiverFromReadingList (opmlUrl, callback) { //11/12/23 by DW
+	isReadingListInDatabase (opmlUrl, function (flInDatabase, listRec) {
+		if (flInDatabase) {
+			getRiverFromList (listRec.feedUrls, callback);
+			}
+		else {
+			const message = "Can't get river from the reading list because it isn't in our database.";
+			callback ({message});
+			}
+		});
+	}
+
 function getFollowers (feedUrl, callback) { //users who follow the feed -- 5/18/22 by DW
 	const sqltext = "select listName from subscriptions where feedUrl=" + davesql.encode (feedUrl) + ";";
 	davesql.runSqltext (sqltext, function (err, result) {
@@ -1827,19 +1858,13 @@ function subscribeToFeed (screenname, feedUrl, callback) {
 			}
 		reallysimple.readFeed (feedUrl, function (err, theFeed) {
 			if (err) {
-				httpReadUrl (feedUrl, function (err, htmltext) {
-					if (err) {
-						callback (err);
+				feedhunter.huntForFeed (feedUrl, undefined, function (foundFeedUrl) {
+					if (foundFeedUrl === undefined) { //no feed found -- 11/8/23 by DW
+						const message = "Can't subscribe because no feed was found.";
+						callback ({message});
 						}
 					else {
-						var feedlist = findFeedsFromHTML (htmltext);
-						if (feedlist.length == 0) {
-							const message = "Can't find any feeds in the HTML text.";
-							callback ({message});
-							}
-						else {
-							callback (undefined, feedlist [0]);
-							}
+						callback (undefined, foundFeedUrl);
 						}
 					});
 				}
@@ -2274,7 +2299,8 @@ function getFeedSearch (theSearchString, callback) { //12/26/22 by DW
 		});
 	}
 
-function isUserInDatabase (screenname, callback) { //9/17/22 by DW
+
+function findUserWithScreenname (screenname, callback) { //9/17/22 by DW
 	const sqltext = "select * from users where screenname=" + davesql.encode (screenname) + ";";
 	davesql.runSqltext (sqltext, function (err, result) {
 		if (err) {
@@ -2285,11 +2311,29 @@ function isUserInDatabase (screenname, callback) { //9/17/22 by DW
 				callback (false);
 				}
 			else {
-				callback (true, result [0]);
+				callback (true, removeNullValuesFromObject (result [0]));
 				}
 			}
 		});
 	}
+function findUserWithEmail (emailaddress, callback) { //2/15/23 by DW
+	const sqltext = "select * from users where emailAddress = " + davesql.encode (emailaddress) + ";";
+	davesql.runSqltext (sqltext, function (err, result) {
+		if (err) {
+			callback (false);
+			}
+		else {
+			if (result.length == 0) {
+				callback (false);
+				}
+			else {
+				callback (true, removeNullValuesFromObject (result [0]));
+				}
+			}
+		});
+	}
+
+
 function setUserPrefs (screenname, jsontext, callback) { //9/15/22 by DW
 	const now = new Date ();
 	function normalizeCatString (s) {
@@ -2364,13 +2408,14 @@ function setUserPrefs (screenname, jsontext, callback) { //9/15/22 by DW
 		}
 	var userRec = setupUserRec ();
 	
-	isUserInDatabase (screenname, function (flInDatabase, userRecFromDatabase) {
+	findUserWithScreenname (screenname, function (flInDatabase, userRecFromDatabase) {
 		if (flInDatabase) {
 			if (userRecFromDatabase.whenCreated != null) {
 				userRec.whenCreated = userRecFromDatabase.whenCreated
 				}
 			userRec.emailAddress = userRecFromDatabase.emailAddress; //12/8/22 by DW
 			userRec.emailSecret = userRecFromDatabase.emailSecret;
+			userRec.role = userRecFromDatabase.role; //11/5/23 by DW
 			}
 		else { //12/12/22 by DW 
 			if (!config.flEnableNewUsers) {
@@ -2413,7 +2458,7 @@ function getAllUsers (callback) { //9/15/22 by DW
 		});
 	}
 function getUserCategories (screenname, callback) { //9/19/22 by DW
-	isUserInDatabase (screenname, function (flInDatabase, userRec) {
+	findUserWithScreenname (screenname, function (flInDatabase, userRec) {
 		if (flInDatabase) {
 			const catsRec = {
 				screenname,
@@ -2428,7 +2473,7 @@ function getUserCategories (screenname, callback) { //9/19/22 by DW
 		});
 	}
 function getUserPrefs (screenname, callback) { //9/26/22 by DW
-	isUserInDatabase (screenname, function (flInDatabase, userRec) {
+	findUserWithScreenname (screenname, function (flInDatabase, userRec) {
 		if (flInDatabase) {
 			if (userRec.emailSecret !== undefined) { //12/16/22 by DW
 				delete userRec.emailSecret;
@@ -2444,7 +2489,21 @@ function getUserPrefs (screenname, callback) { //9/26/22 by DW
 			callback (undefined, removeNullValuesFromObject (userRec));
 			}
 		else {
-			callback ({message: "Can't get the user prefs because there is no user named \"" + screenname + "\"."});
+			callback ({message: "Can't get the info because there is no user named \"" + screenname + "\"."});
+			}
+		});
+	}
+
+function getUserInfo (screenname, callback) { //11/10/23 by DW
+	getUserPrefs (screenname, function (err, userRec) {
+		if (err) {
+			callback (err);
+			}
+		else {
+			delete userRec.apps;
+			delete userRec.emailAddress;
+			delete userRec.role;
+			callback (undefined, userRec);
 			}
 		});
 	}
@@ -2789,7 +2848,19 @@ function rssCloudRenew (urlServer, port, path, feedUrl, domain, callback) {
 			callback (err);
 			}
 		else {
-			callback (undefined, body);
+			var options = {
+				explicitArray: false
+				};
+			xml2js.parseString (body, options, function (err, jstruct) {
+				if (err) {
+					myConsoleLog ("rssCloudRenew: err.message == " + err.message); 
+					callback (err);
+					}
+				else {
+					myConsoleLog ("rssCloudRenew: response from server == " + utils.jsonStringify (jstruct)); 
+					callback (undefined, jstruct);
+					}
+				});
 			}
 		});
 	}
@@ -2840,7 +2911,7 @@ function renewFeedNow (feedUrl, options, callback) { //rssCloud support
 				});
 			}
 		else {
-			let message = "Can't renew the feed because it's not in the database.";
+			const message = "Can't renew the feed because it's not in the database.";
 			callback ({message});
 			}
 		});
@@ -2887,72 +2958,6 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 	}
 
 //reading lists -- 10/9/23 by DW
-	
-	
-	
-	function upgradeReadingLists (callback) { //10/25/23 by DW
-		console.log ("upgradeReadingLists");
-		const sqltext = "select * from readinglists;";
-		davesql.runSqltext (sqltext, function (err, result) {
-			if (err) {
-				console.log ("upgradeReadingLists: err.message == " + err.message);
-				if (callback !== undefined) {
-					callback (err);
-					}
-				}
-			else {
-				function doNext (ix) {
-					if (ix < result.length) {
-						const listRec = result [ix];
-						getNodeArrayFromOpml (listRec.opmlUrl, function (err, theNodeArray) {
-							if (err) {
-								console.log ("upgradeReadingLists: err.message == " + err.message);
-								}
-							else {
-								
-								var feedUrlsArray = new Array ();
-								theNodeArray.forEach (function (item) {
-									feedUrlsArray.push (item.xmlUrl);
-									});
-								
-								listRec.feedUrls = utils.jsonStringify (feedUrlsArray);
-								const sqltext = "replace into readinglists " + davesql.encodeValues (listRec);
-								davesql.runSqltext (sqltext, function (err, result) {
-									if (err) {
-										console.log ("upgradeReadingLists: err.message == " + err.message);
-										}
-									else {
-										doNext (ix + 1);
-										}
-									});
-								}
-							});
-						}
-					else {
-						if (callback !== undefined) {
-							callback ();
-							}
-						}
-					}
-				doNext (0);
-				}
-			});
-		}
-	
-	
-	
-	function parseFeedUrls (result) {
-		result.forEach (function (item) { //10/23/23 by DW
-			try {
-				item.feedUrls = JSON.parse (item.feedUrls);
-				}
-			catch (err) {
-				}
-			});
-		return (result);
-		}
-	
-	
 	function checkSubsForOneUserAndOneReadingList (screenname, opmlUrl, callback) {
 		getSubscriptions (screenname, function (err, theSubscriptions) {
 			if (err) {
@@ -2986,7 +2991,7 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 											categories = item.category;
 											}
 										});
-									return (categories);
+									return ("," + categories + ","); //11/19/23 by DW
 									}
 								listRec.feedUrls.forEach (function (feedUrl) {
 									if (notFindSubscription (feedUrl, opmlUrl)) {
@@ -3028,8 +3033,16 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 				}
 			});
 		}
-	
-	
+	function parseFeedUrls (result) {
+		result.forEach (function (item) { //10/23/23 by DW
+			try {
+				item.feedUrls = JSON.parse (item.feedUrls);
+				}
+			catch (err) {
+				}
+			});
+		return (result);
+		}
 	function isReadingListInDatabase (opmlUrl, callback) { //10/9/23 by DW
 		const sqltext = "select * from readinglists where opmlUrl = " + davesql.encode (opmlUrl) + ";";
 		davesql.runSqltext (sqltext, function (err, result) {
@@ -3097,7 +3110,7 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 					whenCreated: new Date (),
 					whenChecked: new Date (0),
 					whoFirstSubscribed, 
-					feedUrls: utils.jsonStringify (new Array ()) //empty array
+					feedUrls: getUrlArrayFromOutline (theOutline) //10/28/23 by DW
 					};
 				var sqltext = "replace into readinglists " + davesql.encodeValues (listRec) + ";";
 				davesql.runSqltext (sqltext, function (err, result) {
@@ -3394,6 +3407,7 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 					callback (err);
 					}
 				else {
+					result = removeNullValues (result);
 					result = parseFeedUrls (result);
 					callback (undefined, result);
 					}
@@ -3426,6 +3440,17 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 						callback (undefined, result);
 						}
 					});
+				}
+			});
+		}
+	function getReadingListFollowers (opmlUrl, callback) { //10/28/23 by DW
+		const sqltext = "select * from readinglistsubscriptions where opmlUrl=" + davesql.encode (opmlUrl) + ";";
+		davesql.runSqltext (sqltext, function (err, result) {
+			if (err) {
+				callback (err);
+				}
+			else {
+				callback (undefined, result);
 				}
 			});
 		}

@@ -1,3 +1,11 @@
+#### 11/18/23; 12:14:15 PM by DW
+
+At startup set the value of config.mysqlVersion, available to the client app via the pagetable. 
+
+#### 11/11/23; 1:06:07 PM by DW
+
+Respect config.flEnableSupervisorMode.
+
 #### 10/26/23; 10:38:53 AM by DW -- v0.6.7
 
 Reading lists in all their glory!

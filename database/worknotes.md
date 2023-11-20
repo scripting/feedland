@@ -1,3 +1,21 @@
+11/20/23; 8:47:30 AM by DW
+
+Removing checks for flDeleted for a performance boost. 
+
+https://github.com/scripting/feedlandInstall/issues/51
+
+Being cautious, I made it easy to turn this back on, with config.flCheckForDeleted which defaults false. 
+
+But I recommend when and if this feature needs to come back, we implement it by actually deleting the item in the database. 
+
+#### 11/19/23; 9:33:55 AM by DW
+
+When we create the subscription record, we stored the categories incorrectly. They need to be surrounded by commas, or they won't be found when building a river based on categories. I wrote up the process in this <a href="https://github.com/scripting/a8c-FeedLand-Support/issues/67">thread.</a>
+
+#### 11/5/23; 11:26:37 AM by DW
+
+When you add a field to the users table, you have to add a line of code to setUserPrefs. Otherwise the new thing will fall back to its default value every time prefs are changed. 
+
 #### 10/23/23; 9:42:27 AM by DW
 
 When checking if a feed changed it's possible for a comparison to fail, not sure which field, or why. 
