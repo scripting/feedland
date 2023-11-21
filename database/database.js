@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.7.17";  
+var myProductName = "feedlandDatabase", myVersion = "0.7.18";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -1555,7 +1555,8 @@ function getRiverFromOpml (urlOpml, callback) { //8/21/22 by DW
 function getRiverFromCategory (screenname, catname, callback) {
 	const cachekey = "category:" + screenname + "/" + catname, whenstart = new Date ();
 	function getTheFeeds (screenname, catname, callback) {
-		const sqltext =  "select * from subscriptions where listname=" + davesql.encode (screenname) + " and categories like '%," + catname + ",%';";
+		const catnameparam = davesql.encode ("%," + catname + ",%"); //11/21/23 by DW
+		const sqltext =  "select * from subscriptions where listname=" + davesql.encode (screenname) + " and categories like " + catnameparam + ";";
 		davesql.runSqltext (sqltext, function (err, result) {
 			if (err) {
 				callback (err);
