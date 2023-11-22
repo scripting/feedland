@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.7.18";  
+var myProductName = "feedlandDatabase", myVersion = "0.7.19";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -2844,6 +2844,7 @@ function rssCloudRenew (urlServer, port, path, feedUrl, domain, callback) {
 			})
 		};
 	myConsoleLog ("rssCloudRenew: feedUrl == " + utils.jsonStringify (feedUrl)); //8/18/23 by DW
+	myConsoleLog ("rssCloudRenew: theRequest == " + utils.jsonStringify (theRequest)); //11/21/23 by DW
 	requestWithRedirect (theRequest, function (err, response, body) {
 		if (err) {
 			callback (err);

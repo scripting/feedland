@@ -1,4 +1,4 @@
-const myVersion = "0.6.29", myProductName = "feedland"; 
+const myVersion = "0.6.32", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -858,9 +858,11 @@ function getRssCloudOptions () {
 	
 	let appconfig = daveappserver.getConfig ();
 	
-	var splits = appconfig.myDomain.split (":"); //5/17/23 by DW
+	const rssDomain = (appconfig.rssCloudNotifyDomain === undefined) ? appconfig.myDomain : appconfig.rssCloudNotifyDomain; //11/22/23 by DW
+	var splits = rssDomain.split (":"); 
 	options.domain = splits [0];
 	options.port = (splits.length == 2) ? Number (splits [1]) : 80;
+	
 	if (options.port == NaN) {
 		options.port = 80;
 		}

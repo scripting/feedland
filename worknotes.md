@@ -1,3 +1,9 @@
+#### 11/22/23; 11:46:16 AM by DW
+
+New config value, rssCloudNotifyDomain.
+
+If it's provided we use that in getRssCloudOptions, in place of config.myDomain. 
+
 #### 11/18/23; 12:14:15 PM by DW
 
 At startup set the value of config.mysqlVersion, available to the client app via the pagetable. 
