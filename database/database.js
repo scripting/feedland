@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.7.19";  
+var myProductName = "feedlandDatabase", myVersion = "0.7.27";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -81,6 +81,8 @@ exports.getReadingListSubscriptions = getReadingListSubscriptions; //10/13/23 by
 exports.deleteReadingListSubscription = deleteReadingListSubscription; //10/13/23 by DW
 exports.getReadingListsInfo = getReadingListsInfo; //10/19/23 by DW
 exports.getReadingListFollowers = getReadingListFollowers; //10/28/23 by DW
+
+exports.addMacroToPagetable = addMacroToPagetable; //12/1/23 by DW
 
 const fs = require ("fs");
 const md5 = require ("md5");
@@ -255,6 +257,11 @@ function markdownProcess (markdowntext) { //8/25/22 by DW
 	var htmltext = marked.parse (markdowntext);
 	return (htmltext);
 	}
+
+function addMacroToPagetable (pagetable) { //12/1/23 by DW
+	pagetable.feedlandDatabaseVersion = myVersion; //allows it to appear in About dialog in feedlandHome.
+	}
+
 function httpReadUrl (url, callback) { //8/21/22 by DW
 	request (url, function (err, response, data) {
 		if (err) {
@@ -900,8 +907,13 @@ function setupNewFeedRec (feedUrl, theFeed) {
 	
 	function getUrlCloudServer (theFeed) {
 		var url = undefined;
-		if ((theFeed.cloud !== undefined) && (theFeed.cloud.type == "rsscloud")) {
-			url = "http://" + theFeed.cloud.domain + ":" + theFeed.cloud.port + theFeed.cloud.path;
+		if (theFeed.cloudUrl === undefined) {
+			if ((theFeed.cloud !== undefined) && (theFeed.cloud.type == "rsscloud")) {
+				url = "http://" + theFeed.cloud.domain + ":" + theFeed.cloud.port + theFeed.cloud.path;
+				}
+			}
+		else { //11/28/23 by DW -- use the value provided by source:cloud element
+			url = theFeed.cloudUrl;
 			}
 		return (url);
 		}
@@ -1014,7 +1026,7 @@ function checkFeed (feedUrl, callback) {
 			var feedRec = setupNewFeedRec (feedUrl, theFeed); //5/27/22 by DW
 			isFeedInDatabase (feedUrl, function (flInDatabase, feedRec2) {
 				var flChanged = !flInDatabase;
-				if (flInDatabase) {
+				if (flInDatabase) { 
 					feedRec.whenCreated = feedRec2.whenCreated;
 					feedRec.whenUpdated = feedRec2.whenUpdated;
 					feedRec.ctErrors = feedRec2.ctErrors;
@@ -2681,6 +2693,7 @@ function buildLikesFeed (screenname, callback) { //10/19/22 by DW
 						rssCloudPath: "/pleaseNotify",
 						rssCloudRegisterProcedure: "",
 						rssCloudProtocol: "http-post",
+						rssCloudUrl: "http://rpc.rsscloud.io:5337/pleaseNotify", //11/28/23 by DW
 						maxFeedItems: 25
 						};
 					let historyArray = new Array ();
@@ -2960,6 +2973,35 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 	}
 
 //reading lists -- 10/9/23 by DW
+	function createFeedRecordForReadingList (screenname, feedUrl, callback) { //11/28/23 by DW
+		isFeedInDatabase (feedUrl, function (flInDatabase, feedRec) {
+			if (flInDatabase) { //nothing to do
+				callback (); 
+				}
+			else {
+				reallysimple.readFeed (feedUrl, function (err, theFeed) {
+					if (err) {
+						myConsoleLog ("createFeedRecordForReadingList: error creating feed record for " + err.message + ", err.message == " + err.message);
+						callback (err);
+						}
+					else {
+						var feedRec = setupNewFeedRec (feedUrl, theFeed);
+						feedRec.ctItems = theFeed.items.length; 
+						feedRec.whoFirstSubscribed = screenname; 
+						feedRec.ctSubs = 1;
+						saveFeed (feedRec, function (err) {
+							if (err) {
+								myConsoleLog ("createFeedRecordForReadingList: error creating feed record for " + feedUrl + ", err.message == " + err.message);
+								}
+							else {
+								myConsoleLog ("createFeedRecordForReadingList: created feed record for " + feedUrl);
+								}
+							});
+						}
+					});
+				}
+			});
+		}
 	function checkSubsForOneUserAndOneReadingList (screenname, opmlUrl, callback) {
 		getSubscriptions (screenname, function (err, theSubscriptions) {
 			if (err) {
@@ -2993,7 +3035,14 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 											categories = item.category;
 											}
 										});
-									return ("," + categories + ","); //11/19/23 by DW
+									
+									if (categories === undefined) { //11/30/23 by DW
+										return (undefined);
+										}
+									else {
+										return ("," + categories + ","); //11/19/23 by DW
+										}
+									
 									}
 								listRec.feedUrls.forEach (function (feedUrl) {
 									if (notFindSubscription (feedUrl, opmlUrl)) {
@@ -3019,7 +3068,9 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 												}
 											else {
 												myConsoleLog ("batchSubscribe: added subscription, subRec == " + utils.jsonStringify (subRec));
-												doNextSub (ix + 1)
+												createFeedRecordForReadingList (screenname, theFeedUrl, function (err) {
+													doNextSub (ix + 1);
+													});
 												}
 											});
 										}
@@ -3126,6 +3177,7 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 				}
 			});
 		}
+	
 	function subscribeToReadingList (screenname, opmlUrl, callback) { //10/8/23 by DW
 		isReadingListInDatabase (opmlUrl, function (flInDatabase, listRec) {
 			if (flInDatabase) {
@@ -3177,6 +3229,7 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 				}
 			});
 		}
+	
 	function getReadingList (opmlUrl, callback) { //10/8/23 by DW
 		const sqltext = "select * from readinglists where opmlurl=" + davesql.encode (opmlUrl) + ";";
 		davesql.runSqltext (sqltext, function (err, result) {

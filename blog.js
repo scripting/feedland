@@ -94,7 +94,6 @@ function buildRss (screenname, callback) {
 					
 					docs: config.docsForFeed, //7/14/22 by DW
 					
-					twitterScreenName: checkNull (feedRec.twitterAccount),
 					maxFeedItems: config.maxFeedItems,
 					
 					flRssCloudEnabled: true, 
@@ -102,7 +101,9 @@ function buildRss (screenname, callback) {
 					rssCloudPort: 5337,
 					rssCloudPath: "/pleaseNotify",
 					rssCloudRegisterProcedure: "",
-					rssCloudProtocol: "http-post"
+					rssCloudProtocol: "http-post",
+					
+					rssCloudUrl: "http://rpc.rsscloud.io:5337/pleaseNotify" //11/28/23 by DW
 					};
 				const sqltext = "select * from items where flDeleted=false and feedUrl=" + davesql.encode (feedUrl) + " order by pubDate desc limit " + config.maxFeedItems + ";"; 
 				davesql.runSqltext (sqltext, function (err, result) {

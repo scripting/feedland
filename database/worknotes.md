@@ -1,4 +1,24 @@
-11/20/23; 8:47:30 AM by DW
+#### 11/30/23; 4:12:41 PM by DW
+
+Fixed problem with importing reading list feeds that don't have any categories. We were assigning the value of category in the database as 
+
+,undefined,
+
+Instead we return undefined which should be represented in the database as NULL.
+
+To find the code search for getCategoriesFor.
+
+#### 11/28/23; 2:13:35 PM by DW
+
+Implement support for source:cloud element. 
+
+#### 11/28/23; 11:47:16 AM by DW
+
+Subscribing to new reading list, we were failing to add most of the feeds to the feeds table in the database. 
+
+The debugging work is narrated in <a href="https://github.com/scripting/a8c-FeedLand-Support/issues/67">this thread</a>  on GitHub.
+
+#### 11/20/23; 8:47:30 AM by DW
 
 Removing checks for flDeleted for a performance boost. 
 
