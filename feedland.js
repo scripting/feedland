@@ -1,4 +1,4 @@
-const myVersion = "0.6.41", myProductName = "feedland"; 
+const myVersion = "0.6.44", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -70,7 +70,11 @@ var config = {
 	minSecsBetwReadingListChecks: 60,  //10/10/23 by DW
 	minSecsBetwIndividualReadingListCheck: 5 * 60, //10/10/23 by DW
 	
-	flWordPressIdentityDefault: false //11/13/23 by DW
+	flWordPressIdentityDefault: false, //11/13/23 by DW
+	
+	flIncludeImageMetadata: false, //12/1/23 by DW
+	urlImageForMetadata: "http://scripting.com/images/2022/10/20/someoneElsesFeedList.png",
+	metaDescription: "The first full feed management system. Share lists of feeds with other users, both in and outside of FeedLand. Writing feeds, reading news."
 	};
 
 var whenLastDayRollover = new Date ();
@@ -297,16 +301,29 @@ function addMacroToPagetable (pagetable) {
 	pagetable.mysqlVersion = config.mysqlVersion; //11/18/23 by DW
 	database.addMacroToPagetable (pagetable); //12/1/23 by DW
 	
-	//12/2/22 by DW -- set up the normal case for the Facebook/Twitter metadata
-		pagetable.metaUrl = "https://feedland.org/";
-		pagetable.metaTitle = "FeedLand";
-		pagetable.metaDescription = "The first full feed management system. Share lists of feeds with other users, both in and outside of FeedLand. Writing feeds, reading news.";
-		pagetable.metaTwitterOwnerName = "@davewiner";
-		pagetable.metaSiteName = "FeedLand";
+	//12/2/22 by DW & 12/1/23 by DW -- set up the normal case for the Facebook/Twitter metadata
+		pagetable.metaUrl = config.urlServerForClient;
 		
-		const imgUrl = "http://scripting.com/images/2022/10/20/someoneElsesFeedList.png";
-		pagetable.facebookImage = "<meta property=\"og:image\" content=\"" + imgUrl + "\" />";
-		pagetable.twitterImage = "<meta name=\"twitter:image:src\" content=\"" + imgUrl + "\">";
+		const siteName = (config.productNameForDisplay === undefined) ? "FeedLand" : config.productNameForDisplay;
+		
+		pagetable.metaTitle = siteName;
+		
+		pagetable.metaDescription = config.metaDescription;
+		
+		
+		pagetable.metaTwitterOwnerName = "";
+		
+		pagetable.metaSiteName = siteName;
+		
+		if (config.flIncludeImageMetadata) { //12/1/23 by DW
+			const imgUrl = config.urlImageForMetadata;
+			pagetable.facebookImage = "<meta property=\"og:image\" content=\"" + imgUrl + "\" />";
+			pagetable.twitterImage = "<meta name=\"twitter:image:src\" content=\"" + imgUrl + "\">";
+			}
+		else {
+			pagetable.facebookImage = "";
+			pagetable.twitterImage = "";
+			}
 	
 	}
 function asyncAddMacroToPagetable (pagetable, theRequest, callback) { //12/2/22 by DW
@@ -1269,6 +1286,11 @@ function handleHttpRequest (theRequest) {
 				case "/getfeedlist": //11/6/23 by DW
 					getFeedList (httpReturn);
 					return (true); 
+				case "/checkmyreadinglistsubs": //12/13/23 by DW
+					callWithScreenname (function (screenname) {
+						database.checkSubsForOneUserAndOneReadingList (screenname, params.url, httpReturn);
+						});
+					return (true);
 				
 				case config.rssCloud.feedUpdatedCallback: //12/12/22 by DW
 					returnPlainText (params.challenge);

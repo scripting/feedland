@@ -1,3 +1,21 @@
+#### 12/13/23; 12:32:40 PM by DW
+
+Fixed bugs in reading list code. 
+
+#### 12/1/23; 12:18:34 PM by DW
+
+What do we do when a user subscribes to a reading list? 
+
+We return before doing it all.
+
+And we do less -- just checking if each of the feeds in the list are in the database if they exist. 
+
+We want the readouts in feedlandHome to look correct as soon as possible.
+
+The truth is subscribing to a new reading list takes as much time as subscribing from a list, and that can take a second for each feed. 
+
+There is an art to this, we're still not doing it right in some circumstances. 
+
 #### 11/30/23; 4:12:41 PM by DW
 
 Fixed problem with importing reading list feeds that don't have any categories. We were assigning the value of category in the database as 

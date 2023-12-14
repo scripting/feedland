@@ -1,4 +1,8 @@
-11/28/23; 12:30:56 PM by DW
+#### 12/1/23; 12:40:11 PM by DW
+
+Clean out twitter and facebook metadata. 
+
+#### 11/28/23; 12:30:56 PM by DW
 
 We no longer generate source:account feed-level for twitter. 
 

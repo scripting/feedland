@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.7.27";  
+var myProductName = "feedlandDatabase", myVersion = "0.7.30";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -81,6 +81,7 @@ exports.getReadingListSubscriptions = getReadingListSubscriptions; //10/13/23 by
 exports.deleteReadingListSubscription = deleteReadingListSubscription; //10/13/23 by DW
 exports.getReadingListsInfo = getReadingListsInfo; //10/19/23 by DW
 exports.getReadingListFollowers = getReadingListFollowers; //10/28/23 by DW
+exports.checkSubsForOneUserAndOneReadingList = checkSubsForOneUserAndOneReadingList; //12/13/23 by DW
 
 exports.addMacroToPagetable = addMacroToPagetable; //12/1/23 by DW
 
@@ -2346,7 +2347,6 @@ function findUserWithEmail (emailaddress, callback) { //2/15/23 by DW
 		});
 	}
 
-
 function setUserPrefs (screenname, jsontext, callback) { //9/15/22 by DW
 	const now = new Date ();
 	function normalizeCatString (s) {
@@ -2979,9 +2979,10 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 				callback (); 
 				}
 			else {
+				myConsoleLog ("createFeedRecordForReadingList: feedUrl == " + feedUrl);
 				reallysimple.readFeed (feedUrl, function (err, theFeed) {
 					if (err) {
-						myConsoleLog ("createFeedRecordForReadingList: error creating feed record for " + err.message + ", err.message == " + err.message);
+						myConsoleLog ("createFeedRecordForReadingList: err.message == " + err.message);
 						callback (err);
 						}
 					else {
@@ -2991,14 +2992,37 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 						feedRec.ctSubs = 1;
 						saveFeed (feedRec, function (err) {
 							if (err) {
-								myConsoleLog ("createFeedRecordForReadingList: error creating feed record for " + feedUrl + ", err.message == " + err.message);
+								myConsoleLog ("createFeedRecordForReadingList: err.message == " + err.message);
 								}
-							else {
-								myConsoleLog ("createFeedRecordForReadingList: created feed record for " + feedUrl);
-								}
+							callback (); //12/13/23 by DW
 							});
 						}
 					});
+				}
+			});
+		}
+	function addReadingListFeedsToDatabase (screenname, opmlUrl, callback) { //12/1/23 by DW
+		getNodeArrayFromOpml (opmlUrl, function (err, theNodeArray) { //10/25/23 by DW
+			if (err) {
+				if (callback !== undefined) {
+					callback (err);
+					}
+				}
+			else {
+				function doNextSub (ix) {
+					if (ix < theNodeArray.length) {
+						const item = theNodeArray [ix];
+						createFeedRecordForReadingList (screenname, item.xmlUrl, function (err) {
+							doNextSub (ix + 1);
+							});
+						}
+					else {
+						if (callback !== undefined) {
+							callback (undefined, theNodeArray);
+							}
+						}
+					}
+				doNextSub (0);
 				}
 			});
 		}
@@ -3064,10 +3088,11 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 										const sqltext = "replace into subscriptions " + davesql.encodeValues (subRec);
 										davesql.runSqltext (sqltext, function (err, result) {
 											if (err) {
-												callback (err);
+												myConsoleLog ("checkSubsForOneUserAndOneReadingList: err.message == " + err.message);
+												doNextSub (ix + 1);
 												}
 											else {
-												myConsoleLog ("batchSubscribe: added subscription, subRec == " + utils.jsonStringify (subRec));
+												myConsoleLog ("checkSubsForOneUserAndOneReadingList: subscribed " + screenname + " to " + utils.jsonStringify (subRec));
 												createFeedRecordForReadingList (screenname, theFeedUrl, function (err) {
 													doNextSub (ix + 1);
 													});
@@ -3086,6 +3111,7 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 				}
 			});
 		}
+	
 	function parseFeedUrls (result) {
 		result.forEach (function (item) { //10/23/23 by DW
 			try {
@@ -3180,6 +3206,21 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 	
 	function subscribeToReadingList (screenname, opmlUrl, callback) { //10/8/23 by DW
 		isReadingListInDatabase (opmlUrl, function (flInDatabase, listRec) {
+			function subscribeUserToReadingList () {
+				addReadingListSubscription (screenname, opmlUrl, function (err, theSubscription) {
+					if (err) {
+						callback (err);
+						}
+					else {
+						callback (undefined, theSubscription);
+						addReadingListFeedsToDatabase (screenname, opmlUrl, function (err) {
+							if (!err) {
+								checkSubsForOneUserAndOneReadingList (screenname, opmlUrl);
+								}
+							});
+						}
+					});
+				}
 			if (flInDatabase) {
 				isUserSubscribedToReadingList (opmlUrl, screenname, function (err, jstruct) {
 					if (err) {
@@ -3190,21 +3231,7 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 							callback (undefined, listRec, jstruct.theSubscription);
 							}
 						else {
-							addReadingListSubscription (screenname, opmlUrl, function (err, theSubscription) {
-								if (err) {
-									callback (err);
-									}
-								else {
-									checkSubsForOneUserAndOneReadingList (screenname, opmlUrl, function (err, urlsToSubscribeTo) { //10/24/23 by DW
-										if (err) {
-											callback (err);
-											}
-										else {
-											callback (undefined, listRec, theSubscription);
-											}
-										});
-									}
-								});
+							subscribeUserToReadingList (); //12/1/23 by DW
 							}
 						}
 					});
@@ -3216,14 +3243,7 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 						callback (err);
 						}
 					else {
-						addReadingListSubscription (screenname, opmlUrl, function (err, theSubscription) {
-							if (err) {
-								callback (err);
-								}
-							else {
-								callback (undefined, listRec, theSubscription);
-								}
-							});
+						subscribeUserToReadingList (); //12/1/23 by DW
 						}
 					});
 				}
