@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.7.31";  
+var myProductName = "feedlandDatabase", myVersion = "0.7.32";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -611,24 +611,9 @@ function getItemFromDatabase (id, callback) { //5/7/22 by DW
 		});
 	}
 function deleteItem (id, callback) { //4/22/22 by DW
-	getItemFromDatabase (id, function (err, itemRec) {
-		if (err) {
-			callback (err);
-			}
-		else {
-			itemRec.flDeleted = true;
-			saveItem (itemRec, function (err, data) {
-				if (err) {
-					callback (err);
-					}
-				else {
-					var convertedRec = convertDatabaseItem (itemRec);
-					updateSocketSubscribers ("deletedItem", convertedRec);
-					callback (undefined, convertedRec);
-					}
-				});
-			}
-		});
+	const message = "This function has been disabled.";
+	callback ({message}); //12/16/23 by DW
+	return;
 	}
 function saveFeed (feedRec, callback) {
 	const sqltext = "replace into feeds " + davesql.encodeValues (removeNullValuesFromObject (feedRec));

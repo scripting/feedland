@@ -1,3 +1,7 @@
+#### 12/16/23; 12:07:17 PM by DW
+
+Disabled the deleteItem call, we don't respect flDeleted att on items. So this is pointless. 
+
 #### 12/14/23; 11:41:07 AM by DW
 
 Fixed a problem, when we discover a new feed in a reading list, we set its category string incorrectly. It needed to be surrounded by commas. 
