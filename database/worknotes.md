@@ -1,3 +1,9 @@
+#### 12/14/23; 11:41:07 AM by DW
+
+Fixed a problem, when we discover a new feed in a reading list, we set its category string incorrectly. It needed to be surrounded by commas. 
+
+We encountered and fixed this problem before on 11/19/23.
+
 #### 12/13/23; 12:32:40 PM by DW
 
 Fixed bugs in reading list code. 

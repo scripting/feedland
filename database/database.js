@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.7.30";  
+var myProductName = "feedlandDatabase", myVersion = "0.7.31";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -3340,7 +3340,9 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 		var cats = new Object ();
 		if (newNodeArray !== undefined) {
 			newNodeArray.forEach (function (item) {
-				cats [item.xmlUrl] = item.category;
+				if (item.category !== undefined) { //12/14/23 by DW
+					cats [item.xmlUrl] = "," + item.category + ",";
+					}
 				});
 			}
 		
