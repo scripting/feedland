@@ -1,4 +1,4 @@
-const myVersion = "0.6.47", myProductName = "feedland"; 
+const myVersion = "0.6.50", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -86,6 +86,32 @@ var whenLastSqlSocketCheck = new Date (); //9/26/23 by DW
 var whenLastReadingListCheck = new Date (); //10/10/23 by DW
 
 
+function readJsonFile (url, callback) { //12/28/23 by DW
+	request (url, function (err, response, jsontext) {
+		if (err) {
+			callback (err);
+			}
+		else {
+			if ((response.statusCode >= 200) && (response.statusCode <= 299)) {
+				var jstruct, flgood = true;
+				try {
+					jstruct = JSON.parse (jsontext);
+					}
+				catch (err) {
+					callback (err);
+					flgood = false;
+					}
+				if (flgood) {
+					callback (undefined, jstruct);
+					}
+				}
+			else {
+				const message = "HTTP error == " + response.statusCode;
+				callback ({message});
+				}
+			}
+		});
+	}
 function getFeedList (callback) { //11/6/23 by DW
 	const sqltext = "select feedUrl from feeds;";
 	davesql.runSqltext (sqltext, function (err, result) {
@@ -383,7 +409,9 @@ function asyncAddMacroToPagetable (pagetable, theRequest, callback) { //12/2/22 
 
 function initNewsproductPagetable (pagetable) {
 	pagetable.productname = config.productName;
-	pagetable.productnameForDisplay = config.productnameForDisplay;
+	
+	pagetable.productnameForDisplay = (config.productnameForDisplay === undefined) ? config.productName : config.productnameForDisplay; //1/9/24 by DW
+	
 	pagetable.version = myVersion;
 	pagetable.urlServerForClient = config.urlServerForClient; 
 	pagetable.flEnableLogin = false; 
@@ -449,55 +477,99 @@ function renderUserNewsproduct (screenname, callback) { //9/15/23 by DW
 		});
 	return (true);
 	}
-function renderUserNewsproductWithTemplate (urlOutlineTemplate, theRequest, callback) { //9/16/23 by DW
+function renderUserNewsproductWithTemplate (urlOutlineTemplate, urlNewsProductApp, urlNewsProductSpec, theRequest, callback) { //9/16/23 by DW
+	const urlServerHomePageSource = (urlNewsProductApp === undefined) ? config.urlNewsProductSource : urlNewsProductApp; //12/24/23 by DW
 	var pagetable = {
 		urlTemplate: urlOutlineTemplate,
 		newsProductInfo: "undefined",
 		userPrefs: "undefined",
 		urlServerForClient: config.urlServerForClient,
-		urlServerHomePageSource: config.urlNewsProductSource
+		urlServerHomePageSource //12/24/23 by DW
 		};
 	initNewsproductPagetable (pagetable);
 	function getOutlineTemplate (callback) {
-		opml.readOutline (urlOutlineTemplate, function (err, theOutline) {
-			if (err) {
-				callback (err);
-				}
-			else {
-				function getHeadAtt (name) {
-					var attval = "";
-					try {
-						if (theOutline.opml.head [name] !== undefined) {
-							attval = theOutline.opml.head [name];
+		if (urlNewsProductSpec === undefined) {
+			opml.readOutline (urlOutlineTemplate, function (err, theOutline) {
+				if (err) {
+					callback (err);
+					}
+				else {
+					function getHeadAtt (name) {
+						var attval = "";
+						try {
+							if (theOutline.opml.head [name] !== undefined) {
+								attval = theOutline.opml.head [name];
+								}
+							}
+						catch (err) {
+							}
+						return (attval);
+						}
+					pagetable.pageTitle = getHeadAtt ("title");
+					pagetable.productnameForDisplay = pagetable.pageTitle; //1/9/24 by DW
+					pagetable.pageDescription = getHeadAtt ("description");
+					
+					var imageUrl = getHeadAtt ("image");
+					if (imageUrl.length != 0) {
+						pagetable.pageImage = "<img src=\"" + imageUrl + "\">";
+						}
+					else {
+						pagetable.pageImage = "";
+						}
+					
+					if (false) { //(config.flExpandIncludes) { //8/22/22 by DW
+						opml.expandIncludes (theOutline, function (theNewOutline) { //8/11/22 by DW
+							pagetable.theOutlineInJson = utils.jsonStringify (theNewOutline);
+							callback ();
+							});
+						}
+					else {
+						pagetable.theOutlineInJson = utils.jsonStringify (theOutline);
+						pagetable.theNewsProductSpec = utils.jsonStringify (new Object ()); //12/28/23 by DW
+						callback (undefined, theOutline);
+						}
+					}
+				});
+			}
+		else { //12/28/23 by DW
+			readJsonFile (urlNewsProductSpec, function (err, theSpec) {
+				if (err) {
+					callback (err);
+					}
+				else {
+					function getValue (name) {
+						try {
+							if (theSpec [name] === undefined) {
+								return ("");
+								}
+							else {
+								return (theSpec [name]);
+								}
+							}
+						catch (err) {
+							return ("");
 							}
 						}
-					catch (err) {
+					
+					pagetable.pageTitle = getValue ("title");
+					pagetable.productnameForDisplay = pagetable.pageTitle; //1/9/24 by DW
+					pagetable.pageDescription = getValue ("description");
+					
+					var imageUrl = getValue ("image");
+					if (imageUrl.length != 0) {
+						pagetable.pageImage = "<img src=\"" + imageUrl + "\">";
 						}
-					return (attval);
+					else {
+						pagetable.pageImage = "";
+						}
+					
+					pagetable.theNewsProductSpec = utils.jsonStringify (theSpec);
+					pagetable.theOutlineInJson = utils.jsonStringify (new Object ());
+					
+					callback (undefined, theSpec);
 					}
-				pagetable.pageTitle = getHeadAtt ("title");
-				pagetable.pageDescription = getHeadAtt ("description");
-				
-				var imageUrl = getHeadAtt ("image");
-				if (imageUrl.length != 0) {
-					pagetable.pageImage = "<img src=\"" + imageUrl + "\">";
-					}
-				else {
-					pagetable.pageImage = "";
-					}
-				
-				if (false) { //(config.flExpandIncludes) { //8/22/22 by DW
-					opml.expandIncludes (theOutline, function (theNewOutline) { //8/11/22 by DW
-						pagetable.theOutlineInJson = utils.jsonStringify (theNewOutline);
-						callback ();
-						});
-					}
-				else {
-					pagetable.theOutlineInJson = utils.jsonStringify (theOutline);
-					callback (undefined, theOutline);
-					}
-				}
-			});
+				});
+			}
 		}
 	function getHtmlTemplate (callback) {
 		request (pagetable.urlServerHomePageSource, function (err, response, templatetext) {
@@ -1244,8 +1316,8 @@ function handleHttpRequest (theRequest) {
 							});
 						}
 					else {
-						if (params.template !== undefined) {
-							renderUserNewsproductWithTemplate (params.template, theRequest, function (err, htmltext) {
+						if ((params.template !== undefined) || (params.spec !== undefined)) {
+							renderUserNewsproductWithTemplate (params.template, params.app, params.spec, theRequest, function (err, htmltext) {  //12/24/23 by DW -- new param for app, spec
 								if (err) {
 									returnError (err);
 									}

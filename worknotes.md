@@ -1,3 +1,23 @@
+#### 1/9/24; 1:47:49 PM by DW
+
+Fixed a couple of problems with productNameForDisplay for news products.
+
+#### 12/28/23; 10:33:38 AM by DW
+
+A new way of specifying a news product, using a JSON file in place of OPML. 
+
+Biggest changes in `renderUserNewsproductWithTemplate`.
+
+#### 12/24/23; 10:08:48 AM by DW
+
+In /newsproduct call, allow the caller to specify the URL of the source of the newsproduct app.
+
+This makes it easy for me to test a new version of the app without disturbing the previous version.
+
+https://feedland.com/newsproduct?template=<opmlurl>&app=<appurl>
+
+This is only for the templated version, keep everything simple for product specified by the username.
+
 #### 12/1/23; 12:40:11 PM by DW
 
 Clean out twitter and facebook metadata. 
