@@ -1,4 +1,4 @@
-const myVersion = "0.6.50", myProductName = "feedland"; 
+const myVersion = "0.6.51", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -84,7 +84,6 @@ var emailCache = new Object (); //12/14/22 by DW
 var idLastNewItem = undefined; //9/26/23 by DW
 var whenLastSqlSocketCheck = new Date (); //9/26/23 by DW
 var whenLastReadingListCheck = new Date (); //10/10/23 by DW
-
 
 function readJsonFile (url, callback) { //12/28/23 by DW
 	request (url, function (err, response, jsontext) {
@@ -477,7 +476,7 @@ function renderUserNewsproduct (screenname, callback) { //9/15/23 by DW
 		});
 	return (true);
 	}
-function renderUserNewsproductWithTemplate (urlOutlineTemplate, urlNewsProductApp, urlNewsProductSpec, theRequest, callback) { //9/16/23 by DW
+function renderUserNewsproductWithTemplate (urlOutlineTemplate, urlNewsProductApp, newsProductSpec, theRequest, callback) { //9/16/23 by DW
 	const urlServerHomePageSource = (urlNewsProductApp === undefined) ? config.urlNewsProductSource : urlNewsProductApp; //12/24/23 by DW
 	var pagetable = {
 		urlTemplate: urlOutlineTemplate,
@@ -488,7 +487,7 @@ function renderUserNewsproductWithTemplate (urlOutlineTemplate, urlNewsProductAp
 		};
 	initNewsproductPagetable (pagetable);
 	function getOutlineTemplate (callback) {
-		if (urlNewsProductSpec === undefined) {
+		if (newsProductSpec === undefined) {
 			opml.readOutline (urlOutlineTemplate, function (err, theOutline) {
 				if (err) {
 					callback (err);
@@ -532,43 +531,62 @@ function renderUserNewsproductWithTemplate (urlOutlineTemplate, urlNewsProductAp
 				});
 			}
 		else { //12/28/23 by DW
-			readJsonFile (urlNewsProductSpec, function (err, theSpec) {
-				if (err) {
-					callback (err);
+			var theSpec;
+			function isParamJson (theText) {
+				try {
+					theText = decodeURIComponent (theText);
+					theSpec = JSON.parse (theText);
+					return (true);
 					}
-				else {
-					function getValue (name) {
-						try {
-							if (theSpec [name] === undefined) {
-								return ("");
-								}
-							else {
-								return (theSpec [name]);
-								}
-							}
-						catch (err) {
+				catch (err) {
+					return (false);
+					}
+				}
+			function getStuffForPagetable (theSpec) {
+				function getValue (name) {
+					try {
+						if (theSpec [name] === undefined) {
 							return ("");
 							}
+						else {
+							return (theSpec [name]);
+							}
 						}
-					
-					pagetable.pageTitle = getValue ("title");
-					pagetable.productnameForDisplay = pagetable.pageTitle; //1/9/24 by DW
-					pagetable.pageDescription = getValue ("description");
-					
-					var imageUrl = getValue ("image");
-					if (imageUrl.length != 0) {
-						pagetable.pageImage = "<img src=\"" + imageUrl + "\">";
+					catch (err) {
+						return ("");
+						}
+					}
+				pagetable.pageTitle = getValue ("title");
+				pagetable.productnameForDisplay = pagetable.pageTitle; //1/9/24 by DW
+				pagetable.pageDescription = getValue ("description");
+				
+				var imageUrl = getValue ("image");
+				if (imageUrl.length != 0) {
+					pagetable.pageImage = "<img src=\"" + imageUrl + "\">";
+					}
+				else {
+					pagetable.pageImage = "";
+					}
+				
+				pagetable.theNewsProductSpec = utils.jsonStringify (theSpec);
+				pagetable.theOutlineInJson = utils.jsonStringify (new Object ());
+				}
+			
+			if (isParamJson (newsProductSpec)) { //1/24/24 by DW
+				getStuffForPagetable (theSpec); 
+				callback (undefined, theSpec);
+				}
+			else {
+				readJsonFile (newsProductSpec, function (err, theSpec) { //1/24/24 by DW -- assume it's a URL
+					if (err) {
+						callback (err);
 						}
 					else {
-						pagetable.pageImage = "";
+						getStuffForPagetable (theSpec); //1/24/24 by DW
+						callback (undefined, theSpec);
 						}
-					
-					pagetable.theNewsProductSpec = utils.jsonStringify (theSpec);
-					pagetable.theOutlineInJson = utils.jsonStringify (new Object ());
-					
-					callback (undefined, theSpec);
-					}
-				});
+					});
+				}
 			}
 		}
 	function getHtmlTemplate (callback) {

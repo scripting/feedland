@@ -1,3 +1,9 @@
+#### 1/24/24; 9:02:43 AM by DW
+
+The call to render a news product now checks if the spec parameter is JSON, and if it is, that's the spec.  Otherwise we assume, as before, that it's the URL of the spec, and we read it.
+
+Look in renderUserNewsproductWithTemplate.
+
 #### 1/9/24; 1:47:49 PM by DW
 
 Fixed a couple of problems with productNameForDisplay for news products.
