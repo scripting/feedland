@@ -1,4 +1,4 @@
-const myVersion = "0.6.51", myProductName = "feedland"; 
+const myVersion = "0.6.52", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -73,6 +73,9 @@ var config = {
 	flWordPressIdentityDefault: false, //11/13/23 by DW
 	
 	flIncludeImageMetadata: false, //12/1/23 by DW
+	
+	flFeedsHaveIds: false, //1/31/24 by DW
+	
 	urlImageForMetadata: "http://scripting.com/images/2022/10/20/someoneElsesFeedList.png",
 	metaDescription: "The first full feed management system. Share lists of feeds with other users, both in and outside of FeedLand. Writing feeds, reading news."
 	};
@@ -1427,7 +1430,17 @@ function getMysqlVersion (callback) { //11/18/23 by DW
 			}
 		callback (undefined, theVersion);
 		});
-	
+	}
+function getFeedsHaveIds (callback) { //1/31/24 by DW
+	const sqltext = "select feedId from feeds;";
+	davesql.runSqltext (sqltext, function (err, result) {
+		if (err) {
+			callback (false);
+			}
+		else {
+			callback (true);
+			}
+		});
 	}
 
 function everyNight () {
@@ -1499,14 +1512,18 @@ function start () {
 			config.database.logCallback = logSqlCalls; //9/21/23 by DW
 			davesql.start (config.database, function () {
 				database.start (config, function () {
-					getMysqlVersion (function (err, mysqlVersion) { //11/18/23 by DW
-						config.mysqlVersion = mysqlVersion;
-						if (config.flWebsocketEnabled && config.flUseSqlForSockets) { //9/26/23 by DW
-							initLastNewItem (); //9/26/23 by DW
-							}
-						if (config.flBackupOnStartup) { //1/9/23 by DW
-							database.backupDatabase (); 
-							}
+					getFeedsHaveIds (function (flFeedsHaveIds) { //1/31/24 by DW
+						config.flFeedsHaveIds = flFeedsHaveIds;
+						console.log ("start: config.flFeedsHaveIds == " + config.flFeedsHaveIds); 
+						getMysqlVersion (function (err, mysqlVersion) { //11/18/23 by DW
+							config.mysqlVersion = mysqlVersion;
+							if (config.flWebsocketEnabled && config.flUseSqlForSockets) { //9/26/23 by DW
+								initLastNewItem (); //9/26/23 by DW
+								}
+							if (config.flBackupOnStartup) { //1/9/23 by DW
+								database.backupDatabase (); 
+								}
+							});
 						});
 					});
 				});

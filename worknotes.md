@@ -1,3 +1,11 @@
+#### 1/31/24; 10:33:51 AM by DW
+
+Beginning an upgrade to feedland.org and feedland.com to use feedId in addition to feedUrl in the feeds and subscriptions tables. 
+
+The goal is to optimize building of rivers, and possibly other things in the future. 
+
+First change is adding a new value to config -- flFeedsHaveIds. This is initialized at startup, by seeing if it's an error to ask about feedId in the feeds table. 
+
 #### 1/24/24; 9:02:43 AM by DW
 
 The call to render a news product now checks if the spec parameter is JSON, and if it is, that's the spec.  Otherwise we assume, as before, that it's the URL of the spec, and we read it.

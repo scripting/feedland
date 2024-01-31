@@ -1,3 +1,7 @@
+#### 1/31/24; 10:46:24 AM by DW
+
+As part of the conversion for config.flFeedsHaveIds, in getFeedsInCategory, we request f.feedId so it's returned to the client for each feed, so it can construct queries that use the feedId in place of feedUrl. 
+
 #### 12/16/23; 12:07:17 PM by DW
 
 Disabled the deleteItem call, we don't respect flDeleted att on items. So this is pointless. 

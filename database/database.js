@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.7.32";  
+var myProductName = "feedlandDatabase", myVersion = "0.7.33";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -2042,7 +2042,10 @@ function getUsersOpmlUrl (screenname) {
 function getFeedsInCategory (screenname, catname, callback) {
 	var likeclause = (catname === undefined) ? "" : " and categories like '%," + catname + ",%'"; //11/5/22 by DW
 	
-	var sqltext = "select s.feedUrl, f.title, f.description, f.htmlUrl, f.ctSubs, f.ctItems, f.whenCreated, f.whenUpdated, f.whenChecked, f.ctChecks, f.ctSecs, f.ctErrors, f.ctConsecutiveErrors, f.whenLastError, s.categories, f.whoFirstSubscribed, s.urlReadingList from subscriptions as s, feeds as f where s.feedUrl = f.feedUrl and f.title is not null and s.listName = " + davesql.encode (screenname) + likeclause + " order by s.whenUpdated desc;";
+	const askForFeedId = (config.flFeedsHaveIds) ? ", f.feedId " : ""; //1/31/24 by DW
+	const sqltext = "select s.feedUrl, f.title, f.description, f.htmlUrl, f.ctSubs, f.ctItems, f.whenCreated, f.whenUpdated, f.whenChecked, f.ctChecks, f.ctSecs, f.ctErrors, f.ctConsecutiveErrors, f.whenLastError, s.categories, f.whoFirstSubscribed, s.urlReadingList " + askForFeedId + " from subscriptions as s, feeds as f where s.feedUrl = f.feedUrl and f.title is not null and s.listName = " + davesql.encode (screenname) + likeclause + " order by s.whenUpdated desc;";
+	console.log ("getFeedsInCategory: sqltext == " + sqltext);
+	
 	davesql.runSqltext (sqltext, function (err, result) {
 		if (err) {
 			callback (err);
@@ -2056,13 +2059,11 @@ function getFeedsInCategory (screenname, catname, callback) {
 				var returnedArray = new Array (); //9/5/22 by DW
 				removeNullValues (result); 
 				result.forEach (function (sub) {
-					
 					if (sub.urlReadingList !== undefined) { //10/16/23 by DW
 						if (sub.urlReadingList.length == 0) { //10/13/23 by DW
 							sub.urlReadingList = undefined;
 							}
 						}
-					
 					returnedArray.push (convertCategories (sub));
 					});
 				callback (undefined, returnedArray);
