@@ -1,3 +1,11 @@
+#### 2/1/24; 11:18:11 AM by DW
+
+If you want a config value to make it to config in database, it must be set brefore we call database.start.
+
+We were doing it in the wrong order for config.mysqlVersion and config.flFeedsHaveIds. 
+
+Also changed the initial value for config.flFeedsHaveIds to undefined. If it had this value, I would have found the problem yesterday instead of today. 
+
 #### 1/31/24; 10:33:51 AM by DW
 
 Beginning an upgrade to feedland.org and feedland.com to use feedId in addition to feedUrl in the feeds and subscriptions tables. 
