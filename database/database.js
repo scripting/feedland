@@ -2034,7 +2034,10 @@ function setCategoriesForSubscription (screenname, feedUrl, jsontext, callback) 
 	}
 
 function getStandardFeedElements () { //12/26/22 by DW
-	return ("s.feedUrl, f.title, f.htmlUrl, f.ctSubs, f.ctItems, f.whenCreated, f.whenUpdated, f.whenChecked, f.ctChecks, f.ctSecs, f.ctErrors, f.ctConsecutiveErrors, f.whenLastError, f.whoFirstSubscribed, count(s.feedUrl) as ct, f.whenUpdated")
+	const askForFeedId = (config.flFeedsHaveIds) ? ", f.feedId " : ""; //1/31/24 by DW
+	const sqltext = "s.feedUrl, f.title, f.htmlUrl, f.ctSubs, f.ctItems, f.whenCreated, f.whenUpdated, f.whenChecked, f.ctChecks, f.ctSecs, f.ctErrors, f.ctConsecutiveErrors, f.whenLastError, f.whoFirstSubscribed, count(s.feedUrl) as ct, f.whenUpdated" + askForFeedId;
+	console.log ("getStandardFeedElements: sqltext == " + sqltext);
+	return (sqltext);
 	}
 function getUsersOpmlUrl (screenname) {
 	return ("xxx");
