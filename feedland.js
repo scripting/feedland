@@ -1,4 +1,4 @@
-const myVersion = "0.6.53", myProductName = "feedland"; 
+const myVersion = "0.6.54", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -1483,6 +1483,7 @@ function everySecond () {
 		everyNight (); //8/22/22 by DW
 		}
 	}
+
 
 function start () {
 	var options = {

@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.7.33";  
+var myProductName = "feedlandDatabase", myVersion = "0.7.34";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -512,10 +512,11 @@ function isFeedInDatabase (feedUrl, callback) {
 			}
 		});
 	}
-function addSubscription (screenname, feedUrl, callback) {
+function addSubscription (screenname, feedUrl, feedId, callback) {
 	var subsRec = {
 		listName: maxStringLength (screenname, config.maxListNameLength),
 		feedUrl: maxStringLength (feedUrl, config.maxFeedUrlLength),
+		feedId, //2/3/24 by DW
 		categories: ",all,", //9/11/22 by DW
 		whenUpdated: new Date ()
 		};
@@ -625,7 +626,13 @@ function saveFeed (feedRec, callback) {
 			}
 		else {
 			if (callback !== undefined) {
-				callback (undefined, feedRec);
+				if (err) {
+					callback (err);
+					}
+				else {
+					feedRec.feedId = result.insertId; //2/3/24 by DW
+					callback (undefined, feedRec); 
+					}
 				}
 			}
 		});
@@ -711,6 +718,7 @@ function convertDatabaseFeed (feedRec) {
 		}
 	var apiRec = {
 		feedUrl: feedRec.feedUrl,
+		feedId: feedRec.feedId, //2/3/24 by DW
 		title: checkNull (feedRec.title),
 		link: checkNull (feedRec.htmlUrl),
 		description: checkNull (feedRec.description),
@@ -1065,10 +1073,16 @@ function checkFeed (feedUrl, callback) {
 					}
 				feedRec.whenChecked = whenstart;
 				feedRec.ctChecks++;
-				saveFeed (feedRec);
-				if (callback !== undefined) {
-					callback (undefined, theFeed, feedRec);
-					}
+				saveFeed (feedRec, function (err, feedRec) { //2/3/24 by DW
+					if (callback !== undefined) {
+						if (err) {
+							callback (err);
+							}
+						else {
+							callback (undefined, theFeed, feedRec);
+							}
+						}
+					});
 				});
 			}
 		});
@@ -1082,6 +1096,7 @@ function logNewitem (itemRec) { //5/23/22 by DW
 	}
 function checkFeedItems (feedRec, itemsArray, flNewFeed, callback) {
 	const feedUrl = feedRec.feedUrl;
+	const feedId = feedRec.feedId; //2/3/24 by DW
 	const whenstart = new Date ();
 	var ctNewItems = 0;
 	
@@ -1103,6 +1118,7 @@ function checkFeedItems (feedRec, itemsArray, flNewFeed, callback) {
 			}
 		var itemRec = {
 			feedUrl,
+			feedId, //2/3/24 by DW
 			guid,
 			title: item.title,
 			link: item.link,
@@ -1902,7 +1918,8 @@ function subscribeToFeed (screenname, feedUrl, callback) {
 							callback (undefined, convertDatabaseFeed (feedRec));
 							}
 						else {
-							addSubscription (screenname, feedUrl, function (err, result) {
+							let feedId = feedRec.feedId; //2/3/24 by DW
+							addSubscription (screenname, feedUrl, feedId, function (err, result) { //2/3/24 by DW
 								if (err) {
 									callback (err);
 									}
@@ -1939,27 +1956,33 @@ function subscribeToFeed (screenname, feedUrl, callback) {
 										feedRec.ctItems = theFeed.items.length; //7/13/22 by DW
 										feedRec.whoFirstSubscribed = screenname; //7/20/22 by DW
 										feedRec.ctSubs = 1; //8/31/22 by DW
-										saveFeed (feedRec, function () {
-											addSubscription (screenname, feedUrl, function (err, result) {
-												if (err) {
-													callback (err);
-													}
-												else {
-													addFeedToUserFeedsOpmlFile (screenname, feedRec, function (err) {
-														if (err) {
-															callback (err);
-															}
-														else { //8/19/22 by DW -- return before we check in all the new feed items
-															let whenstart = new Date ();
-															checkFeedItems (feedRec, theFeed.items, true, function () {
-																myConsoleLog ("subscribeToFeed: checkFeedItems returned after " + utils.secondsSince (whenstart) + " seconds");
-																});
-															myConsoleLog ("subscribeToFeed: returning before all the feed items are checked. " + whenstart.toLocaleTimeString ());
-															callback (undefined, convertDatabaseFeed (feedRec));
-															}
-														});
-													}
-												});
+										saveFeed (feedRec, function (err, feedRec) {
+											if (err) {
+												callback (err);
+												}
+											else {
+												let feedId = feedRec.feedId; //2/3/24 by DW
+												addSubscription (screenname, feedUrl, feedId, function (err, result) {
+													if (err) {
+														callback (err);
+														}
+													else {
+														addFeedToUserFeedsOpmlFile (screenname, feedRec, function (err) {
+															if (err) {
+																callback (err);
+																}
+															else { //8/19/22 by DW -- return before we check in all the new feed items
+																let whenstart = new Date ();
+																checkFeedItems (feedRec, theFeed.items, true, function () {
+																	myConsoleLog ("subscribeToFeed: checkFeedItems returned after " + utils.secondsSince (whenstart) + " seconds");
+																	});
+																myConsoleLog ("subscribeToFeed: returning before all the feed items are checked. " + whenstart.toLocaleTimeString ());
+																callback (undefined, convertDatabaseFeed (feedRec));
+																}
+															});
+														}
+													});
+												}
 											});
 										}
 									});
@@ -2938,8 +2961,8 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 			}
 		theList.forEach (function (item) {
 			if (!deleteFromSubs (item.xmlUrl)) {
-				checkFeedAndItems (item.xmlUrl, function (err) {
-					addSubscription (screenname, item.xmlUrl, function (err, result) {
+				checkFeedAndItems (item.xmlUrl, function (err, theFeed, feedRec) { //2/3/24 by DW
+					addSubscription (screenname, item.xmlUrl, feedRec.feedId, function (err, result) {
 						});
 					});
 				}
@@ -3695,7 +3718,6 @@ function start (options, callback) {
 			config [x] = options [x];
 			}
 		}
-	
 	
 	if (callback !== undefined) {
 		callback (undefined);

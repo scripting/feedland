@@ -1,3 +1,13 @@
+#### 2/3/24; 10:21:32 AM by DW
+
+These are the changes needed to get the server running again after transitioning to having a feedId column for the three main tables: feeds, items and subscriptions. 
+
+1. When we create a new subscription, set the <i>feedId</i> for the subscription record. 
+
+2. When we create a new item, set the <i>feedId</i> for the item record. 
+
+The trickiest part was handling new subscriptions made by new feeds appearing in a reading list. That should be carefully tested to make sure the new subscription record has a feedId value properly set. 
+
 #### 1/31/24; 10:46:24 AM by DW
 
 As part of the conversion for config.flFeedsHaveIds, in getFeedsInCategory, we request f.feedId so it's returned to the client for each feed, so it can construct queries that use the feedId in place of feedUrl. 
