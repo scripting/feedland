@@ -1,3 +1,13 @@
+#### 2/7/24; 4:18:17 PM by DW
+
+Trying to speed up river building by limiting results from a river to a configurable number of days. 
+
+confi
+
+#### 2/3/24; 4:29:40 PM by DW
+
+Converted getRiver and getRiverFromCategory to use feedIds if they're available.
+
 #### 2/3/24; 10:21:32 AM by DW
 
 These are the changes needed to get the server running again after transitioning to having a feedId column for the three main tables: feeds, items and subscriptions. 

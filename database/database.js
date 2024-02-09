@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.7.34";  
+var myProductName = "feedlandDatabase", myVersion = "0.7.36";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -149,6 +149,8 @@ var config = {
 	
 	flCheckForDeleted: false, //11/20/23 by DW
 	
+	ctRiverCutoffDays: 365, //2/7/24 by DW
+	
 	getUserOpmlSubscriptions: function (username, catname, callback) { //6/27/22 by DW
 		},
 	getStats: function () { //6/27/22 by DW
@@ -257,6 +259,17 @@ function convertCategories (sub) { //9/6/22 by DW
 function markdownProcess (markdowntext) { //8/25/22 by DW
 	var htmltext = marked.parse (markdowntext);
 	return (htmltext);
+	}
+function dateDaysBefore (ctDays, d) { //2/7/24 by DW
+	//return a date ctDays days before d
+	if (d === undefined) {
+		d = new Date ();
+		}
+	else {
+		d = new Date (d);
+		}
+	const thePastDate = new Date (d - (ctDays * 24 * 60 * 60 * 1000));
+	return (thePastDate);
 	}
 
 function addMacroToPagetable (pagetable) { //12/1/23 by DW
@@ -1439,7 +1452,12 @@ function getRiver (feedUrl, screenname, callback, metadata=undefined) {
 				if (listtext.length > 0) {
 					listtext = utils.stringMid (listtext, 1, listtext.length - 1);
 					}
-				feedClause = "feedurl in (" + listtext + ")";
+				if (config.flFeedsHaveIds) { //2/3/24 by DW
+					feedClause = "feedId in (" + listtext + ")";
+					}
+				else {
+					feedClause = "feedurl in (" + listtext + ")";
+					}
 				}
 			else {
 				feedClause = "feedurl=" + davesql.encode (feedUrl);
@@ -1453,6 +1471,16 @@ function getRiver (feedUrl, screenname, callback, metadata=undefined) {
 			}
 		
 		return (feedClause);
+		}
+	function getTimeClause () { //2/7/24 by DW
+		if (config.ctRiverCutoffDays === undefined) { //this is how you can turn the feature off in config
+			return ("");
+			}
+		else {
+			const whenCutoff = dateDaysBefore (config.ctRiverCutoffDays); //2/7/24 by DW
+			const timeClause = " and pubDate > " + davesql.encode (whenCutoff) + " "; //2/7/24 by DW
+			return (timeClause);
+			}
 		}
 	function sortRiver (theFlatArray) {
 		var titles = new Object (), ctDuplicatesSkipped = 0;
@@ -1500,7 +1528,7 @@ function getRiver (feedUrl, screenname, callback, metadata=undefined) {
 		}
 	
 	const deleteCheck = (config.flCheckForDeleted) ? " flDeleted=false " : ""; //11/20/23 by DW
-	const sqltext = "select * from items where " + deleteCheck + getFeedClause () + " order by pubDate desc limit " + config.maxRiverItems + ";"; 
+	const sqltext = "select * from items where " + deleteCheck + getFeedClause () + getTimeClause () + " order by pubDate desc limit " + config.maxRiverItems + ";"; 
 	davesql.runSqltext (sqltext, function (err, result) {
 		if (err) {
 			if (callback !== undefined) {
@@ -1566,6 +1594,20 @@ function getRiverFromOpml (urlOpml, callback) { //8/21/22 by DW
 			});
 		}
 	}
+
+function getListOfFeedIds (theSubscriptions) { //2/3/24 by DW
+	var theList = new Array ();
+	theSubscriptions.forEach (function (sub) {
+		if (config.flFeedsHaveIds) {
+			theList.push (sub.feedId);
+			}
+		else {
+			theList.push (sub.feedUrl);
+			}
+		});
+	return (theList);
+	}
+
 function getRiverFromCategory (screenname, catname, callback) {
 	const cachekey = "category:" + screenname + "/" + catname, whenstart = new Date ();
 	function getTheFeeds (screenname, catname, callback) {
@@ -1590,10 +1632,7 @@ function getRiverFromCategory (screenname, catname, callback) {
 				callback (err);
 				}
 			else {
-				var feedUrlList = new Array ();
-				theSubscriptions.forEach (function (sub) {
-					feedUrlList.push (sub.feedUrl);
-					});
+				const feedUrlList = getListOfFeedIds (theSubscriptions);
 				if (feedUrlList.length == 0) {
 					let message = "Can't get the river because there are no feeds in the \"" + catname + "\" category";
 					callback ({message});
