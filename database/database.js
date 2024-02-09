@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.7.36";  
+var myProductName = "feedlandDatabase", myVersion = "0.7.37";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -1528,7 +1528,7 @@ function getRiver (feedUrl, screenname, callback, metadata=undefined) {
 		}
 	
 	const deleteCheck = (config.flCheckForDeleted) ? " flDeleted=false " : ""; //11/20/23 by DW
-	const sqltext = "select * from items where " + deleteCheck + getFeedClause () + getTimeClause () + " order by pubDate desc limit " + config.maxRiverItems + ";"; 
+	const sqltext = "select * from items use index (itemPubDate) where " + deleteCheck + getFeedClause () + getTimeClause () + " order by pubDate desc limit " + config.maxRiverItems + ";"; 
 	davesql.runSqltext (sqltext, function (err, result) {
 		if (err) {
 			if (callback !== undefined) {
