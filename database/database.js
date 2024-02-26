@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.7.37";  
+var myProductName = "feedlandDatabase", myVersion = "0.7.39";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -1528,7 +1528,8 @@ function getRiver (feedUrl, screenname, callback, metadata=undefined) {
 		}
 	
 	const deleteCheck = (config.flCheckForDeleted) ? " flDeleted=false " : ""; //11/20/23 by DW
-	const sqltext = "select * from items use index (itemPubDate) where " + deleteCheck + getFeedClause () + getTimeClause () + " order by pubDate desc limit " + config.maxRiverItems + ";"; 
+	const sqltext = "select * from items use index (feedId) where " + deleteCheck + getFeedClause () + getTimeClause () + " order by pubDate desc limit " + config.maxRiverItems + ";"; //2/12/24 by DW
+	console.log ("getRiver: sqltext == " + sqltext);
 	davesql.runSqltext (sqltext, function (err, result) {
 		if (err) {
 			if (callback !== undefined) {
@@ -1608,7 +1609,50 @@ function getListOfFeedIds (theSubscriptions) { //2/3/24 by DW
 	return (theList);
 	}
 
+
+function getRiverFromAllCategory (screenname, callback) { //2/22/24 by DW
+	const catname = "All", ctFeedLimit = 150;
+	const cachekey = "category:" + screenname + "/" + catname, whenstart = new Date ();
+	function getTheFeeds (screenname, catname, callback) {
+		const catnameparam = davesql.encode ("%," + catname + ",%");
+		const sqltext =  "select s.* from subscriptions s join feeds f on s.feedUrl = f.feedUrl where s.listname = " + davesql.encode (screenname) + " and s.categories like " + catnameparam + " order by f.whenUpdated Desc limit " + ctFeedLimit + ";";
+		davesql.runSqltext (sqltext, function (err, result) {
+			if (err) {
+				callback (err);
+				}
+			else {
+				callback (undefined, result);
+				}
+			});
+		}
+	getTheFeeds (screenname, catname, function (err, theSubscriptions) {
+		if (err) {
+			callback (err);
+			}
+		else {
+			const feedUrlList = getListOfFeedIds (theSubscriptions);
+			if (feedUrlList.length == 0) {
+				let message = "Can't get the river because there are no feeds in the \"" + catname + "\" category";
+				callback ({message});
+				}
+			else {
+				const metadata = {cachekey, feedUrlList}; //2/1/23 by DW
+				getRiver (feedUrlList, undefined, function (err, river) {
+					if (!err) {
+						addToRiverCache (cachekey, feedUrlList, river); //9/15/22 by DW
+						}
+					myConsoleLog ("getRiverFromAllCategory: cachekey == " + cachekey + ", " + utils.secondsSince (whenstart) + " secs.");
+					callback (err, river);
+					}, metadata);
+				}
+			}
+		});
+	}
+
+
 function getRiverFromCategory (screenname, catname, callback) {
+	
+	
 	const cachekey = "category:" + screenname + "/" + catname, whenstart = new Date ();
 	function getTheFeeds (screenname, catname, callback) {
 		const catnameparam = davesql.encode ("%," + catname + ",%"); //11/21/23 by DW
@@ -1651,6 +1695,8 @@ function getRiverFromCategory (screenname, catname, callback) {
 			});
 		}
 	}
+
+
 function getRiverFromScreenname (screenname, callback) { //4/25/23 by DW
 	const cachekey = "screenname:" + screenname, whenstart = new Date ();
 	function getTheFeeds (screenname, callback) {

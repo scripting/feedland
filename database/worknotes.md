@@ -1,3 +1,21 @@
+#### 2/22/24; 9:13:25 AM by DW
+
+I added some test code when it was building the All category for user davewiner. 
+
+The hope was it would make the query run faster, but it actually ran slower, so I commented the test code. 
+
+Notes on the idea are below.
+
+For at least a month we've been trying to figure out why my <i>All</i> category takes 18 seconds to render where it used to take less than one second, as do all my other categories. This takes people focusing on it from the FeedLand point of view and from the OS/SQL standpoint. We haven't gotten together on this, and it doesn't seem likely we will in the near future. In the meantime I can't help but come up with my own ideas about how to work around this problem. Limit the number of feeds in a category? Or -- my current thought -- include feeds that have updated in the last 48 hours say. That's another query, but I think it might work! Or another approach, limit it to the 200 feeds that have updated most recently. 200 seemed to be a magic number. If I cut the All category down to 200 feeds it got a lot faster. 
+
+https://github.com/scripting/feedlandDev/issues/4
+
+So I'm going to give it a try now.
+
+#### 2/12/24; 2:01:27 PM by DW
+
+Using a different index in getRiver.
+
 #### 2/7/24; 4:18:17 PM by DW
 
 Trying to speed up river building by limiting results from a river to a configurable number of days. 
