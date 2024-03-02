@@ -1,4 +1,4 @@
-const myVersion = "0.6.59", myProductName = "feedland"; 
+const myVersion = "0.6.65", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -71,10 +71,10 @@ var config = {
 	minSecsBetwIndividualReadingListCheck: 5 * 60, //10/10/23 by DW
 	
 	flWordPressIdentityDefault: false, //11/13/23 by DW
-	
 	flIncludeImageMetadata: false, //12/1/23 by DW
-	
 	flFeedsHaveIds: undefined, //1/31/24 by DW
+	httpRequestTimeoutSecs: 1, //2/26/24 by DW
+	flCanUseFeedIds: true, //2/26/24 by DW
 	
 	urlImageForMetadata: "http://scripting.com/images/2022/10/20/someoneElsesFeedList.png",
 	metaDescription: "The first full feed management system. Share lists of feeds with other users, both in and outside of FeedLand. Writing feeds, reading news."
@@ -1509,6 +1509,7 @@ function start () {
 			appConfig.getStaticFile = getStaticFileInSql;
 			appConfig.publishStaticFile = publishStaticFileInSql;
 			}
+		reallysimple.setConfig ({timeOutSecs: config.httpRequestTimeoutSecs}); //2/26/24 by DW
 		blog.start (config, function () {
 			config.database.logCallback = logSqlCalls; //9/21/23 by DW
 			davesql.start (config.database, function () {

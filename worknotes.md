@@ -1,3 +1,15 @@
+#### 2/26/24; 11:09:49 AM by DW
+
+New config setting -- config.httpRequestTimeoutSecs, defaults to 1.
+
+It's a setting for the reallySimple package that does all our feed reading. 
+
+Down there the default value is 10. 
+
+Really any feed that can't be read in 1 second is trouble. 
+
+I've wanted to fix this for a long time. 
+
 #### 2/1/24; 11:18:11 AM by DW
 
 If you want a config value to make it to config in database, it must be set brefore we call database.start.

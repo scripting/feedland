@@ -1,3 +1,21 @@
+#### 3/2/24; 12:07:02 PM by DW
+
+getRiverFromEverything was broken. The fix was in getRiver.
+
+#### 3/2/24; 9:58:45 AM by DW
+
+Rewrote saveFeed function.
+
+https://github.com/scripting/feedlandDev/issues/7
+
+#### 2/26/24; 1:02:16 PM by DW
+
+New config setting -- config.flCanUseFeedIds, defaults to true.
+
+I suspect the code that uses feedId's to build rivers. It was never necessary on Digital Ocean servers, and did not improve performance on VIP. 
+
+Even so we leave the default at true. I want to try setting it false on my new test server and see what happens. 
+
 #### 2/22/24; 9:13:25 AM by DW
 
 I added some test code when it was building the All category for user davewiner. 

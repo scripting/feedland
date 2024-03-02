@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.7.39";  
+var myProductName = "feedlandDatabase", myVersion = "0.7.43";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -148,8 +148,8 @@ var config = {
 	ctSecsLifeRiverCache: 5 * 60, //9/13/23 by DW
 	
 	flCheckForDeleted: false, //11/20/23 by DW
-	
 	ctRiverCutoffDays: 365, //2/7/24 by DW
+	flLogCheckFeed: true, //2/28/24 by DW
 	
 	getUserOpmlSubscriptions: function (username, catname, callback) { //6/27/22 by DW
 		},
@@ -585,6 +585,10 @@ function getNexItemtId () { //5/3/22 by DW
 function saveItem (itemRec, callback) { 
 	itemRec = removeNullValuesFromObject (itemRec); //5/27/23 by DW
 	
+	if (itemRec.feedId === undefined) { //3/2/24 by DW
+		delete itemRec.feedId;
+		}
+	
 	if (itemRec.enclosureLength !== undefined) { //1/10/23 by DW
 		if (typeof itemRec.enclosureLength == "string") {
 			if (itemRec.enclosureLength.length == 0) {
@@ -629,27 +633,54 @@ function deleteItem (id, callback) { //4/22/22 by DW
 	callback ({message}); //12/16/23 by DW
 	return;
 	}
+
+
 function saveFeed (feedRec, callback) {
-	const sqltext = "replace into feeds " + davesql.encodeValues (removeNullValuesFromObject (feedRec));
-	davesql.runSqltext (sqltext, function (err, result) {
-		if (err) {
-			if (callback !== undefined) {
-				callback (err);
+	isFeedInDatabase (feedRec.feedUrl, function (flInDatabase, feedRecFromDatabase) {
+		var sqltext;
+		if (flInDatabase && (feedRecFromDatabase.feedId !== undefined)) {
+			const whereclause = " where feedId = " + feedRecFromDatabase.feedId;
+			const newFeedRec = removeNullValuesFromObject (feedRec);
+			if (newFeedRec.feedId !== undefined) { //don't try to update the feedId
+				delete newFeedRec.feedId; 
 				}
+			
+			var valuestext = "";
+			for (var x in newFeedRec) {
+				var val = newFeedRec [x];
+				if (notNull (val)) {
+					if (valuestext.length > 0) {
+						valuestext += ", ";
+						}
+					valuestext += x + " = " + davesql.encode (val);
+					}
+				}
+			sqltext = "update feeds set " + valuestext + whereclause;
 			}
 		else {
-			if (callback !== undefined) {
-				if (err) {
+			sqltext = "insert into feeds " + davesql.encodeValues (removeNullValuesFromObject (feedRec));
+			console.log ("saveFeed insert: feedRec.feedUrl == " + feedRec.feedUrl + ", feedRecFromDatabase.feedId == " + feedRecFromDatabase.feedId);
+			}
+		davesql.runSqltext (sqltext, function (err, result) {
+			if (err) {
+				console.log ("saveFeed error: sqltext == " + sqltext);
+				if (callback !== undefined) {
 					callback (err);
 					}
-				else {
-					feedRec.feedId = result.insertId; //2/3/24 by DW
-					callback (undefined, feedRec); 
+				}
+			else {
+				if ((feedRec.feedId !== undefined) && (result.insertId !== undefined)) { 
+					feedRec.feedId = result.insertId; 
+					}
+				if (callback !== undefined) {
+					callback (undefined, feedRec);
 					}
 				}
-			}
+			});
 		});
 	}
+
+
 function convertDatabaseItem (itemRec) { //convert database item to the item struct defined by the API
 	function convertDate (d) {
 		if ((d === undefined) || (d == null)) {
@@ -1239,7 +1270,9 @@ function checkFeedAndItems (feedUrl, callback, flNewFeed=false) {
 		});
 	}
 function checkOneFeed (feedUrl, callback) {
-	myConsoleLog ("checkOneFeed: feedUrl == " + feedUrl); //8/18/23 by DW
+	if (config.flLogCheckFeed) { //2/28/24 by DW
+		myConsoleLog ("checkOneFeed: feedUrl == " + feedUrl); //8/18/23 by DW
+		}
 	checkFeedAndItems (feedUrl, function (err, theFeed, feedRec) {
 		if (err) {
 			if (callback !== undefined) {
@@ -1437,7 +1470,7 @@ function getRiver (feedUrl, screenname, callback, metadata=undefined) {
 		var feedClause;
 		if (feedUrl === undefined) {
 			if (screenname === undefined) { //10/14/22 by DW
-				feedClause = "";
+				feedClause = "1 = 1"; //3/2/24 by DW
 				}
 			else {
 				feedClause = "feedurl in (select feedUrl from subscriptions where listName='" + screenname + "')";
@@ -1452,7 +1485,7 @@ function getRiver (feedUrl, screenname, callback, metadata=undefined) {
 				if (listtext.length > 0) {
 					listtext = utils.stringMid (listtext, 1, listtext.length - 1);
 					}
-				if (config.flFeedsHaveIds) { //2/3/24 by DW
+				if (config.flFeedsHaveIds && config.flCanUseFeedIds) { //2/3/24 by DW
 					feedClause = "feedId in (" + listtext + ")";
 					}
 				else {
@@ -1599,7 +1632,7 @@ function getRiverFromOpml (urlOpml, callback) { //8/21/22 by DW
 function getListOfFeedIds (theSubscriptions) { //2/3/24 by DW
 	var theList = new Array ();
 	theSubscriptions.forEach (function (sub) {
-		if (config.flFeedsHaveIds) {
+		if (config.flFeedsHaveIds && config.flCanUseFeedIds) {
 			theList.push (sub.feedId);
 			}
 		else {
