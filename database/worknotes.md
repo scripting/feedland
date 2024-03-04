@@ -1,3 +1,11 @@
+#### 3/4/24; 4:53:53 PM by DW
+
+feedland.org is running really slowly, and the slowness is traced to using <i>index (feedId)</i> in the query in getRiver. 
+
+we didn't know what we were doing when we were trying out new queries earlier this year. 
+
+must remember to treat this app with more respect in the future. 
+
 #### 3/2/24; 12:07:02 PM by DW
 
 getRiverFromEverything was broken. The fix was in getRiver.

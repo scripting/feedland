@@ -1,3 +1,7 @@
+#### 3/4/24; 5:07:45 PM by DW
+
+Changed the default of flCanUseFeedIds to false. We really don't have river-building with feedId's debugged, so it should defauit false. My advice would be for everyone to turn it off, so I turned it off for them.
+
 #### 2/26/24; 11:09:49 AM by DW
 
 New config setting -- config.httpRequestTimeoutSecs, defaults to 1.

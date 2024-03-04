@@ -1,4 +1,4 @@
-const myVersion = "0.6.65", myProductName = "feedland"; 
+const myVersion = "0.6.66", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -74,7 +74,7 @@ var config = {
 	flIncludeImageMetadata: false, //12/1/23 by DW
 	flFeedsHaveIds: undefined, //1/31/24 by DW
 	httpRequestTimeoutSecs: 1, //2/26/24 by DW
-	flCanUseFeedIds: true, //2/26/24 by DW
+	flCanUseFeedIds: false, //2/26/24 by DW & 3/4/24 by DW
 	
 	urlImageForMetadata: "http://scripting.com/images/2022/10/20/someoneElsesFeedList.png",
 	metaDescription: "The first full feed management system. Share lists of feeds with other users, both in and outside of FeedLand. Writing feeds, reading news."

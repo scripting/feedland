@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.7.43";  
+var myProductName = "feedlandDatabase", myVersion = "0.7.44";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -1515,6 +1515,14 @@ function getRiver (feedUrl, screenname, callback, metadata=undefined) {
 			return (timeClause);
 			}
 		}
+	function useIndexFeedId () { //3/4/24 by DW
+		if (config.flFeedsHaveIds && config.flCanUseFeedIds) {
+			return (" use index (feedId) ");
+			}
+		else {
+			return ("");
+			}
+		}
 	function sortRiver (theFlatArray) {
 		var titles = new Object (), ctDuplicatesSkipped = 0;
 		var theRiver = {
@@ -1561,7 +1569,7 @@ function getRiver (feedUrl, screenname, callback, metadata=undefined) {
 		}
 	
 	const deleteCheck = (config.flCheckForDeleted) ? " flDeleted=false " : ""; //11/20/23 by DW
-	const sqltext = "select * from items use index (feedId) where " + deleteCheck + getFeedClause () + getTimeClause () + " order by pubDate desc limit " + config.maxRiverItems + ";"; //2/12/24 by DW
+	const sqltext = "select * from items " + useIndexFeedId () + " where " + deleteCheck + getFeedClause () + getTimeClause () + " order by pubDate desc limit " + config.maxRiverItems + ";"; //2/12/24 by DW
 	console.log ("getRiver: sqltext == " + sqltext);
 	davesql.runSqltext (sqltext, function (err, result) {
 		if (err) {
@@ -2188,7 +2196,6 @@ function getFeedsInCategory (screenname, catname, callback) {
 	
 	const askForFeedId = (config.flFeedsHaveIds) ? ", f.feedId " : ""; //1/31/24 by DW
 	const sqltext = "select s.feedUrl, f.title, f.description, f.htmlUrl, f.ctSubs, f.ctItems, f.whenCreated, f.whenUpdated, f.whenChecked, f.ctChecks, f.ctSecs, f.ctErrors, f.ctConsecutiveErrors, f.whenLastError, s.categories, f.whoFirstSubscribed, s.urlReadingList " + askForFeedId + " from subscriptions as s, feeds as f where s.feedUrl = f.feedUrl and f.title is not null and s.listName = " + davesql.encode (screenname) + likeclause + " order by s.whenUpdated desc;";
-	console.log ("getFeedsInCategory: sqltext == " + sqltext);
 	
 	davesql.runSqltext (sqltext, function (err, result) {
 		if (err) {
