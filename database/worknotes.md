@@ -1,3 +1,15 @@
+#### 3/17/24; 10:51:07 AM by DW
+
+The logging message in checkOneFeed now says how many seconds it took.
+
+#### 3/9/24; 10:59:19 AM by DW
+
+In addSubscription, we assumed feedId can't be null, but the value passed to us is sometimes null, due to an earlier coding error when we quickly added feedId's as an experiment. We went crazy there. Still paying for it, fixing a bug that was added over a month ago. 
+
+Fixed crashing bug when we were saving a new feed. It was in some debugging code I added to debug another feature. Still paying for the attempt to quickly add feedId. Not a good thing to try when your attention is not in DatabaseLand. 
+
+Commented out the console.log statement. 
+
 #### 3/4/24; 4:53:53 PM by DW
 
 feedland.org is running really slowly, and the slowness is traced to using <i>index (feedId)</i> in the query in getRiver. 

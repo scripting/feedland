@@ -1,3 +1,11 @@
+3/17/24; 10:24:26 AM by DW
+
+Until now the most frequently we could check a feed was once a second. 
+
+Now we can do it more frequently. 
+
+See startFeedChecker.
+
 #### 3/4/24; 5:07:45 PM by DW
 
 Changed the default of flCanUseFeedIds to false. We really don't have river-building with feedId's debugged, so it should defauit false. My advice would be for everyone to turn it off, so I turned it off for them.

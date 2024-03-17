@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.7.44";  
+var myProductName = "feedlandDatabase", myVersion = "0.7.48";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -529,10 +529,14 @@ function addSubscription (screenname, feedUrl, feedId, callback) {
 	var subsRec = {
 		listName: maxStringLength (screenname, config.maxListNameLength),
 		feedUrl: maxStringLength (feedUrl, config.maxFeedUrlLength),
-		feedId, //2/3/24 by DW
 		categories: ",all,", //9/11/22 by DW
 		whenUpdated: new Date ()
 		};
+	
+	if (notNull (feedId)) { //3/9/24 by DW
+		subsRec.feedId = feedId;
+		}
+	
 	var sqltext = "replace into subscriptions " + davesql.encodeValues (subsRec);
 	davesql.runSqltext (sqltext, function (err, result) {
 		setFeedSubsCount (feedUrl, function (err, ctSubs) {
@@ -659,7 +663,6 @@ function saveFeed (feedRec, callback) {
 			}
 		else {
 			sqltext = "insert into feeds " + davesql.encodeValues (removeNullValuesFromObject (feedRec));
-			console.log ("saveFeed insert: feedRec.feedUrl == " + feedRec.feedUrl + ", feedRecFromDatabase.feedId == " + feedRecFromDatabase.feedId);
 			}
 		davesql.runSqltext (sqltext, function (err, result) {
 			if (err) {
@@ -1270,16 +1273,20 @@ function checkFeedAndItems (feedUrl, callback, flNewFeed=false) {
 		});
 	}
 function checkOneFeed (feedUrl, callback) {
-	if (config.flLogCheckFeed) { //2/28/24 by DW
-		myConsoleLog ("checkOneFeed: feedUrl == " + feedUrl); //8/18/23 by DW
-		}
+	const whenstart = new Date ();
 	checkFeedAndItems (feedUrl, function (err, theFeed, feedRec) {
 		if (err) {
+			if (config.flLogCheckFeed) { //3/17/24 by DW
+				myConsoleLog ("checkOneFeed: feedUrl == " + feedUrl + ", err.message == " + err.message);
+				}
 			if (callback !== undefined) {
 				callback (err);
 				}
 			}
 		else {
+			if (config.flLogCheckFeed) { //3/17/24 by DW
+				myConsoleLog ("checkOneFeed: " + utils.secondsSince (whenstart) + " secs, feedUrl == " + feedUrl);
+				}
 			if (callback !== undefined) {
 				callback (undefined, convertDatabaseFeed (feedRec));
 				}
@@ -1570,7 +1577,6 @@ function getRiver (feedUrl, screenname, callback, metadata=undefined) {
 	
 	const deleteCheck = (config.flCheckForDeleted) ? " flDeleted=false " : ""; //11/20/23 by DW
 	const sqltext = "select * from items " + useIndexFeedId () + " where " + deleteCheck + getFeedClause () + getTimeClause () + " order by pubDate desc limit " + config.maxRiverItems + ";"; //2/12/24 by DW
-	console.log ("getRiver: sqltext == " + sqltext);
 	davesql.runSqltext (sqltext, function (err, result) {
 		if (err) {
 			if (callback !== undefined) {
@@ -2225,7 +2231,7 @@ function getFeedsInCategory (screenname, catname, callback) {
 function getSubscriptions (screenname, callback) {
 	getFeedsInCategory (screenname, undefined, callback);
 	}
-function getOpmlFromArray (metadata, feedsArray) {
+function getOpmlFromArray (metadata, feedsArray, flIncludeFeedsFromReadingLists=false) {
 	var opmltext = "", indentlevel = 0, now = new Date ();
 	function add (s) {
 		opmltext += utils.filledString ("\t", indentlevel) + s + "\n";
@@ -2291,7 +2297,14 @@ function getOpmlFromArray (metadata, feedsArray) {
 						add ("</outline>"); indentlevel--;
 						}
 					else {
-						addOneSub (feed);
+						if (flIncludeFeedsFromReadingLists) { //3/17/24 by DW
+							addOneSub (feed);
+							}
+						else {
+							if (feed.urlReadingList === undefined) {
+								addOneSub (feed);
+								}
+							}
 						}
 					}
 				}

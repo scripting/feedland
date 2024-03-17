@@ -1,4 +1,4 @@
-const myVersion = "0.6.66", myProductName = "feedland"; 
+const myVersion = "0.6.70", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -1458,12 +1458,6 @@ function everySecond () {
 			whenLastCloudRenew = now;
 			}
 		}
-	if (config.flUpdateFeedsInBackground) {
-		if (utils.secondsSince (whenLastFeedCheck) >= config.minSecsBetwFeedChecks)  {
-			database.updateNextFeedIfReady ();
-			whenLastFeedCheck = now;
-			}
-		}
 	if (config.flUseSqlForSockets) { //9/26/23 by DW && 10/4/23 by DW
 		if (utils.secondsSince (whenLastSqlSocketCheck) >= config.minSecsBetwSqlSocketChecks)  {
 			notifySocketSubscribersFromSql (function (jstruct) { //10/1/23 by DW -- added callback
@@ -1484,6 +1478,13 @@ function everySecond () {
 		}
 	}
 
+function startFeedChecker () { //3/17/24 by DW
+	if (config.flUpdateFeedsInBackground) {
+		const ctmillisecs = config.minSecsBetwFeedChecks * 1000;
+		console.log ("startFeedChecker: ctmillisecs == " + ctmillisecs);
+		setInterval (database.updateNextFeedIfReady, ctmillisecs); 
+		}
+	}
 
 function start () {
 	var options = {
@@ -1524,6 +1525,9 @@ function start () {
 								}
 							if (config.flBackupOnStartup) { //1/9/23 by DW
 								database.backupDatabase (); 
+								}
+							if (config.flUpdateFeedsInBackground) { //3/17/24 by DW
+								startFeedChecker ();
 								}
 							});
 						});
