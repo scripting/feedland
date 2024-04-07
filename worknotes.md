@@ -1,4 +1,8 @@
-3/17/24; 10:24:26 AM by DW
+#### 3/23/24; 7:37:28 PM by DW
+
+New endpoint: /getuserinfowithwordpresstoken.
+
+#### 3/17/24; 10:24:26 AM by DW
 
 Until now the most frequently we could check a feed was once a second. 
 

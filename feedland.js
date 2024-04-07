@@ -1,4 +1,4 @@
-const myVersion = "0.6.70", myProductName = "feedland"; 
+const myVersion = "0.6.74", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -14,6 +14,7 @@ const reallysimple = require ("reallysimple");
 const blog = require ("./blog.js");
 const process = require ("process"); //9/14/22 by DW
 const qs = require ("querystring"); //10/9/22 by DW
+const wordpress = require ("wpidentity"); //3/23/24 by DW
 
 
 var config = {
@@ -847,6 +848,20 @@ function loginWordpressUser (accessToken, theUserInfo, callback) { //10/31/23 by
 		});
 	}
 
+function getUserInfoWithWordpressToken (token, callback) { //3/23/24 by DW
+	wordpress.getUserInfo (token, function (err, theUserInfo) { //gets us the email address, among other things
+		database.findUserWithEmail (theUserInfo.email, function (flEmailUsed, userRec) { 
+			if (flEmailUsed) {
+				callback (undefined, userRec);
+				}
+			else {
+				const message = "Can't find a user with email address \"" + theUserInfo.email + "\"";
+				callback ({message});
+				}
+			});
+		});
+	}
+
 function removeNullValuesFromObject (obj) { //9/26/22 by DW
 	for (var x in obj) { 
 		if (obj [x] == null) {
@@ -1383,6 +1398,10 @@ function handleHttpRequest (theRequest) {
 					callWithScreenname (function (screenname) {
 						database.checkSubsForOneUserAndOneReadingList (screenname, params.url, httpReturn);
 						});
+					return (true);
+				
+				case "/getuserinfowithwordpresstoken": //3/23/24 by DW
+					getUserInfoWithWordpressToken (params.token, httpReturn);
 					return (true);
 				
 				case config.rssCloud.feedUpdatedCallback: //12/12/22 by DW
