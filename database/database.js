@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.7.50";  
+var myProductName = "feedlandDatabase", myVersion = "0.7.51";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
