@@ -1,3 +1,13 @@
+#### 4/29/24; 9:26:53 AM by DW
+
+One of my servers was using up space at an alarming rate. I investigated and found it was accumulating a lot of files in the feedland data folder, riverBuildLogs sub-folder.
+
+It felt familiar, like we had been here before, and we did on 10/20/23, there's a worknotes entry here, it says that config.flRiverBuildLogEnabled would now default to false, but I checked the code, and it's still defaulting to true. 
+
+This time I changed it for real, I hope, and any servers out there that are writing lots of files that are only useful for a certain kind of debugging, will stop doing so on the next restart. 
+
+BTW, you might want to look in the data/riverBuildLogs folder and delete the files.
+
 #### 3/17/24; 10:51:07 AM by DW
 
 The logging message in checkOneFeed now says how many seconds it took.

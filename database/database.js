@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.7.51";  
+var myProductName = "feedlandDatabase", myVersion = "0.7.52";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -136,7 +136,7 @@ var config = {
 		message: "Backup of FeedLand server",
 		userAgent: ""
 		},
-	flRiverBuildLogEnabled: true, //10/10/22 by DW
+	flRiverBuildLogEnabled: false, //4/29/24 by DW
 	riverBuildLogFolder: "data/riverBuildLogs/",
 	
 	blockedUsers: [

@@ -1,4 +1,4 @@
-const myVersion = "0.6.75", myProductName = "feedland"; 
+const myVersion = "0.6.76", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
