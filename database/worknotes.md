@@ -1,12 +1,12 @@
 #### 4/29/24; 9:26:53 AM by DW
 
-One of my servers was using up space at an alarming rate. I investigated and found it was accumulating a lot of files in the feedland data folder, riverBuildLogs sub-folder.
+One of my servers was using up space at an alarming rate. I investigated and found it was accumulating a lot of files in the feedland <i>data</i> folder, <i>riverBuildLogs</i> sub-folder.
 
-It felt familiar, like we had been here before, and we did on 10/20/23, there's a worknotes entry here, it says that config.flRiverBuildLogEnabled would now default to false, but I checked the code, and it's still defaulting to true. 
+It felt familiar, like we had been here before, and we did on on 10/20/23. The <a href="https://github.com/scripting/feedland/blob/main/database/worknotes.md#102023-112957-am-by-dw">worknote</a> says that <i>config.flRiverBuildLogEnabled</i> would now default to false, but I checked the code, and it's still defaulting to true. 
 
 This time I changed it for real, I hope, and any servers out there that are writing lots of files that are only useful for a certain kind of debugging, will stop doing so on the next restart. 
 
-BTW, you might want to look in the data/riverBuildLogs folder and delete the files.
+BTW, you might want to look in the <i>data/riverBuildLogs</i> folder and delete the files.
 
 #### 3/17/24; 10:51:07 AM by DW
 
