@@ -4,7 +4,7 @@ A database for storing feeds for FeedLand aggregators.
 
 ### What is this?
 
-This is the source code for the NPM package <a href="https://www.npmjs.com/package/feedlanddatabase">feedlanddatabase</a>. 
+This is the source code for the NPM package <a href="https://github.com/scripting/feedland/tree/main/database">feedlanddatabase</a>. 
 
 #### Background
 
