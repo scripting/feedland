@@ -1,4 +1,4 @@
-const myVersion = "0.6.76", myProductName = "feedland"; 
+const myVersion = "0.6.78", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -78,7 +78,10 @@ var config = {
 	flCanUseFeedIds: false, //2/26/24 by DW & 3/4/24 by DW
 	
 	urlImageForMetadata: "http://scripting.com/images/2022/10/20/someoneElsesFeedList.png",
-	metaDescription: "The first full feed management system. Share lists of feeds with other users, both in and outside of FeedLand. Writing feeds, reading news."
+	metaDescription: "The first full feed management system. Share lists of feeds with other users, both in and outside of FeedLand. Writing feeds, reading news.",
+	
+	membershipClosedHeadline: "We're not signing up new users yet.", //5/27/24 by DW
+	membershipClosedExplanation: "We're building a new FeedLand capable of serving even more news and users."
 	};
 
 var whenLastDayRollover = new Date ();
@@ -315,6 +318,8 @@ function addMacroToPagetable (pagetable) {
 		addvalue ("productNameForDisplay");
 		addvalue ("urlServerHomePageSource");
 		addvalue ("urlStarterFeeds"); //1/22/23 by DW
+		addvalue ("membershipClosedHeadline"); //5/27/24 by DW
+		addvalue ("membershipClosedExplanation");
 		return (utils.jsonStringify (theConfig));
 		}
 	pagetable.urlForFeeds = config.urlForFeeds;
@@ -328,6 +333,8 @@ function addMacroToPagetable (pagetable) {
 	pagetable.feedlandVersion = myVersion; //9/21/23 by DW
 	pagetable.flWordPressIdentityDefault = config.flWordPressIdentityDefault; //11/13/23 by DW
 	pagetable.mysqlVersion = config.mysqlVersion; //11/18/23 by DW
+	pagetable.membershipClosedHeadline = config.membershipClosedHeadline; //5/27/24 by DW
+	pagetable.membershipClosedExplanation = config.membershipClosedExplanation;
 	database.addMacroToPagetable (pagetable); //12/1/23 by DW
 	
 	//12/2/22 by DW & 12/1/23 by DW -- set up the normal case for the Facebook/Twitter metadata
