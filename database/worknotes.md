@@ -1,3 +1,27 @@
+#### 6/28/24; 11:23:10 AM by DW
+
+Remove debugging code added to checkReadingList to track down breaking change fix yesterday.
+
+#### 6/27/24; 9:09:57 AM by DW
+
+Breaking change in the move to mysql2, it changed the way it deals with JSON objects in tables, it parses them. 
+
+https://github.com/scripting/feedlandInstall/issues/60
+
+Added a long comment at the head of checkReadingList explaining what it does and how it works. 
+
+New function -- addFeedIfNecessary -- called it from addFeedsIfNecessary. Does the minimum necessary to be sure the feed is in the database.
+
+Added lots of debugging code.
+
+#### 6/24/24; 9:29:48 AM by DW
+
+Formatting change for title and description in OPML subscription lists we generate. See getUserOpmlSubscriptions.
+
+#### 6/20/24; 8:51:33 AM by DW
+
+Fixed a crashing bug in subscribeToReadingList. 
+
 #### 4/29/24; 9:26:53 AM by DW
 
 One of my servers was using up space at an alarming rate. I investigated and found it was accumulating a lot of files in the feedland <i>data</i> folder, <i>riverBuildLogs</i> sub-folder.

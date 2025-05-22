@@ -1,4 +1,4 @@
-const myVersion = "0.6.78", myProductName = "feedland"; 
+const myVersion = "0.6.79", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -177,7 +177,7 @@ function initLastNewItem (callback) { //9/26/23 by DW
 		});
 	}
 function notifySocketSubscribersFromSql (callback) { //9/26/23 by DW
-	const sqltext = "select * from items where id > " + davesql.encode (idLastNewItem) + " order by id desc;";
+	const sqltext = "select * from items where id > " + davesql.encode (idLastNewItem) + " order by id desc;", whenstart = new Date ();
 	davesql.runSqltext (sqltext, function (err, result) {
 		if (err) {
 			console.log ("notifySocketSubscribersFromSql: " + err.message); 
@@ -185,6 +185,15 @@ function notifySocketSubscribersFromSql (callback) { //9/26/23 by DW
 		else {
 			if (result.length > 0) {
 				let feedRecs = new Object (); //if more than one item for a feed, we only have to get the feed data once
+				
+				var ids = ""; //5/21/25 by DW
+				result.forEach (function (item) {
+					if (ids.length > 0) {
+						ids += ", ";
+						}
+					ids += item.id
+					});
+				console.log ("\nnotifySocketSubscribersFromSql: id's seen == " + ids + "\n"); 
 				
 				function doNext (ix) {
 					if (ix < result.length) {
@@ -217,6 +226,9 @@ function notifySocketSubscribersFromSql (callback) { //9/26/23 by DW
 							sendmessage (feedRecs [item.feedUrl]);
 							doNext (ix + 1);
 							}
+						}
+					else {
+						console.log ("notifySocketSubscribersFromSql: " + utils.secondsSince (whenstart) + " secs.");
 						}
 					}
 				doNext (0);

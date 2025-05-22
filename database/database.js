@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.7.52";  
+var myProductName = "feedlandDatabase", myVersion = "0.7.55";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -188,8 +188,8 @@ function initStats () {
 		}
 	}
 function myConsoleLog (theLogMessage) { //10/11/23 by DW
-	const whenstring = new Date ().toLocaleTimeString ();
-	console.log (whenstring + " " + theLogMessage);
+	const whenstring = new Date ().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}); //6/28/24 by DW
+	console.log (whenstring + ": " + theLogMessage);
 	}
 function notNull (val) {
 	if (val === undefined) {
@@ -1040,6 +1040,26 @@ function setupNewFeedRec (feedUrl, theFeed) {
 		};
 	return (feedRec);
 	}
+
+function addFeedIfNecessary (feedUrl, callback) { //6/27/24 by DW
+	isFeedInDatabase (feedUrl, function (flInDatabase) {
+		if (flInDatabase) {
+			callback (undefined);
+			}
+		else {
+			reallysimple.readFeed (feedUrl, function (err, theFeed) {
+				if (err) {
+					callback (err);
+					}
+				else {
+					var feedRec = setupNewFeedRec (feedUrl, theFeed); 
+					saveFeed (feedRec, callback);
+					}
+				});
+			}
+		});
+	}
+
 function checkFeed (feedUrl, callback) { 
 	function callbackWithError (message) {
 		if (callback !== undefined) {
@@ -1577,6 +1597,7 @@ function getRiver (feedUrl, screenname, callback, metadata=undefined) {
 	
 	const deleteCheck = (config.flCheckForDeleted) ? " flDeleted=false " : ""; //11/20/23 by DW
 	const sqltext = "select * from items " + useIndexFeedId () + " where " + deleteCheck + getFeedClause () + getTimeClause () + " order by pubDate desc limit " + config.maxRiverItems + ";"; //2/12/24 by DW
+	console.log ("getRiver: sqltext == " + sqltext);
 	davesql.runSqltext (sqltext, function (err, result) {
 		if (err) {
 			if (callback !== undefined) {
@@ -2330,12 +2351,15 @@ function getUserOpmlSubscriptions (screenname, catname, callback) {
 			callback (err);
 			}
 		else {
-			var categoryInfo = (catname === undefined) ? "" : " (category: " + catname + ")";
+			const categoryInfo = (catname === undefined) ? "" : ", " + catname + " category";
+			const title = (catname === undefined) ? screenname : screenname + "/" + catname; //6/24/24 by DW
 			var metadata = {
-				title: "Subscriptions for " + screenname + categoryInfo,
-				description: "List created by " + myProductName + " v" + myVersion
+				title,
+				
+				description: screenname + "'s subscription list" + categoryInfo + ". List created by " + myProductName + " v" + myVersion + "." //6/24/24 by DW
+				
 				};
-			var opmltext = getOpmlFromArray (metadata, feedsArray);
+			const opmltext = getOpmlFromArray (metadata, feedsArray);
 			callback (undefined, opmltext);
 			}
 		});
@@ -3365,7 +3389,11 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 						callback (undefined, theSubscription);
 						addReadingListFeedsToDatabase (screenname, opmlUrl, function (err) {
 							if (!err) {
-								checkSubsForOneUserAndOneReadingList (screenname, opmlUrl);
+								checkSubsForOneUserAndOneReadingList (screenname, opmlUrl, function (err, urlsToSubscribeTo) { //6/20/24 by DW
+									if (err) {
+										console.log ("subscribeToReadingList: err.message == " + err.message);
+										}
+									});
 								}
 							});
 						}
@@ -3682,12 +3710,12 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 			});
 		}
 	function checkReadingList (opmlUrl, callback) { //10/8/23 by DW
-		myConsoleLog ("checkReadingList: opmlUrl == " + opmlUrl);
+		myConsoleLog ("checkReadingList: opmlUrl == " + opmlUrl + ", hello");
 		function addFeedsIfNecessary (urlsToCheck, callback) {
 			function doNextUrl (ix) {
 				if (ix < urlsToCheck.length) {
 					myConsoleLog ("addFeedsIfNecessary: urlsToCheck [ix] == " + urlsToCheck [ix]);
-					checkFeedAndItems (urlsToCheck [ix], function (err) {
+					addFeedIfNecessary (urlsToCheck [ix], function (err) { //6/28/24 by DW
 						doNextUrl (ix + 1);
 						});
 					}
@@ -3716,6 +3744,7 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 			}
 		getTwoArrays (function (err, oldlist, newNodeArray) {
 			if (err) {
+				myConsoleLog ("checkReadingList: err.message == " + err.message);
 				callback (err);
 				}
 			else {
