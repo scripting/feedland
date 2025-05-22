@@ -1,3 +1,7 @@
+#### 5/21/25; 11:25:27 AM by DW
+
+Added a little debugging code to websocket notification of new items.
+
 #### 3/23/24; 7:37:28 PM by DW
 
 New endpoint: /getuserinfowithwordpresstoken.
