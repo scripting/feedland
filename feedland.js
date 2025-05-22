@@ -228,14 +228,12 @@ function notifySocketSubscribersFromSql (callback) { //9/26/23 by DW
 							}
 						}
 					else {
-						console.log ("notifySocketSubscribersFromSql: " + utils.secondsSince (whenstart) + " secs.");
 						}
 					}
 				doNext (0);
 				
 				
 				idLastNewItem = result [0].id;
-				console.log ("notifySocketSubscribersFromSql: idLastNewItem == " + idLastNewItem);
 				}
 			}
 		});
