@@ -176,6 +176,26 @@ function initLastNewItem (callback) { //9/26/23 by DW
 			}
 		});
 	}
+
+
+var idsAlreadyNotifiedAbout = new Array (); //5/25/25 by DW -- debugging
+
+function notifyingAbout (item) { //5/25/25 by DW
+	var flRepeated = false;
+	idsAlreadyNotifiedAbout.forEach (function (id) {
+		if (id == item.id) {
+			console.log ("notifyingAbout: repeated id == " + id);
+			flRepeated = true;
+			}
+		});
+	if (!flRepeated) {
+		idsAlreadyNotifiedAbout.unshift (item.id);
+		while (idsAlreadyNotifiedAbout.length > 100) {
+			idsAlreadyNotifiedAbout.pop ();
+			}
+		}
+	}
+
 function notifySocketSubscribersFromSql (callback) { //9/26/23 by DW
 	const sqltext = "select * from items where id > " + davesql.encode (idLastNewItem) + " order by id desc;", whenstart = new Date ();
 	davesql.runSqltext (sqltext, function (err, result) {
@@ -197,8 +217,11 @@ function notifySocketSubscribersFromSql (callback) { //9/26/23 by DW
 				
 				function doNext (ix) {
 					if (ix < result.length) {
-						const item = result [ix];
+						const item = result [ix]; //the new feed item we're notifying about
 						function sendmessage (feedRec) {
+							
+							notifyingAbout (item); //5/25/25 by DW
+							
 							let jstruct = {
 								item: database.convertDatabaseItem (item),
 								theFeed: feedRec

@@ -1,3 +1,7 @@
+#### 5/31/25; 2:18:18 PM by DW
+
+New config option, legalTags, configures what HTML you allow to pass from a feed into the database. The default is to let through <p> and <br>.
+
 #### 6/28/24; 11:23:10 AM by DW
 
 Remove debugging code added to checkReadingList to track down breaking change fix yesterday.

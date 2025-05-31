@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.7.55";  
+var myProductName = "feedlandDatabase", myVersion = "0.7.56";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -150,6 +150,14 @@ var config = {
 	flCheckForDeleted: false, //11/20/23 by DW
 	ctRiverCutoffDays: 365, //2/7/24 by DW
 	flLogCheckFeed: true, //2/28/24 by DW
+	
+	legalTags: { //5/31/25 by DW
+		allowedTags: [
+			"p", "br"
+			],
+		allowedAttributes: {
+			}
+		},
 	
 	getUserOpmlSubscriptions: function (username, catname, callback) { //6/27/22 by DW
 		},
@@ -436,17 +444,10 @@ function getItemGuid (item) {
 	return (guid);
 	}
 function stripMarkup (s) { //9/11/22 by DW
-	const legalTags = {
-		allowedTags: [
-			"p", "br"
-			],
-		allowedAttributes: {
-			}
-		};
 	if ((s === undefined) || (s == null) || (s.length == 0)) {
 		return ("");
 		}
-	return (sanitizeHtml (s, legalTags));
+	return (sanitizeHtml (s, config.legalTags));
 	}
 function getItemDescription (item) { //5/28/22 by DW
 	var description;
