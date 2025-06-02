@@ -1,3 +1,15 @@
+#### 6/2/25; 11:54:16 AM by DW -- v0.8.0
+
+We incorrectly assumed that incoming feed records will have image attributes laid out like this:
+
+* theFeed = {imageUrl, imageTitle, imageLink, imageWidth, imageHeight, imageDescription};
+
+But that isn't the way it works. Instead what comes in is this:
+
+* theFeed = {image: {url, title, link, width, height, description}}
+
+We do the conversion in setupNewFeedRec.
+
 #### 5/31/25; 2:18:18 PM by DW
 
 New config option, legalTags, configures what HTML you allow to pass from a feed into the database. The default is to let through <p> and <br>.

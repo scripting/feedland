@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.7.56";  
+var myProductName = "feedlandDatabase", myVersion = "0.8.0";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -947,6 +947,28 @@ function setupNewFeedRec (feedUrl, theFeed) {
 	const titlestring = maxStringLength (theFeed.title, config.maxLengthFeedTitle);
 	const descriptionstring = maxStringLength (theFeed.description, config.maxLengthFeedDescription);
 	
+	function convertImageFormat (theFeed) { //6/2/25 by DW
+		if (theFeed.image !== undefined) {
+			if (theFeed.image.url !== undefined) {
+				theFeed.imageUrl = theFeed.image.url;
+				}
+			if (theFeed.image.title !== undefined) {
+				theFeed.imageTitle = theFeed.image.title;
+				}
+			if (theFeed.image.link !== undefined) {
+				theFeed.imageLink = theFeed.image.link;
+				}
+			if (theFeed.image.width !== undefined) {
+				theFeed.imageWidth = theFeed.image.width;
+				}
+			if (theFeed.image.height !== undefined) {
+				theFeed.imageHeight = theFeed.image.height;
+				}
+			if (theFeed.image.description !== undefined) {
+				theFeed.imageDescription = theFeed.image.description;
+				}
+			}
+		}
 	function getUrlCloudServer (theFeed) {
 		var url = undefined;
 		if (theFeed.cloudUrl === undefined) {
@@ -998,6 +1020,9 @@ function setupNewFeedRec (feedUrl, theFeed) {
 			}
 		return (n);
 		}
+	
+	convertImageFormat (theFeed); //6/2/25 by DW
+	
 	var feedRec = {
 		feedUrl: feedUrl,
 		
