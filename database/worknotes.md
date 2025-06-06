@@ -1,3 +1,7 @@
+#### 6/6/25; 11:41:22 AM by DW
+
+When checking items for changes, we weren't checking outlineJsontext.
+
 #### 6/2/25; 11:54:16 AM by DW -- v0.8.0
 
 We incorrectly assumed that incoming feed records will have image attributes laid out like this:

@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.8.0";  
+var myProductName = "feedlandDatabase", myVersion = "0.8.1";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -1252,6 +1252,7 @@ function checkFeedItems (feedRec, itemsArray, flNewFeed, callback) {
 				checkChange ("enclosureUrl");
 				checkChange ("enclosureLength");
 				checkChange ("flDeleted"); //4/22/22 by DW
+				checkChange ("outlineJsontext"); //6/6/25 by DW
 				itemRec.id = dbItem.id; //must preserve this value
 				itemRec.whenCreated = dbItem.whenCreated; //must preserve this value
 				}
