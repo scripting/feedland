@@ -1,4 +1,4 @@
-const myVersion = "0.7.2", myProductName = "feedland"; 
+const myVersion = "0.7.8", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -195,7 +195,6 @@ function notifySocketSubscribersFromSql (callback) { //9/26/23 by DW
 						}
 					ids += item.id
 					});
-				console.log ("\nnotifySocketSubscribersFromSql: id's seen == " + ids + "\n"); 
 				
 				function doNext (ix) {
 					if (ix < result.length) {

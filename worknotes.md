@@ -1,3 +1,9 @@
+#### 10/31/25; 7:30:53 AM by DW -- 0.7.5
+
+New version of wpIdentity, 0.5.27. 
+
+And new version of daveappserver, which requires wpIdentity too. 
+
 #### 10/26/25; 12:04:25 PM by DW -- v0.7.1
 
 No changes in this version of feedlandserver. 
