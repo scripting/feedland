@@ -1,4 +1,52 @@
-#### 10/27/25; 12:49:23 PM by DW
+#### 11/21/25; 4:28:34 PM by DW -- v0.8.6
+
+New version of getItemGuid following Brent Simmons' approach in NetNewsWire.
+
+* https://github.com/scripting/feedlandDev/issues/11#issuecomment-3564109490
+
+According to Brent -- 
+
+* The first fallback, if no guid, is link + pubDate. This is because there are feeds out there where the link for every item is the same (often a link to the site’s home page).
+
+* After that is title + pubDate. 
+
+* If link and title are empty, then it’s just pubDate.
+
+* If pubDate is empty, then we use, in order, link alone, title alone, and finally body alone.
+
+#### 11/21/25; 10:31:54 AM by DW
+
+Changes to how getItemGuid works.
+
+* We don't accept guids of zero length.
+
+* If we don't have a guid value but do have a link value we use the link as the guid.
+
+* If we have neither a guid or link, we smash together pubDate and title and md5 it.
+
+#### 11/20/25; 10:45:47 AM by DW
+
+Commented out console.log of sqltext for river2 calls. These took up a lot of space in the console. 
+
+No longer calling a change to pubDate a change to the item. Same with enclosureLength.
+
+#### 11/18/25; 11:49:24 AM by DW
+
+getItemPubdate now checks whether the pubDate value is defined before it checks its value. 
+
+the way markdowntext used to work at this level
+
+* If present, we overwrite the description element with the rendered markdown text
+
+* This is not the level to do this at. We must retain the description, it's the conservative thing to do. 
+
+* How markdowntext will be used is not decided yet, and doing the replacement here gives us no flexibility in the future. 
+
+* There's a new config.flMarkdownReplacesDescription, default false -- but don't set it true. I did it this way so the code could remain here for future study.
+
+* Also markd not defined when converting to markdown text, so it didn't even work, thank goodness. 
+
+#### 10/27/25; 12:49:23 PM by DW -- v0.8.4
 
 In getRiver2 the first param can be a string, we weren't handling that properly. 
 

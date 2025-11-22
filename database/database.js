@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.8.3";  
+var myProductName = "feedlandDatabase", myVersion = "0.8.6";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -150,7 +150,6 @@ var config = {
 	flCheckForDeleted: false, //11/20/23 by DW
 	ctRiverCutoffDays: 365, //2/7/24 by DW
 	flLogCheckFeed: true, //2/28/24 by DW
-	
 	legalTags: { //5/31/25 by DW
 		allowedTags: [
 			"p", "br"
@@ -158,6 +157,7 @@ var config = {
 		allowedAttributes: {
 			}
 		},
+	flMarkdownReplacesDescription: false, //11/18/25 by DW
 	
 	getUserOpmlSubscriptions: function (username, catname, callback) { //6/27/22 by DW
 		},
@@ -407,12 +407,16 @@ function updateSocketSubscribers (verb, jstruct, callback) {
 		return (true); //we're sending every update to every user, later we could narrow this to users who are subscribed
 		});
 	}
-function getItemGuid (item) {
+
+
+function getItemGuid (item) { //brent's algorithm -- 11/21/25 by DW
 	var guid = "";
 	function ok (val) {
 		if (val !== undefined) {
 			if (val != "null") {
-				return (true);
+				if (val.length > 0) { //11/21/25 by DW
+					return (true);
+					}
 				}
 			}
 		return (false);
@@ -421,22 +425,49 @@ function getItemGuid (item) {
 		guid = item.guid;
 		}
 	else {
-		if (ok (item.pubDate)) {
-			guid += item.pubDate;
+		if (ok (item.link) && ok (item.pubDate)) {
+			guid = item.link + item.pubDate;
 			}
-		if (ok (item.link)) {
-			guid += item.link;
-			}
-		if (ok (item.title)) {
-			guid += item.title;
+		else {
+			if (ok (item.title) && ok (item.pubDate)) {
+				guid = item.title + item.pubDate;
+				}
+			else {
+				if (ok (item.pubDate)) {
+					guid = item.pubDate;
+					}
+				else {
+					if (ok (item.link)) {
+						guid = item.link;
+						}
+					else {
+						if (ok (item.title)) {
+							guid = item.title;
+							}
+						else {
+							if (ok (item.description)) {
+								guid = item.description;
+								}
+							}
+						}
+					}
+				}
 			}
 		if (guid.length > 0) {
 			guid = md5 (guid);
 			}
 		}
-	guid = maxStringLength (guid, config.maxGuidLength);
+	if (guid.length == 0) {
+		guid = undefined;
+		}
+	else {
+		guid = maxStringLength (guid, config.maxGuidLength);
+		}
 	return (guid);
 	}
+
+
+
 function stripMarkup (s) { //9/11/22 by DW
 	if ((s === undefined) || (s == null) || (s.length == 0)) {
 		return ("");
@@ -445,21 +476,18 @@ function stripMarkup (s) { //9/11/22 by DW
 	}
 function getItemDescription (item) { //5/28/22 by DW
 	var description;
-	if (item.markdowntext === undefined) {
-		description = item.description;
-		description = stripMarkup (description); //9/11/22 by DW
-		description = utils.trimWhitespace (description);
+	if (config.flMarkdownReplacesDescription && (item.markdowntext !== undefined)) {
+		description = markdownProcess (item.markdowntext); //11/8/22 by DW
 		}
 	else {
-		description = markdownProcess (item.markdowntext); //11/8/22 by DW
+		description = item.description;
+		description = stripMarkup (description); //9/11/22 by DW -- it checks for undefined, returns empty string
+		description = utils.trimWhitespace (description);
 		}
 	return (description);
 	}
 function getItemPubdate (pubDate) { //8/26/22 by DW
-	if (pubDate === undefined) {
-		pubDate = now;
-		}
-	else {
+	if (pubDate !== undefined) { //11/18/25 by DW
 		var now = new Date ();
 		pubDate = new Date (pubDate);
 		if (pubDate > now) {
@@ -1227,6 +1255,11 @@ function logNewitem (itemRec) { //5/23/22 by DW
 	var textstring = (itemRec.title === undefined) ? utils.maxStringLength (utils.stripMarkup (itemRec.description), 50) : itemRec.title;
 	console.log (nowstring + ": " + textstring);
 	}
+
+
+
+
+
 function checkFeedItems (feedRec, theFeed, flNewFeed, callback) {
 	const feedUrl = feedRec.feedUrl;
 	const feedId = feedRec.feedId; //2/3/24 by DW
@@ -1280,17 +1313,40 @@ function checkFeedItems (feedRec, theFeed, flNewFeed, callback) {
 		isItemInDatabase (feedUrl, guid, function (flThere, dbItem) {
 			var flChanged = !flThere;
 			if (flThere) {
-				function checkChange (name, flDateType=false) {
-					if (flDateType) {
+				function checkChange (name) {
+					if (itemRec [name] != dbItem [name]) {
+						function shortText (theText) {
+							if (name == "description") {
+								return (theText.length + " chars");
+								}
+							else {
+								var s;
+								if (theText == null) {
+									s = "null";
+									}
+								else {
+									s = utils.maxStringLength (utils.stringNthField (theText, "\n", 1), 100);
+									}
+								return (s);
+								}
+							}
+						console.log ("\ncheckChange: \"" + name + "\" changed, feedUrl == " + feedUrl);
+						console.log ("new value == " + shortText (itemRec [name]) + "\nold value == " + shortText (dbItem [name]) + "\n");
+						flChanged = true;
+						}
+					}
+				function checkPubdateChange () { //11/18/25 by DW
+					return; //11/20/25 by DW -- we don't consider a change to pubDate a change to the item
+					const d1 = itemRec.pubDate, d2 = dbItem.pubDate;
+					if ((d1 == undefined) && (d2 == null)) {
+						//no change, the pubDate wasn't specified in item
+						}
+					else {
 						function convert (d) {
 							return (new Date (d).toUTCString ());
 							}
-						if (convert (itemRec [name]) != convert (dbItem [name])) {
-							flChanged = true;
-							}
-						}
-					else {
-						if (itemRec [name] != dbItem [name]) {
+						if (convert (d1) != convert (d2)) {
+							console.log ("checkPubdateChange: d1 == " + d1 + ", d2 == " + d2 + ", feedUrl == " + feedUrl);
 							flChanged = true;
 							}
 						}
@@ -1299,16 +1355,15 @@ function checkFeedItems (feedRec, theFeed, flNewFeed, callback) {
 					const json1 = itemRec [name];
 					const json2 = dbItem [name];
 					if (!jsonObjectsEqual (json1, json2)) {
+						console.log ("checkJsonChange: \"" + name + "\" changed, feedUrl == " + feedUrl);
 						flChanged = true;
 						}
 					}
-				
 				checkChange ("title");
 				checkChange ("link");
 				checkChange ("description");
-				checkChange ("pubDate", true);
-				checkChange ("enclosureUrl");
-				checkChange ("enclosureLength");
+				checkPubdateChange (); //11/18/25 by DW
+				checkChange ("enclosureUrl"); 
 				checkChange ("flDeleted"); //4/22/22 by DW
 				checkChange ("outlineJsontext"); //6/6/25 by DW
 				checkJsonChange ("metadata"); //8/22/25 by DW
@@ -1361,6 +1416,11 @@ function checkFeedItems (feedRec, theFeed, flNewFeed, callback) {
 		}
 	checkNextItem (0);
 	}
+
+
+
+
+
 function checkFeedAndItems (feedUrl, callback, flNewFeed=false) {
 	const whenstart = new Date ();
 	checkFeed (feedUrl, function (err, theFeed, feedRec) {
@@ -3895,10 +3955,6 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 					}
 				else {
 					addToRiverBuildLog (whenstart, sqltext);
-					
-					console.log ("getRiver2: " + utils.secondsSince (whenstart) + " secs.");
-					console.log ("getRiver2: sqltext == " + sqltext);
-					
 					if (callback !== undefined) {
 						let jstruct = sortRiver (convertItemList (result));
 						jstruct.metadata = metadata; //2/1/23 by DW
