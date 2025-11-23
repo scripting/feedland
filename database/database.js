@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.8.6";  
+var myProductName = "feedlandDatabase", myVersion = "0.8.8";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -70,10 +70,7 @@ exports.renewFeedNow = renewFeedNow; //10/9/22 by DW
 
 exports.getCurrentRiverBuildLog = getCurrentRiverBuildLog; //10/10/22 by DW
 exports.isFeedInRiver = isFeedInRiver; //2/1/23 by DW
-
-
 exports.getFeedlistFromOpml = getFeedlistFromOpml; //6/1/23 by DW
-
 exports.checkReadingList = checkReadingList; //10/9/23 by DW
 exports.subscribeToReadingList = subscribeToReadingList; //10/9/23 by DW
 exports.checkNextReadingListfReady = checkNextReadingListfReady; //10/10/23 by DW
@@ -82,8 +79,8 @@ exports.deleteReadingListSubscription = deleteReadingListSubscription; //10/13/2
 exports.getReadingListsInfo = getReadingListsInfo; //10/19/23 by DW
 exports.getReadingListFollowers = getReadingListFollowers; //10/28/23 by DW
 exports.checkSubsForOneUserAndOneReadingList = checkSubsForOneUserAndOneReadingList; //12/13/23 by DW
-
 exports.addMacroToPagetable = addMacroToPagetable; //12/1/23 by DW
+exports.nightlyDeleteItems = nightlyDeleteItems; //11/23/25 by DW
 
 const fs = require ("fs");
 const md5 = require ("md5");
@@ -158,6 +155,8 @@ var config = {
 			}
 		},
 	flMarkdownReplacesDescription: false, //11/18/25 by DW
+	flDeleteOldItems: false, //11/23/25 by DW
+	ctDaysToKeep: 365, //11/23/25 by DW
 	
 	getUserOpmlSubscriptions: function (username, catname, callback) { //6/27/22 by DW
 		},
@@ -407,7 +406,12 @@ function updateSocketSubscribers (verb, jstruct, callback) {
 		return (true); //we're sending every update to every user, later we could narrow this to users who are subscribed
 		});
 	}
-
+function nowstring () { //11/23/25 by DW
+	var now = new Date ();
+	var theString = now.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+	theString = utils.replaceAll  (theString, " ", "");
+	return (theString);
+	}
 
 function getItemGuid (item) { //brent's algorithm -- 11/21/25 by DW
 	var guid = "";
@@ -465,8 +469,6 @@ function getItemGuid (item) { //brent's algorithm -- 11/21/25 by DW
 		}
 	return (guid);
 	}
-
-
 
 function stripMarkup (s) { //9/11/22 by DW
 	if ((s === undefined) || (s == null) || (s.length == 0)) {
@@ -2778,6 +2780,8 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 		});
 	}
 
+
+
 //reading lists -- 10/9/23 by DW
 	function createFeedRecordForReadingList (screenname, feedUrl, callback) { //11/28/23 by DW
 		isFeedInDatabase (feedUrl, function (flInDatabase, feedRec) {
@@ -3966,6 +3970,40 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 			}
 		}
 
+
+function deleteOldItems (ctDaysCutoff, callback) { //11/23/25 by DW
+	const whenstart = new Date ();
+	const sqltext = "delete from items where datediff (now (), whenCreated) > " + davesql.encode (ctDaysCutoff);
+	davesql.runSqltext (sqltext, function (err, result) {
+		if (err) {
+			if (callback !== undefined) {
+				callback (err);
+				}
+			}
+		else {
+			if (callback !== undefined) {
+				const ctItemsDeleted = result.affectedRows;
+				callback (undefined, ctItemsDeleted);
+				}
+			}
+		});
+	}
+function nightlyDeleteItems () { //11/23/25 by DW
+	if (config.flDeleteOldItems) { //11/22/25 by DW
+		console.log (nowstring () + ": nightlyDeleteItems starting.");
+		const whenstart = new Date ();
+		deleteOldItems (config.ctDaysToKeep, function (err, ctDeleted) {
+			if (err) {
+				console.log (nowstring ()  + ": nightlyDeleteItems: err.message == " + err.message);
+				}
+			else {
+				console.log (nowstring ()  + ": nightlyDeleteItems: ctDeleted == " + ctDeleted + ", in " + utils.secondsSince (whenstart) + " secs.");
+				}
+			});
+		}
+	}
+
+
 function start (options, callback) {
 	function everySecond () {
 		if (flRiverBuildLogChanged) { //10/10/22 by DW
@@ -3991,6 +4029,5 @@ function start (options, callback) {
 	
 	setInterval (everySecond, 1000); //10/10/22 by DW
 	utils.runEveryMinute (everyMinute); //9/15/22 by DW
-	
 	
 	}

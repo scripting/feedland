@@ -1,4 +1,4 @@
-const myVersion = "0.7.12", myProductName = "feedland"; 
+const myVersion = "0.7.15", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -1480,10 +1480,13 @@ function getFeedsHaveIds (callback) { //1/31/24 by DW
 		});
 	}
 
+
+
 function everyNight () {
 	if (config.flNightlyBackup) { //3/29/23 by DW
 		database.backupDatabase (); 
 		}
+	database.nightlyDeleteItems ();  //11/22/25 by DW
 	}
 function everyMinute () {
 	}
@@ -1522,7 +1525,6 @@ function startFeedChecker () { //3/17/24 by DW
 		setInterval (database.updateNextFeedIfReady, ctmillisecs); 
 		}
 	}
-
 function start () {
 	var options = {
 		everySecond,

@@ -1,3 +1,23 @@
+#### 11/23/25; 9:02:46 AM by DW -- v0.8.8
+
+New feature, we can automatically delete items older than a certain number of days. 
+
+Two new config settings --
+
+1. flDeleteOldItems, default false
+
+2. ctDaysToKeep, default 365
+
+If it's enabled, database.nightlyDeleteItems will do the work.
+
+If config.flDeleteOldItems were set true, we'd maintain approximately one years' worth of items, if ctDaysToKeep is 365. 
+
+Note this breaks the blog feature of FeedLand, we should disable the commands in the feedlandHome. 
+
+This is a relatively slow function, it takes about a minute to run on feedland.social.
+
+I'm installing this version on feedland.org and feedland.social. If it works without problems on those systems, we'll move it to feedland.com. 
+
 #### 11/21/25; 4:28:34 PM by DW -- v0.8.6
 
 New version of getItemGuid following Brent Simmons' approach in NetNewsWire.
