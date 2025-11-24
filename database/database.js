@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.8.8";  
+var myProductName = "feedlandDatabase", myVersion = "0.8.9";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -2126,7 +2126,7 @@ function findUserWithScreenname (screenname, callback) { //9/17/22 by DW
 	const sqltext = "select * from users where screenname=" + davesql.encode (screenname) + ";";
 	davesql.runSqltext (sqltext, function (err, result) {
 		if (err) {
-			callback (false);
+			callback (false, undefined, err); //11/24/25 by DW
 			}
 		else {
 			if (result.length == 0) {
@@ -2294,23 +2294,38 @@ function getUserCategories (screenname, callback) { //9/19/22 by DW
 		});
 	}
 function getUserPrefs (screenname, callback) { //9/26/22 by DW
-	findUserWithScreenname (screenname, function (flInDatabase, userRec) {
-		if (flInDatabase) {
-			if (userRec.emailSecret !== undefined) { //12/16/22 by DW
-				delete userRec.emailSecret;
-				}
-			if (userRec.apps !== undefined) { //5/25/23 by DW
-				try {
-					userRec.apps = JSON.parse (userRec.apps);
-					}
-				catch (err) {
-					console.log ("getUserPrefs: err.message == " + err.message);
-					}
-				}
-			callback (undefined, removeNullValuesFromObject (userRec));
+	findUserWithScreenname (screenname, function (flInDatabase, userRec, err) {
+		if (err) { //11/24/25 by DW
+			err.code = 500;
+			callback (err);
 			}
 		else {
-			callback ({message: "Can't get the info because there is no user named \"" + screenname + "\"."});
+			if (flInDatabase) {
+				if (userRec.emailSecret !== undefined) { //12/16/22 by DW
+					delete userRec.emailSecret;
+					}
+				if (userRec.apps !== undefined) { //5/25/23 by DW
+					var flError = false;
+					try {
+						userRec.apps = JSON.parse (userRec.apps);
+						}
+					catch (err) {
+						let message = "Can't get user prefs because the apps object is not valid JSON.";
+						let code = 500; //internal error
+						console.log ("getUserPrefs: message == " + message);
+						flError = true;
+						callback ({code, message});
+						}
+					}
+				if (!flError) {
+					callback (undefined, removeNullValuesFromObject (userRec));
+					}
+				}
+			else {
+				let message = "Can't get the info because there is no user named \"" + screenname + "\".";
+				let code = 404;
+				callback ({code, message});
+				}
 			}
 		});
 	}

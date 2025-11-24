@@ -1,3 +1,9 @@
+#### 11/24/25; 12:27:05 PM by DW -- v0.8.9
+
+In getUserPrefs, return an error code to indicate, 404 if it wasn't found, 500 if there was an error. 
+
+In findUserWithScreenname, added a third param for the callback, the err value on the SQL query. If there was an error, we return it to the caller, with a code of 500.
+
 #### 11/23/25; 9:02:46 AM by DW -- v0.8.8
 
 New feature, we can automatically delete items older than a certain number of days. 
