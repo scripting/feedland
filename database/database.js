@@ -1132,7 +1132,7 @@ function setupNewFeedRec (feedUrl, theFeed) {
 		imageLink: getFeedMetadataLink (theFeed.imageLink),
 		imageWidth: getFeedMetadataNumber (theFeed.imageWidth),
 		imageHeight: getFeedMetadataNumber (theFeed.imageHeight),
-		imageDescription: getFeedMetadataString (theFeed.imageDescription)
+		imageDescription: getFeedMetadataString (theFeed.imageDescription),
 		};
 	return (feedRec);
 	}
@@ -1171,7 +1171,6 @@ function checkFeed (feedUrl, callback) {
 		callbackWithError ("Can't check the feed because the URL is too long, max length is " + config.maxFeedUrlLength + ".");
 		return;
 		}
-	
 	reallysimple.readFeed (feedUrl, function (err, theFeed) {
 		if (err) {
 			if (callback !== undefined) {
@@ -1257,9 +1256,6 @@ function logNewitem (itemRec) { //5/23/22 by DW
 	var textstring = (itemRec.title === undefined) ? utils.maxStringLength (utils.stripMarkup (itemRec.description), 50) : itemRec.title;
 	console.log (nowstring + ": " + textstring);
 	}
-
-
-
 
 
 function checkFeedItems (feedRec, theFeed, flNewFeed, callback) {
@@ -1418,9 +1414,6 @@ function checkFeedItems (feedRec, theFeed, flNewFeed, callback) {
 		}
 	checkNextItem (0);
 	}
-
-
-
 
 
 function checkFeedAndItems (feedUrl, callback, flNewFeed=false) {
