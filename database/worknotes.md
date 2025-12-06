@@ -1,3 +1,15 @@
+11/29/25; 10:43:14 AM by DW
+
+Wasted at least a full day because feedlanddatabase requires a specific version of reallysimple, and feedland's package.json might include a different one, esp since our normal procedure is to specify the version at the top level.
+
+I couldn't get it to work reliably because under some circumstances feedlanddatabase code would be calling an old version of reallysimple, which didn't have the new features needed for the metadata element. Which I thought was done a long time ago, because I update code differently when I'm developing. 
+
+So here's what I did, I changed the first to the second
+
+"reallysimple": "^0.5.3"
+
+"reallysimple": "*",
+
 #### 11/24/25; 12:27:05 PM by DW -- v0.8.9
 
 In getUserPrefs, return an error code to indicate, 404 if it wasn't found, 500 if there was an error. 

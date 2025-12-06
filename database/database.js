@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.8.9";  
+var myProductName = "feedlandDatabase", myVersion = "0.8.11";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -1310,6 +1310,19 @@ function checkFeedItems (feedRec, theFeed, flNewFeed, callback) {
 			};
 		isItemInDatabase (feedUrl, guid, function (flThere, dbItem) {
 			var flChanged = !flThere;
+			
+			//debugging -- 11/29/25 by DW -- debugging
+				if (feedUrl == "https://scripting4.wordpress.com/feed/") {
+					if (flThere) {
+						console.log ("checkOneItem: existing item, title == " + item.title + ", itemRec.metadata == " + itemRec.metadata);
+						console.log ("checkOneItem: existing item, theFeed.wpSiteId == " + theFeed.wpSiteId + ", item.wpPostId == " + item.wpPostId);
+						}
+					else {
+						console.log ("checkOneItem: new item, title == " + item.title + ", itemRec.metadata == " + itemRec.metadata);
+						console.log ("checkOneItem: new item, theFeed.wpSiteId == " + theFeed.wpSiteId + ", item.wpPostId == " + item.wpPostId);
+						}
+					}
+			
 			if (flThere) {
 				function checkChange (name) {
 					if (itemRec [name] != dbItem [name]) {
@@ -1329,7 +1342,7 @@ function checkFeedItems (feedRec, theFeed, flNewFeed, callback) {
 								}
 							}
 						console.log ("\ncheckChange: \"" + name + "\" changed, feedUrl == " + feedUrl);
-						console.log ("new value == " + shortText (itemRec [name]) + "\nold value == " + shortText (dbItem [name]) + "\n");
+						console.log ("new value == \"" + shortText (itemRec [name]) + "\"\nold value == \"" + shortText (dbItem [name]) + "\"\n");
 						flChanged = true;
 						}
 					}
@@ -1353,7 +1366,7 @@ function checkFeedItems (feedRec, theFeed, flNewFeed, callback) {
 					const json1 = itemRec [name];
 					const json2 = dbItem [name];
 					if (!jsonObjectsEqual (json1, json2)) {
-						console.log ("checkJsonChange: \"" + name + "\" changed, feedUrl == " + feedUrl);
+						console.log ("checkJsonChange: \"" + name + "\" changed, feedUrl == " + feedUrl + ", old value == " + json2 + ", new value == " + json1);
 						flChanged = true;
 						}
 					}

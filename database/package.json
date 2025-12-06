@@ -1,7 +1,7 @@
 {
 	"name": "feedlanddatabase",
 	"description": "FeedLand code that manages the tables for users, feeds, items, subscriptions, likes.",
-	"version": "0.8.9",
+	"version": "0.8.11",
 	"author": "Dave Winer <dave@scripting.com>",
 	"main": "database.js",
 	"license": "GPLV2",
@@ -27,7 +27,7 @@
 		"daves3": "*",
 		"nodejs-websocket": "*",
 		"davegithub": "*",
-		"reallysimple": "^0.4.26",
+		"reallysimple": "*",
 		"feedhunter": "*",
 		"xml2js": "*",
 		"opml": "*"
