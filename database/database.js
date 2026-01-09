@@ -1,4 +1,4 @@
-var myProductName = "feedlandDatabase", myVersion = "0.8.11";  
+var myProductName = "feedlandDatabase", myVersion = "0.8.14";  
 
 exports.start = start;
 exports.addSubscription = addSubscription;
@@ -81,6 +81,7 @@ exports.getReadingListFollowers = getReadingListFollowers; //10/28/23 by DW
 exports.checkSubsForOneUserAndOneReadingList = checkSubsForOneUserAndOneReadingList; //12/13/23 by DW
 exports.addMacroToPagetable = addMacroToPagetable; //12/1/23 by DW
 exports.nightlyDeleteItems = nightlyDeleteItems; //11/23/25 by DW
+exports.getRecentPosts = getRecentPosts; //12/11/25 by DW
 
 const fs = require ("fs");
 const md5 = require ("md5");
@@ -408,7 +409,7 @@ function updateSocketSubscribers (verb, jstruct, callback) {
 	}
 function nowstring () { //11/23/25 by DW
 	var now = new Date ();
-	var theString = now.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+	var theString = now.toLocaleTimeString([], {hour: "2-digit", minute: "2-digit", second: "2-digit"}); //1/9/26 -- added second param
 	theString = utils.replaceAll  (theString, " ", "");
 	return (theString);
 	}
@@ -1363,8 +1364,8 @@ function checkFeedItems (feedRec, theFeed, flNewFeed, callback) {
 						}
 					}
 				function checkJsonChange (name) { //8/22/25 by DW
-					const json1 = itemRec [name];
-					const json2 = dbItem [name];
+					const json1 = itemRec [name]; //new value
+					const json2 = dbItem [name]; //old value
 					if (!jsonObjectsEqual (json1, json2)) {
 						console.log ("checkJsonChange: \"" + name + "\" changed, feedUrl == " + feedUrl + ", old value == " + json2 + ", new value == " + json1);
 						flChanged = true;
@@ -2802,7 +2803,6 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 	}
 
 
-
 //reading lists -- 10/9/23 by DW
 	function createFeedRecordForReadingList (screenname, feedUrl, callback) { //11/28/23 by DW
 		isFeedInDatabase (feedUrl, function (flInDatabase, feedRec) {
@@ -3995,6 +3995,7 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 function deleteOldItems (ctDaysCutoff, callback) { //11/23/25 by DW
 	const whenstart = new Date ();
 	const sqltext = "delete from items where datediff (now (), whenCreated) > " + davesql.encode (ctDaysCutoff);
+	console.log ("deleteOldItems: sqltext == " + sqltext);
 	davesql.runSqltext (sqltext, function (err, result) {
 		if (err) {
 			if (callback !== undefined) {
@@ -4024,6 +4025,20 @@ function nightlyDeleteItems () { //11/23/25 by DW
 		}
 	}
 
+function getRecentPosts (feedUrl, ctPosts, callback) { //12/11/25 by DW
+	ctPosts = (ctPosts === undefined) ? 50 : ctPosts;
+	const sqltext = "select * from items where feedurl = " + davesql.encode (feedUrl) + " order by whenCreated desc limit " + ctPosts + ";";
+	console.log ("getRecentPosts: sqltext = " + sqltext);
+	davesql.runSqltext (sqltext, function (err, result) {
+		if (err) {
+			callback (err);
+			}
+		else {
+			const theList = convertItemList (result);
+			callback (undefined, theList);
+			}
+		});
+	}
 
 function start (options, callback) {
 	function everySecond () {

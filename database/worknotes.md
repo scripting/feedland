@@ -1,3 +1,17 @@
+#### 1/8/26; 5:25:52 PM by DW
+
+i spent about a day rewriting the nightly delete items function, which hasn't been working on feedland.com, and I need to stay on WordLand. It's quite a bit more complex than I thought. So I reverted to the original version, left the old code in here but commented out. But along the way I created a new index, which I think may improve performance in the product in other places.
+
+* `create index itemCreated on items (whenCreated);`
+
+#### 1/6/26; 4:59:58 PM by DW
+
+We're having some trouble debugging the deleteOldItems function, so I added a debugging code that also displays the sql query that does the deleting. 
+
+#### 12/11/25; 12:31:38 PM by DW
+
+Added getRecentPosts.
+
 #### 11/29/25; 10:43:14 AM by DW
 
 Wasted at least a full day because feedlanddatabase requires a specific version of reallysimple, and feedland's package.json might include a different one, esp since our normal procedure is to specify the version at the top level.

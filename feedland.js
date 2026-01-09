@@ -1,4 +1,4 @@
-const myVersion = "0.7.18", myProductName = "feedland"; 
+const myVersion = "0.7.20", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -1417,9 +1417,11 @@ function handleHttpRequest (theRequest) {
 						database.checkSubsForOneUserAndOneReadingList (screenname, params.url, httpReturn);
 						});
 					return (true);
-				
 				case "/getuserinfowithwordpresstoken": //3/23/24 by DW
 					getUserInfoWithWordpressToken (params.token, httpReturn);
+					return (true);
+				case "/getrecentposts": //12/11/25 by DW
+					database.getRecentPosts (params.url, params.maxcount, httpReturn);
 					return (true);
 				
 				case config.rssCloud.feedUpdatedCallback: //12/12/22 by DW
