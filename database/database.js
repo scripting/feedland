@@ -82,6 +82,7 @@ exports.checkSubsForOneUserAndOneReadingList = checkSubsForOneUserAndOneReadingL
 exports.addMacroToPagetable = addMacroToPagetable; //12/1/23 by DW
 exports.nightlyDeleteItems = nightlyDeleteItems; //11/23/25 by DW
 exports.getRecentPosts = getRecentPosts; //12/11/25 by DW
+exports.getItemFromFeed = getItemFromFeed; //2/19/26 by DW
 
 const fs = require ("fs");
 const md5 = require ("md5");
@@ -158,6 +159,8 @@ var config = {
 	flMarkdownReplacesDescription: false, //11/18/25 by DW
 	flDeleteOldItems: false, //11/23/25 by DW
 	ctDaysToKeep: 365, //11/23/25 by DW
+	
+	maxConcurrentFeedChecks: 10, //5/7/26 by DW
 	
 	getUserOpmlSubscriptions: function (username, catname, callback) { //6/27/22 by DW
 		},
@@ -1312,17 +1315,6 @@ function checkFeedItems (feedRec, theFeed, flNewFeed, callback) {
 		isItemInDatabase (feedUrl, guid, function (flThere, dbItem) {
 			var flChanged = !flThere;
 			
-			//debugging -- 11/29/25 by DW -- debugging
-				if (feedUrl == "https://scripting4.wordpress.com/feed/") {
-					if (flThere) {
-						console.log ("checkOneItem: existing item, title == " + item.title + ", itemRec.metadata == " + itemRec.metadata);
-						console.log ("checkOneItem: existing item, theFeed.wpSiteId == " + theFeed.wpSiteId + ", item.wpPostId == " + item.wpPostId);
-						}
-					else {
-						console.log ("checkOneItem: new item, title == " + item.title + ", itemRec.metadata == " + itemRec.metadata);
-						console.log ("checkOneItem: new item, theFeed.wpSiteId == " + theFeed.wpSiteId + ", item.wpPostId == " + item.wpPostId);
-						}
-					}
 			
 			if (flThere) {
 				function checkChange (name) {
@@ -1342,8 +1334,6 @@ function checkFeedItems (feedRec, theFeed, flNewFeed, callback) {
 								return (s);
 								}
 							}
-						console.log ("\ncheckChange: \"" + name + "\" changed, feedUrl == " + feedUrl);
-						console.log ("new value == \"" + shortText (itemRec [name]) + "\"\nold value == \"" + shortText (dbItem [name]) + "\"\n");
 						flChanged = true;
 						}
 					}
@@ -1367,7 +1357,6 @@ function checkFeedItems (feedRec, theFeed, flNewFeed, callback) {
 					const json1 = itemRec [name]; //new value
 					const json2 = dbItem [name]; //old value
 					if (!jsonObjectsEqual (json1, json2)) {
-						console.log ("checkJsonChange: \"" + name + "\" changed, feedUrl == " + feedUrl + ", old value == " + json2 + ", new value == " + json1);
 						flChanged = true;
 						}
 					}
@@ -2116,7 +2105,7 @@ function getHotlistOpml (callback) { //7/26/22 by DW
 	}
 function getFeedSearch (theSearchString, callback) { //12/26/22 by DW
 	const pattern = davesql.encode ("%" + theSearchString + "%");
-	const sqltext = "select " + getStandardFeedElements () + " from subscriptions as s, feeds as f where s.feedUrl = f.feedUrl and f.title like + " + pattern + " group by feedUrl order by ct desc limit 100;";
+	const sqltext = "select " + getStandardFeedElements () + " from subscriptions as s, feeds as f where s.feedUrl = f.feedUrl and f.title like " + pattern + " group by feedUrl order by ct desc limit 100;";
 	davesql.runSqltext (sqltext, function (err, result) {
 		if (err) {
 			callback (err);
@@ -3369,18 +3358,32 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 	function checkReadingList (opmlUrl, callback) { //10/8/23 by DW
 		myConsoleLog ("checkReadingList: opmlUrl == " + opmlUrl + ", hello");
 		function addFeedsIfNecessary (urlsToCheck, callback) {
-			function doNextUrl (ix) {
-				if (ix < urlsToCheck.length) {
-					myConsoleLog ("addFeedsIfNecessary: urlsToCheck [ix] == " + urlsToCheck [ix]);
-					addFeedIfNecessary (urlsToCheck [ix], function (err) { //6/28/24 by DW
-						doNextUrl (ix + 1);
-						});
+			var ixNext = 0, ctInFlight = 0, ctDone = 0;
+			const maxConcurrent = config.maxConcurrentFeedChecks;
+			const ctTotalFeeds = urlsToCheck.length;
+			if (ctTotalFeeds > 0) {
+				function startMore () {
+					while ((ctInFlight < maxConcurrent) && (ixNext < ctTotalFeeds)) {
+						const ix = ixNext++;
+						ctInFlight++;
+						myConsoleLog ("addFeedsIfNecessary: urlsToCheck [ix] == " + urlsToCheck [ix]);
+						addFeedIfNecessary (urlsToCheck [ix], function (err) { //6/28/24 by DW
+							ctInFlight--;
+							ctDone++;
+							if (ctDone === ctTotalFeeds) {
+								callback ();
+								}
+							else {
+								startMore ();
+								}
+							});
+						}
 					}
-				else {
-					callback ();
-					}
+				startMore ();
 				}
-			doNextUrl (0);
+			else {
+				callback ();
+				}
 			}
 		function getTwoArrays (callback) {
 			getReadingList (opmlUrl, function (err, listRec) {
@@ -3991,7 +3994,6 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 			}
 		}
 
-
 function deleteOldItems (ctDaysCutoff, callback) { //11/23/25 by DW
 	const whenstart = new Date ();
 	const sqltext = "delete from items where datediff (now (), whenCreated) > " + davesql.encode (ctDaysCutoff);
@@ -4036,6 +4038,23 @@ function getRecentPosts (feedUrl, ctPosts, callback) { //12/11/25 by DW
 		else {
 			const theList = convertItemList (result);
 			callback (undefined, theList);
+			}
+		});
+	}
+function getItemFromFeed (feedUrl, guid, callback) { //2/19/26 by DW
+	const sqltext = "select * from items where feedUrl = " + davesql.encode (feedUrl) + " and guid = " + davesql.encode (guid) + " and flDeleted = 0 limit 1";
+	davesql.runSqltext (sqltext, function (err, result) {
+		if (err) {
+			callback (err);
+			}
+		else {
+			if (result.length == 0) {
+				const message = "Can't find an item in that feed with that guid value.";
+				callback ({message});
+				}
+			else {
+				callback (undefined, convertDatabaseItem (result [0]));
+				}
 			}
 		});
 	}

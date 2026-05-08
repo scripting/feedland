@@ -1,3 +1,13 @@
+#### 5/7/26; 9:29:48 AM by DW
+
+Started working with Claude Code on FeedLand. 
+
+Rewrote the code that reads all the feeds in an OPML reading list.  See addFeedsIfNecessary.
+
+#### 2/19/26; 8:54:41 AM by DW
+
+New function getItemFromFeed, takes a feedUrl and guid, and returns the item record if there is a match. 
+
 #### 1/8/26; 5:25:52 PM by DW
 
 i spent about a day rewriting the nightly delete items function, which hasn't been working on feedland.com, and I need to stay on WordLand. It's quite a bit more complex than I thought. So I reverted to the original version, left the old code in here but commented out. But along the way I created a new index, which I think may improve performance in the product in other places.

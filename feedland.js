@@ -1424,6 +1424,10 @@ function handleHttpRequest (theRequest) {
 					database.getRecentPosts (params.url, params.maxcount, httpReturn);
 					return (true);
 				
+				case "/getitemfromfeed": //2/19/26 by DW
+					database.getItemFromFeed (params.url, params.guid, httpReturn);
+					return (true); 
+				
 				case config.rssCloud.feedUpdatedCallback: //12/12/22 by DW
 					returnPlainText (params.challenge);
 					return (true); 
@@ -1438,7 +1442,15 @@ function handleHttpRequest (theRequest) {
 
 function logSqlCalls (options) { //9/21/23 by DW
 	const now = new Date ();
-	if (!options.err) { //errors are logged elsewhere, we're looking for performance problems
+	if (options.err !== undefined) { //3/4/26 by DW
+		if (utils.stringContains (options.err.message, "ER_MALFORMED_GTID_SET_SPECIFICATION")) {
+			console.log ();
+			console.log ("logSqlCalls: " + now.toLocaleTimeString () + ", ctsecs == " + options.ctsecs + ".");
+			console.log ("\nlogSqlCalls: sqltext == " + options.sqltext);
+			console.log ();
+			}
+		}
+	else {
 		var flLog = false;
 		if (options.ctsecs >= config.logMinSecs) {
 			flLog = true;
@@ -1457,6 +1469,7 @@ function logSqlCalls (options) { //9/21/23 by DW
 			console.log ();
 			}
 		}
+	
 	}
 function getMysqlVersion (callback) { //11/18/23 by DW
 	const sqltext = "select version () as version;";
