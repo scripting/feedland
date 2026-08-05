@@ -1,4 +1,4 @@
-const myVersion = "0.7.20", myProductName = "feedland"; 
+const myVersion = "0.7.24", myProductName = "feedland"; 
 
 exports.start = start; //1/18/23 by DW
 
@@ -74,7 +74,7 @@ var config = {
 	flWordPressIdentityDefault: false, //11/13/23 by DW
 	flIncludeImageMetadata: false, //12/1/23 by DW
 	flFeedsHaveIds: undefined, //1/31/24 by DW
-	httpRequestTimeoutSecs: 1, //2/26/24 by DW
+	httpRequestTimeoutSecs: 30, //6/7/26 by DW
 	flCanUseFeedIds: false, //2/26/24 by DW & 3/4/24 by DW
 	
 	urlImageForMetadata: "http://scripting.com/images/2022/10/20/someoneElsesFeedList.png",
@@ -1014,13 +1014,25 @@ function getRssCloudOptions () {
 	options.websocketPort = (appconfig.flWebsocketEnabled) ? appconfig.websocketPort : undefined;
 	return (options);
 	}
-function handleRssCloudPing (feedUrl, callback) { //8/18/23 by DW
-	console.log ("\nhandleRssCloudPing: feedUrl == " + feedUrl + "\n");
-	database.checkOneFeed (feedUrl, function (err, data) {
-		if (err) { //11/20/23 by DW
-			console.log ("\nhandleRssCloudPing: err.message == " + err.message + "\n");
+function handleRssCloudPing (theUrl, callback) { //8/18/23 by DW
+	console.log ("\nhandleRssCloudPing: theUrl == " + theUrl + "\n");
+	database.getReadingList (theUrl, function (err, listRec) {
+		if ((err !== undefined) || (listRec === undefined)) { //not a reading list -- a feed, the usual case
+			database.checkOneFeed (theUrl, function (err, data) {
+				if (err) { //11/20/23 by DW
+					console.log ("\nhandleRssCloudPing: err.message == " + err.message + "\n");
+					}
+				callback ("Thanks for the update! ;-)");
+				});
 			}
-		callback ("Thanks for the update! ;-)");
+		else { //it's a reading list -- read it right now
+			database.checkReadingList (theUrl, function (err, data) {
+				if (err) {
+					console.log ("\nhandleRssCloudPing: err.message == " + err.message + "\n");
+					}
+				callback ("Thanks for the update! ;-)");
+				});
+			}
 		});
 	}
 function getServerConfig (screenname) { //5/8/23 by DW
@@ -1510,6 +1522,7 @@ function everySecond () {
 	if (config.flRenewSubscriptions) { //10/29/22 by DW
 		if (utils.secondsSince (whenLastCloudRenew) >= config.rssCloud.minSecsBetwRenews)  { //10/9/22 by DW
 			database.renewNextSubscriptionIfReady (getRssCloudOptions ());
+			database.renewNextReadingListIfReady (getRssCloudOptions ()); //8/1/26 by CC -- reading lists renew on the same tick
 			whenLastCloudRenew = now;
 			}
 		}
@@ -1564,7 +1577,7 @@ function start () {
 			appConfig.getStaticFile = getStaticFileInSql;
 			appConfig.publishStaticFile = publishStaticFileInSql;
 			}
-		reallysimple.setConfig ({timeOutSecs: config.httpRequestTimeoutSecs}); //2/26/24 by DW
+		reallysimple.setConfig ({timeOutSecs: config.httpRequestTimeoutSecs}); //2/26/24 by DW & 6/7/26 by DW
 		blog.start (config, function () {
 			config.database.logCallback = logSqlCalls; //9/21/23 by DW
 			davesql.start (config.database, function () {

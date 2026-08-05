@@ -1,7 +1,7 @@
 {
 	"name": "feedlanddatabase",
 	"description": "FeedLand code that manages the tables for users, feeds, items, subscriptions, likes.",
-	"version": "0.8.14",
+	"version": "0.9.3",
 	"author": "Dave Winer <dave@scripting.com>",
 	"main": "database.js",
 	"license": "GPLV2",
@@ -15,7 +15,7 @@
 		"url": "https://github.com/scripting/feedland/tree/main/database"
 		},
 	"peerDependencies": {
-		"davesql": "^0.6.0"
+		"davesql": "^0.7.1"
 		},
 	"dependencies" : {
 		"request": "*",

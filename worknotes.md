@@ -1,3 +1,13 @@
+#### 6/7/26; 8:38:46 PM by DW -- 0.7.21
+
+config.httpRequestTimeoutSecs was a problem because when we try to subscribe to a feed that is relatively slow at the time you want to subscribe, we fail, and then proceed to try out a bunch of other files that might be a feed in the same location, when all we needed to do was be more patient. 
+
+so i'm changing the value of config.httpRequestTimeoutSecs from 1 to 30.
+
+I didn't explain the context of this change in the note for 2/26/24, perhaps we're going to find out now
+
+but if it's slow at reading the feed while we're doing a feed check, that should just hold up its thread, other checks will continue without being blocked.
+
 #### 3/4/26; 1:53:41 PM by DW
 
 In logSqlCalls, there's a specific error we want more info for, part of what appears to be a DDOS attack. I added some extra code that watches for this. It can be removed once we get past this. 

@@ -1,3 +1,37 @@
+#### 8/1/26; 5:32:13 PM by CC -- v0.9.1
+
+rssCloud support for reading lists. When a list's OPML announces a cloud server in its head, we register to be notified when the list changes, and read it the moment the ping arrives, instead of waiting for the next poll.
+
+New function renewNextReadingListIfReady, a mirror of renewNextSubscriptionIfReady working from the readinglists table. Exported, along with getReadingList, which the ping handler in feedland.js needs to tell lists from feeds.
+
+updateReadingListMetadata now stores the list's source:cloud value in urlCloudServer.
+
+Three new columns on the readinglists table: urlCloudServer, whenLastCloudRenew, ctCloudRenews.
+
+#### 8/1/26; 4:35:44 PM by DW -- v0.9.0
+
+addFeedIfNecessary now calls checkFeedAndItems instead of reading the feed and saving only the feed record. Before this, a feed added by the reading-list checker was created without its items -- it sat empty in blogrolls until the background feed checker's rotation reached it, up to an hour on a server with a few hundred feeds. Since the add path had already downloaded and parsed the feed, it now stores the items too, so a newly added feed arrives with its posts. Passes flNewFeed=true, the existing convention for initial imports, so the per-item websocket updates are skipped.
+
+#### 6/3/26; 12:52:32 PM by DW
+
+We were going to have rss.network use feedland's likes system, but that can't work because it requires a user have a feedland id, and they are not required to have one. 
+
+I left getItemFromDatabaseWithGuid in the code but commented it out.
+
+#### 5/15/26; 2:45:53 PM by DW -- v0.8.16
+
+In getUrlCloudServer, if the communication is over https, use https. 
+
+#### 5/12/26; 10:35:17 AM by DW
+
+We didn't always have numeric id's -- they are faster than string comparisons, so we use them. The sqltext in four functions changed. Claude has a tech note for this change, to be made part of feedlandInstall.
+
+Reverted changes when it broke feedland.social pretty badly. Need to rethink how this work goes! ;-)
+
+#### 5/8/26; 4:47:43 PM by DW -- v0.8.14
+
+Doing a further optimization of getRiver2. Will be documented. 
+
 #### 5/7/26; 9:29:48 AM by DW
 
 Started working with Claude Code on FeedLand. 

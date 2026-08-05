@@ -1,6 +1,6 @@
-var myProductName = "feedlandDatabase", myVersion = "0.8.14";  
+var myProductName = "feedlandDatabase", myVersion = "0.9.3";  
 
-exports.start = start;
+exports.start = start; 
 exports.addSubscription = addSubscription;
 exports.deleteSubscription = deleteSubscription;
 exports.getUserSubcriptions = getUserSubcriptions;
@@ -84,6 +84,9 @@ exports.nightlyDeleteItems = nightlyDeleteItems; //11/23/25 by DW
 exports.getRecentPosts = getRecentPosts; //12/11/25 by DW
 exports.getItemFromFeed = getItemFromFeed; //2/19/26 by DW
 
+exports.renewNextReadingListIfReady = renewNextReadingListIfReady; //8/1/26 by CC
+exports.getReadingList = getReadingList; //8/1/26 by CC
+
 const fs = require ("fs");
 const md5 = require ("md5");
 const marked = require ("marked"); //8/25/22 by DW
@@ -161,6 +164,7 @@ var config = {
 	ctDaysToKeep: 365, //11/23/25 by DW
 	
 	maxConcurrentFeedChecks: 10, //5/7/26 by DW
+	minFeedsForForceIndex: 50, //5/8/26 by DW
 	
 	getUserOpmlSubscriptions: function (username, catname, callback) { //6/27/22 by DW
 		},
@@ -1047,7 +1051,8 @@ function setupNewFeedRec (feedUrl, theFeed) {
 		var url = undefined;
 		if (theFeed.cloudUrl === undefined) {
 			if ((theFeed.cloud !== undefined) && (theFeed.cloud.type == "rsscloud")) {
-				url = "http://" + theFeed.cloud.domain + ":" + theFeed.cloud.port + theFeed.cloud.path;
+				const theScheme = ((Number (theFeed.cloud.port) === 443) || (theFeed.cloud.protocol === "https-post")) ? "https://" : "http://"; //8/5/26 by DW
+				url = theScheme + theFeed.cloud.domain + ":" + theFeed.cloud.port + theFeed.cloud.path;
 				}
 			}
 		else { //11/28/23 by DW -- use the value provided by source:cloud element
@@ -1147,15 +1152,7 @@ function addFeedIfNecessary (feedUrl, callback) { //6/27/24 by DW
 			callback (undefined);
 			}
 		else {
-			reallysimple.readFeed (feedUrl, function (err, theFeed) {
-				if (err) {
-					callback (err);
-					}
-				else {
-					var feedRec = setupNewFeedRec (feedUrl, theFeed); 
-					saveFeed (feedRec, callback);
-					}
-				});
+			checkFeedAndItems (feedUrl, callback, true);
 			}
 		});
 	}
@@ -2728,6 +2725,37 @@ function renewNextSubscriptionIfReady (options) { //rssCloud support
 			}
 		}
 	}
+function renewNextReadingListIfReady (options) { //rssCloud support for reading lists -- 8/1/26 by CC
+	if (options.enabled && options.flRequestNotify) {
+		if (options.port !== undefined) { //http is enabled
+			var sqltext = "select * from readinglists where urlCloudServer != '' order by whenLastCloudRenew asc limit 1;"; 
+			davesql.runSqltext (sqltext, function (err, result) {
+				if (err) {
+					console.log ("renewNextReadingListIfReady: err.message == " + err.message);
+					}
+				else {
+					if (result.length > 0) { 
+						var listRec = result [0];
+						if (utils.secondsSince (listRec.whenLastCloudRenew) > options.ctSecsBetwRenews) { //ready to be renewed
+							rssCloudRenew (listRec.urlCloudServer, options.port, options.feedUpdatedCallback, listRec.opmlUrl, options.domain, function (err, data) {
+								if (err) {
+									console.log ("renewNextReadingListIfReady: err.message == " + err.message + ", listRec.opmlUrl == " + listRec.opmlUrl);
+									}
+								else {
+									console.log ("renewNextReadingListIfReady: listRec.opmlUrl == " + listRec.opmlUrl);
+									}
+								listRec.whenLastCloudRenew = new Date ();
+								listRec.ctCloudRenews++;
+								saveReadingList (listRec, function () {
+									});
+								});
+							}
+						}
+					}
+				});
+			}
+		}
+	}
 function renewFeedNow (feedUrl, options, callback) { //rssCloud support
 	isFeedInDatabase (feedUrl, function (flInDatabase, feedRec) {
 		if (flInDatabase) {
@@ -3472,7 +3500,12 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 					if (theOutline.opml.head !== undefined) {
 						const title = theOutline.opml.head.title;
 						const description = theOutline.opml.head.description;
-						const sqltext = "update readinglists set title = " + davesql.encode (title) + ", description = " + davesql.encode (description) + " where opmlUrl = " + davesql.encode (opmlUrl); 
+						
+						var urlCloudServer = theOutline.opml.head ["source:cloud"]; //8/1/26 by CC
+						if (urlCloudServer === undefined) {
+							urlCloudServer = "";
+							}
+						const sqltext = "update readinglists set title = " + davesql.encode (title) + ", description = " + davesql.encode (description) + ", urlCloudServer = " + davesql.encode (urlCloudServer) + " where opmlUrl = " + davesql.encode (opmlUrl); 
 						davesql.runSqltext (sqltext, function (err, result) {
 							if (err) {
 								callback (err);
@@ -3878,6 +3911,8 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 	
 	function getRiver2 (feedUrl, screenname, callback, metadata=undefined) {
 		const whenstart = new Date ();
+		var sizeUrlList = undefined; //5/8/26 by DW
+		
 		function sortRiver (theFlatArray) {
 			var titles = new Object (), ctDuplicatesSkipped = 0;
 			var theRiver = {
@@ -3925,6 +3960,7 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 		
 		function getSqlForListofUrls (urlList) { //10/24/25 by DW
 			urlList = removeArrayDuplicates (urlList); 
+			sizeUrlList = urlList.length; //5/8/26 by DW -- for debugging
 			const firstUrlInList = davesql.encode (urlList [0]);
 			var restOfList = "";
 			for (var i = 1; i < urlList.length; i++) {
@@ -3932,7 +3968,9 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 				}
 			sqltext = `
 				SELECT i.*
-				FROM items i FORCE INDEX (itemsIndex2)
+				
+				FROM items i ${urlList.length >= config.minFeedsForForceIndex ? "FORCE INDEX (itemsIndex2)" : ""}
+				
 				JOIN (
 					SELECT ${firstUrlInList} AS feedUrl
 					${restOfList}
@@ -3983,6 +4021,11 @@ function processSubscriptionList (screenname, theList, flDeleteEnabled=true, cal
 					}
 				else {
 					addToRiverBuildLog (whenstart, sqltext);
+					
+					if (sizeUrlList !== undefined) { //5/8/26 by DW
+						console.log ("getRiver2: " + utils.secondsSince (whenstart) + " secs, " + sizeUrlList + " urls in the feed list.");
+						}
+					
 					if (callback !== undefined) {
 						let jstruct = sortRiver (convertItemList (result));
 						jstruct.metadata = metadata; //2/1/23 by DW
